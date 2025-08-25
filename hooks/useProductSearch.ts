@@ -9,9 +9,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { apiClient } from '@/utils/api';
 import type { 
   Product, 
-  ProductSearchQuery, 
-  ProductSortOrder,
-  PriceInfo 
+  ProductSearchQuery
 } from '@/types/product';
 
 type LoadingState = 'idle' | 'loading' | 'succeeded' | 'failed';
