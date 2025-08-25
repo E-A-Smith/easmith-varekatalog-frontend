@@ -149,6 +149,7 @@ export { Table } from './Table';
 ## 🔗 AWS Amplify Deployment
 
 **Configuration**: `amplify.yml` for frontend-only deployment
+- **Node.js Version**: 20+ (required - Node.js 18 support ends Sep 15, 2025)
 - **Auto-deploy branch**: `develop` → https://develop.d23xt6r6u1pris.amplifyapp.com/
 - **Build artifacts**: `.next/` directory
 - **Security headers**: CSP, HSTS configured in `next.config.ts`
