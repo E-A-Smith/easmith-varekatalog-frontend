@@ -236,7 +236,8 @@ wide: 1920px+          /* Maximum productivity layout */
 ## 🔗 AWS Amplify Deployment
 
 **Configuration**: `amplify.yml` for frontend-only deployment
-- **Node.js Version**: 22 LTS (current LTS - Node.js 18 support ends Sep 15, 2025)
+- **Node.js Version**: 20 LTS (AWS Amplify compatibility - Node.js 22 not yet supported)
+- **Local Development**: Node.js 22 LTS supported for local development
 - **Auto-deploy branch**: `develop` → https://develop.d23xt6r6u1pris.amplifyapp.com/
 - **Build artifacts**: `.next/` directory
 - **Security headers**: CSP, HSTS configured in `next.config.ts`
