@@ -13,8 +13,6 @@ applications:
             - echo 'Build completed successfully'
             - ls -la .next/
             - find .next -name "*manifest*" | head -5
-            - ls -la .amplify-hosting/
-            - cp -r .amplify-hosting .next/
       artifacts:
         baseDirectory: .next
         files:

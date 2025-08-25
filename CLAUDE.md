@@ -1,58 +1,98 @@
-# CLAUDE.md - Varekatalog Frontend Developer Quick Reference
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 **Easmith Varekatalog Frontend** - Next.js 15+ TypeScript application for Byggern retail chain's digital product catalog.
 
-## 📋 Repository Structure
+## 📋 Repository Context
 
 This is a **standalone frontend repository** extracted from the main varekatalog monorepo at `/home/rydesp/dev/varekatalog/`.
 
 **Original Location**: `/home/rydesp/dev/varekatalog/src/frontend/`  
 **New Location**: `/home/rydesp/dev/easmith-varekatalog-frontend/` (this repository)
 
-## 🚀 Development Essentials
-
-**Live Environment:**
-- DEV: https://develop.d23xt6r6u1pris.amplifyapp.com/
-- Branch: develop (auto-deploy enabled via AWS Amplify)
-
-**Documentation References:**
-- **🏗️ SYSTEM ARCHITECTURE**: See main repo `/docs/architecture/varekatalog-system-architecture.md`
-- **📋 BUSINESS REQUIREMENTS**: See main repo `/docs/project/product-manager-output.md` 
-- **🎨 DESIGN SYSTEM**: See main repo `/docs/design/` - UI/UX specifications, brand guidelines, component designs
-
-## ⚡ Quick Commands
+## 🚀 Development Commands
 
 ```bash
-npm run dev         # Development server
+# Essential commands
+npm run dev         # Development server (Next.js 15)
 npm run build       # Production build
 npm run start       # Start production server
-npm run type-check  # TypeScript validation
+npm run type-check  # TypeScript validation (strict mode)
 npm run lint        # ESLint check
-npm run test        # Run tests (Jest + React Testing Library)
 
-# Build validation script
-./scripts/validate-build.sh           # Full validation
-./scripts/validate-build.sh --help    # See all options
+# Testing (Jest + React Testing Library)
+npm test            # Run all tests
+npm test -- --watch # Run tests in watch mode
+npm test ComponentName.test.tsx  # Run specific test
+
+# Build validation
+./scripts/validate-build.sh           # Full validation pipeline
+./scripts/validate-build.sh --help    # See validation options
+./scripts/validate-build.sh --skip-build --skip-security  # Quick validation
+
+# Development utilities
+tree -I 'node_modules|.next|.git' -L 3  # Repository overview
 ```
 
-## 🔧 Critical Configuration
+## 🏗️ Architecture Overview
 
-**PostCSS Config (EXACT):**
+**Tech Stack**: Next.js 15 + React 19 + TypeScript 5 + Tailwind CSS v4 + SWR + Zustand
+
+**Core Architecture Pattern**:
+```
+app/                    # Next.js App Router (Norwegian locale)
+├── api/               # API routes (/health, /search)
+├── layout.tsx         # Root layout with fonts (Inter + JetBrains Mono)
+└── page.tsx          # Main search interface
+
+components/            # Atomic design pattern
+├── ui/               # Base design system components
+├── layout/           # Layout components (Header, SubHeader, AppLayout)
+└── search/           # Search-specific components
+
+hooks/                # Custom React hooks
+├── useProductSearch.ts  # Main search logic with API fallback
+└── useApiStatus.ts     # API health monitoring
+
+types/                # TypeScript definitions
+├── product.ts        # Complete product data model (Norwegian)
+└── index.ts          # Type exports
+
+utils/                # Utilities
+└── api.ts            # API client with error handling
+```
+
+**State Management**: 
+- **SWR** for API data fetching and caching
+- **Zustand** for global state (when needed)
+- **React hooks** for component-local state
+
+**API Integration**:
+- `utils/api.ts` provides `SimpleApiClient` with timeout handling
+- Mock data fallback in `useProductSearch` hook when API unavailable
+- Environment variables: `NEXT_PUBLIC_API_ENDPOINT`, `NEXT_PUBLIC_REGION`
+
+## 🔧 Critical Configuration Requirements
+
+**PostCSS (EXACT - Required for Tailwind v4)**:
 ```javascript
 // postcss.config.mjs
 const config = { plugins: ["@tailwindcss/postcss"] };
 ```
 
-**TypeScript Strict (REQUIRED):**
+**TypeScript (Ultra-Strict)**:
 ```json
 {
   "strict": true,
   "exactOptionalPropertyTypes": true,
-  "noUncheckedIndexedAccess": true
+  "noUncheckedIndexedAccess": true,
+  "noImplicitReturns": true,
+  "noFallthroughCasesInSwitch": true
 }
 ```
 
-**Path Aliases:**
+**Path Aliases** (configured in tsconfig.json and jest.config.js):
 ```typescript
 @/*           -> ./*
 @/components  -> ./components
@@ -62,18 +102,19 @@ const config = { plugins: ["@tailwindcss/postcss"] };
 ```
 
 ## 🚨 FORBIDDEN Practices
-- ❌ `any` types (use proper TypeScript)
-- ❌ Inline styles (use Tailwind classes)
+- ❌ `any` types (strict TypeScript enforced)
+- ❌ Inline styles (use Tailwind classes only)
 - ❌ Components over 200 lines
 - ❌ --turbopack flag (incompatible with Tailwind v4)
-- ❌ console.log in production
+- ❌ console.log in production (removed by Next.js compiler)
 
 ## ✅ MANDATORY Practices
-- ✅ TypeScript strict mode
-- ✅ Export barrel files
-- ✅ Error boundaries
-- ✅ Norwegian language support
-- ✅ Semantic HTML + ARIA
+- ✅ TypeScript strict mode with ultra-strict settings
+- ✅ Component folder structure with barrel exports
+- ✅ Norwegian language support (`lang="no"`)
+- ✅ Tests for all components (Jest + React Testing Library)
+- ✅ Error boundaries and proper error handling
+- ✅ Semantic HTML with ARIA attributes
 
 ## 📁 Component Structure (MANDATORY)
 
@@ -81,52 +122,70 @@ const config = { plugins: ["@tailwindcss/postcss"] };
 ComponentName/
 ├── ComponentName.tsx      # Main implementation
 ├── ComponentName.test.tsx # Tests (required)
-├── types.ts              # Component types
+├── types.ts              # Component-specific types
 └── index.ts              # Export barrel
 ```
 
-## 📚 Essential File References
+**Example barrel export** (`components/ui/index.ts`):
+```typescript
+export { Button } from './Button';
+export { Input } from './Input';
+export { Table } from './Table';
+// etc.
+```
 
-**Configuration Files:**
-- `/package.json` - Dependencies and scripts
-- `/tsconfig.json` - TypeScript configuration  
-- `/next.config.ts` - Next.js configuration
-- `/amplify.yml` - AWS deployment pipeline
-- `/jest.config.js` - Test configuration
-- `/setupTests.ts` - Jest setup
+## 🎯 Product Domain Knowledge
 
-**Key Implementation Files:**
-- `/utils/api.ts` - API utilities
-- `/components/ui/` - Design system components
-- `/types/` - TypeScript definitions
-- `/hooks/` - React hooks
+**Core Entity**: Norwegian building supplies product catalog
+- **VVS-nummer**: 8-digit product codes (primary identifier)
+- **Anbrekk**: Partial quantity availability ("Ja"/"Nei")
+- **LagerStatus**: Stock levels in Norwegian ("På lager", "Få igjen", etc.)
+- **Categories**: Building supplies categories (Sikkerhet, Beslag, Festing, etc.)
 
-## 🎯 Quick Context
+**Search Performance Goal**: <2 second response time for store staff during customer interactions
 
-**Product Goal**: Lightning-fast product lookup for store staff during customer interactions (<2 sec response)
+**API Fallback Strategy**: `useProductSearch` hook includes mock Norwegian product data when API unavailable
 
-**Current Status**: ✅ Phase 1 Complete - Standalone repository ready for independent deployment
+## 🔗 AWS Amplify Deployment
 
-**Emergency Protocol**: Production fixes via hotfix branch from main + full test suite + AWS Amplify deployment
+**Configuration**: `amplify.yml` for frontend-only deployment
+- **Auto-deploy branch**: `develop` → https://develop.d23xt6r6u1pris.amplifyapp.com/
+- **Build artifacts**: `.next/` directory
+- **Security headers**: CSP, HSTS configured in `next.config.ts`
 
-## 🔗 Related Repositories
+**Environment Variables** (set in Amplify Console):
+```
+NEXT_PUBLIC_API_ENDPOINT=https://api-dev.varekatalog.byggern.no
+NEXT_PUBLIC_REGION=eu-west-1
+```
 
-**Main Backend Repository**: `/home/rydesp/dev/varekatalog/`
-- Infrastructure (CloudFormation/AWS SAM)
-- Lambda functions
-- Documentation
-- AWS configurations
+## 🧪 Testing Strategy
 
-## 🚀 AWS Amplify Deployment
+**Test Setup**: `setupTests.ts` + `jest.config.js` with Next.js integration
+```bash
+# Test patterns
+npm test                    # All tests
+npm test Header             # Component tests
+npm test -- --coverage     # Coverage report
+```
 
-**Build Configuration**: `amplify.yml`
-- Frontend-only deployment (no appRoot needed)
-- Automatic builds on push to `develop`
-- Built artifacts in `.next/` directory
+**Test Requirements**: Every component must have corresponding `.test.tsx` file
 
-**Environment Variables** (configure in Amplify Console):
-- `NEXT_PUBLIC_API_ENDPOINT` - Backend API endpoint
-- `NEXT_PUBLIC_REGION` - AWS region
+## 🔒 Security & Performance
+
+**Security Headers**: Configured in `next.config.ts`
+- CSP with specific domains allowed
+- X-Frame-Options: DENY
+- HSTS enabled
+
+**Performance Optimizations**:
+- Tree-shaking for `lucide-react` and AWS SDK
+- Image optimization with AVIF/WebP
+- Console removal in production
+- Package import optimization
+
+**Build Validation**: `./scripts/validate-build.sh` runs complete CI/CD pipeline locally
 
 ---
-*Standalone frontend repository. For complete system documentation, see main varekatalog repository at `/home/rydesp/dev/varekatalog/docs/`*
+
+**Related Repositories**: Main backend at `/home/rydesp/dev/varekatalog/` contains infrastructure (CloudFormation), Lambda functions, and complete system documentation.
