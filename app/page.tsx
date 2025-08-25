@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Table } from '../components/ui';
+import { useState, useMemo } from 'react';
+import { Table, Pagination, EnhancedStatusBar } from '../components/ui';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { NOBBLink } from '../components/ui/NOBBLink';
 import { SubHeader, Header } from '../components/layout';
@@ -10,6 +10,10 @@ import { useProductSearch } from '../hooks';
 import { FilterState } from '../components/search/QuickFilters/types';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
+import type { 
+  ConnectionStatus, 
+  CustomerViewStatus 
+} from '../components/ui/EnhancedStatusBar/types';
 
 // Main product catalog data
 const catalogProducts: Product[] = [
@@ -34,6 +38,23 @@ export default function Dashboard() {
     category: 'Alle kategorier',
     stock: 'Alle'
   });
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Status bar state
+  const [customerView, setCustomerView] = useState<CustomerViewStatus>({
+    isEnabled: false,
+    displayText: 'AV'
+  });
+
+  // Mock connection status (in real app, this would come from API hook)
+  const connectionStatus: ConnectionStatus = useMemo(() => ({
+    isOnline: true,
+    lastSync: new Date(),
+    responseTime: 300
+  }), []);
 
   // Define table columns for consistent display
   const tableColumns = [
@@ -135,7 +156,42 @@ export default function Dashboard() {
     ? searchState.results 
     : catalogProducts;
     
-  const displayData = applyFilters(baseData);
+  const filteredData = applyFilters(baseData);
+
+  // Pagination calculations
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+  
+  // Get paginated data
+  const displayData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when filters change
+  const resetPagination = () => setCurrentPage(1);
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle customer view toggle
+  const handleCustomerViewToggle = () => {
+    setCustomerView(prev => ({
+      isEnabled: !prev.isEnabled,
+      displayText: !prev.isEnabled ? 'PÅ' : 'AV'
+    }));
+  };
+
+  // Handle export functionality
+  const handleExport = () => {
+    console.log('Eksporterer produktdata...', filteredData);
+    // TODO: Implement actual export functionality
+  };
 
   const displayTitle = searchState.hasSearched && searchState.query
     ? `Søkeresultater for "${searchState.query}" (${searchState.results.length} funnet)`
@@ -151,14 +207,17 @@ export default function Dashboard() {
       
       {/* Quick Filters section (36px) */}
       <QuickFilters 
-        totalItems={displayData.length}
-        onFiltersChange={setFilters}
+        totalItems={filteredData.length}
+        onFiltersChange={(newFilters) => {
+          setFilters(newFilters);
+          resetPagination();
+        }}
       />
       
       {/* Main Dashboard Content */}
       <div className="max-w-7xl mx-auto p-6">
         {/* Product Catalog Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
+        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-neutral-200">
             <h2 className="text-lg font-semibold text-neutral-800">
               {displayTitle}
@@ -191,6 +250,34 @@ export default function Dashboard() {
               </div>
             )}
           </div>
+
+          {/* Pagination - Only show when we have data */}
+          {!searchState.isLoading && !searchState.error && filteredData.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              startItem={startItem}
+              endItem={endItem}
+              onPageChange={handlePageChange}
+              showExport={true}
+              onExport={handleExport}
+              itemLabel="produkter"
+              previousLabel="Forrige"
+              nextLabel="Neste"
+              exportLabel="Eksporter"
+              className="border-t"
+            />
+          )}
+
+          {/* Enhanced Status Bar */}
+          <EnhancedStatusBar
+            connectionStatus={connectionStatus}
+            customerView={customerView}
+            onCustomerViewToggle={handleCustomerViewToggle}
+            className="border-t"
+          />
         </div>
       </div>
     </div>

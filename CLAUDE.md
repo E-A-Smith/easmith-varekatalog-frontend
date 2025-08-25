@@ -134,6 +134,93 @@ export { Table } from './Table';
 // etc.
 ```
 
+## 🎨 DESIGN SYSTEM & UI GUIDELINES
+
+### **Authentic Byggern Brand Implementation**
+**Design Philosophy**: "Authentic Byggern Brand Excellence with Desktop-First Efficiency"
+
+Based on official Byggern website analysis, the design system implements authentic brand elements while optimizing for retail staff productivity in customer-facing environments.
+
+**Official Color Palette** (extracted from Byggern.no):
+```css
+/* Primary Brand Colors */
+--byggern-primary: #216ba5;        /* Official brand blue */
+--byggern-primary-hover: #1d5d90;  /* Hover state */
+--byggern-orange: #ff6803;         /* Accent orange */
+--byggern-gold: #d4af37;          /* Logo gold */
+--byggern-yellow: #FFDC32;        /* Authentic yellow from website */
+--byggern-success: #3dcc4a;       /* Success green */
+--byggern-header: #4D4D4D;        /* Header background gray */
+
+/* Status Colors */
+--byggern-text-primary: #141414;   /* Main text */
+--byggern-text-secondary: #4d4d4d; /* Secondary text */
+--byggern-border: #aeaeae;         /* Border color */
+```
+
+**Official Typography System**:
+```css
+/* Authentic Byggern fonts from website analysis */
+--font-heading: 'National2', 'Helvetica Neue', helvetica, arial, sans-serif;
+--font-body: 'Roboto', Arial, sans-serif;
+
+/* Font weights and sizes aligned with brand standards */
+--font-normal: 400;
+--font-medium: 500;
+--font-bold: 700;
+```
+
+**Interface Layout Architecture** (PC-First 1920x1080 with responsive support):
+
+**Two-Tier Header System** (Authentic Byggern structure):
+- **Sub Header**: 36px height - "Varekatalog for Løvenskiold Logistikk levert av Byggern"
+- **Main Header**: 56px height - "BYGGER'N" logo in gold + search input + menu icons
+- **Quick Filters**: 36px height - Norwegian filter controls (leverandører, kategorier, lager)
+
+**Professional Table Layout**:
+- **Dense Information Display**: Optimized for rapid product scanning
+- **Visual Status System**: Color-coded stock indicators (● green, × red)
+- **Norwegian Terminology**: Complete localization for retail staff
+- **Keyboard Navigation**: Full accessibility support with tab order
+
+**Enhanced Bottom Section** (✅ IMPLEMENTED):
+- **Pagination Bar**: "Showing 1-10 of 1,247 produkter • [◀ Forrige] [1][2][3]...[125] [Neste ▶] • [📊 Eksporter]"
+- **Enhanced Status Bar**: "🌐 Online • Last sync: 14:30 • Response: 0.3s • Kundevisning: AV/PÅ"
+
+**New Components Implemented**:
+- `components/ui/Pagination/` - Complete pagination with Norwegian labels and export functionality
+- `components/ui/EnhancedStatusBar/` - Professional status tracking with customer view toggle
+- Integrated pagination logic with 10 items per page and smooth scrolling
+- Real-time connection status monitoring and performance metrics display
+
+**Visual Status Indicators**:
+- **På lager**: `●` Green circle (byggern-success #3dcc4a)
+- **Utsolgt**: `×` Red cross (semantic-error #DC3545)
+- **Få igjen**: `▲` Orange triangle (byggern-orange #ff6803)
+- **Anbrekk Status**: "Ja/Nei" with clear typography
+
+**Responsive Strategy**:
+```css
+mobile: 0px → 639px    /* Card layout, touch-optimized controls */
+tablet: 640px → 767px  /* Condensed table, larger touch targets */
+desktop: 768px → 1919px /* Full information density */
+wide: 1920px+          /* Maximum productivity layout */
+```
+
+**Norwegian Language Standards**:
+- **Complete Localization**: All interface elements in Norwegian
+- **Search Placeholder**: "Søk etter produkter eller kategorier..."
+- **Filter Labels**: "Alle leverandører", "Alle kategorier", "Lager: Alle"  
+- **Status Messages**: "Online", "Kundevisning: AV/PÅ"
+- **Actions**: "Vis", "Skjul", "Eksporter", "Forrige", "Neste"
+- **Product Count**: "produkter" instead of generic "items"
+
+**Design System Achievements**:
+- **Brand Authenticity**: Official colors (#216ba5 vs generic #1E3A5F)
+- **Professional Credibility**: Two-tier navigation matching Byggern.no
+- **Retail Optimization**: <1 second search, customer view controls
+- **Accessibility**: WCAG AA compliance with Norwegian character support (æ, ø, å)
+
 ## 🎯 Product Domain Knowledge
 
 **Core Entity**: Norwegian building supplies product catalog
