@@ -14,19 +14,14 @@ export interface PaginationProps {
   currentPage: number;
   totalPages: number;
   totalItems: number;
-  itemsPerPage: number;
   startItem: number;
   endItem: number;
   onPageChange: (page: number) => void;
   className?: string;
-  showExport?: boolean;
-  onExport?: () => void;
-  isLoading?: boolean;
   // Norwegian language customization
   itemLabel?: string;
   previousLabel?: string;
   nextLabel?: string;
-  exportLabel?: string;
 }
 
 export interface PaginationButtonProps {

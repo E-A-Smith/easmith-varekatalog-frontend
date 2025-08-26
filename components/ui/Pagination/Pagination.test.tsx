@@ -11,7 +11,6 @@ const defaultProps: PaginationProps = {
   currentPage: 1,
   totalPages: 10,
   totalItems: 1247,
-  itemsPerPage: 10,
   startItem: 1,
   endItem: 10,
   onPageChange: jest.fn(),
@@ -85,45 +84,6 @@ describe('Pagination', () => {
     expect(currentPageButton).toHaveAttribute('aria-current', 'page');
   });
 
-  it('renders export button when showExport is true', () => {
-    const mockOnExport = jest.fn();
-    render(
-      <Pagination 
-        {...defaultProps} 
-        showExport={true} 
-        onExport={mockOnExport}
-      />
-    );
-    
-    expect(screen.getByRole('button', { name: 'Eksporter alle resultater' })).toBeInTheDocument();
-  });
-
-  it('calls onExport when export button is clicked', () => {
-    const mockOnExport = jest.fn();
-    render(
-      <Pagination 
-        {...defaultProps} 
-        showExport={true} 
-        onExport={mockOnExport}
-      />
-    );
-    
-    fireEvent.click(screen.getByRole('button', { name: 'Eksporter alle resultater' }));
-    expect(mockOnExport).toHaveBeenCalled();
-  });
-
-  it('shows loading state for export button', () => {
-    render(
-      <Pagination 
-        {...defaultProps} 
-        showExport={true} 
-        onExport={jest.fn()}
-        isLoading={true}
-      />
-    );
-    
-    expect(screen.getByText('Eksporterer...')).toBeInTheDocument();
-  });
 
   it('does not render pagination controls when totalPages is 1', () => {
     render(<Pagination {...defaultProps} totalPages={1} />);
@@ -153,16 +113,12 @@ describe('Pagination', () => {
         itemLabel="elementer"
         previousLabel="Tilbake"
         nextLabel="Fremover"
-        exportLabel="Last ned"
-        showExport={true}
-        onExport={jest.fn()}
       />
     );
     
     expect(screen.getByText(/elementer/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Tilbake' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Fremover' })).toBeInTheDocument();
-    expect(screen.getByText('Last ned')).toBeInTheDocument();
   });
 
   it('handles keyboard navigation properly', () => {

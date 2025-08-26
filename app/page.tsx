@@ -166,11 +166,6 @@ export default function Dashboard() {
   };
 
 
-  // Handle export functionality
-  const handleExport = () => {
-    console.log('Eksporterer produktdata...', filteredData);
-    // TODO: Implement actual export functionality
-  };
 
   const displayTitle = searchState.hasSearched && searchState.query
     ? `Søkeresultater for "${searchState.query}" (${searchState.results.length} funnet)`
@@ -236,16 +231,12 @@ export default function Dashboard() {
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
               startItem={startItem}
               endItem={endItem}
               onPageChange={handlePageChange}
-              showExport={true}
-              onExport={handleExport}
               itemLabel="produkter"
               previousLabel="Forrige"
               nextLabel="Neste"
-              exportLabel="Eksporter"
               className="border-t"
             />
           )}

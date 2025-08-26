@@ -88,18 +88,13 @@ export const Pagination: FC<PaginationProps> = ({
   currentPage,
   totalPages,
   totalItems,
-  itemsPerPage,
   startItem,
   endItem,
   onPageChange,
   className = '',
-  showExport = false,
-  onExport,
-  isLoading = false,
   itemLabel = 'products',
   previousLabel = 'Prev',
-  nextLabel = 'Next',
-  exportLabel = 'Eksporter'
+  nextLabel = 'Next'
 }) => {
   // Generate page numbers to display
   const pageNumbers = useMemo(() => {
@@ -149,11 +144,6 @@ export const Pagination: FC<PaginationProps> = ({
     return pages;
   }, [currentPage, totalPages]);
 
-  const handleExport = () => {
-    if (onExport && !isLoading) {
-      onExport();
-    }
-  };
 
   return (
     <div className={clsx(
