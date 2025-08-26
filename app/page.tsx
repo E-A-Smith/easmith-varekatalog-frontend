@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Table, Pagination, EnhancedStatusBar } from '../components/ui';
+import { useState } from 'react';
+import { Table, Pagination } from '../components/ui';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { NOBBLink } from '../components/ui/NOBBLink';
 import { SubHeader, Header } from '../components/layout';
@@ -10,10 +10,6 @@ import { useProductSearch } from '../hooks';
 import { FilterState } from '../components/search/QuickFilters/types';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
-import type { 
-  ConnectionStatus, 
-  CustomerViewStatus 
-} from '../components/ui/EnhancedStatusBar/types';
 
 // Main product catalog data
 const catalogProducts: Product[] = [
@@ -43,18 +39,6 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Status bar state
-  const [customerView, setCustomerView] = useState<CustomerViewStatus>({
-    isEnabled: false,
-    displayText: 'AV'
-  });
-
-  // Mock connection status (in real app, this would come from API hook)
-  const connectionStatus: ConnectionStatus = useMemo(() => ({
-    isOnline: true,
-    lastSync: new Date(),
-    responseTime: 300
-  }), []);
 
   // Define table columns for consistent display
   const tableColumns = [
@@ -176,16 +160,11 @@ export default function Dashboard() {
   // Handle pagination
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
-  // Handle customer view toggle
-  const handleCustomerViewToggle = () => {
-    setCustomerView(prev => ({
-      isEnabled: !prev.isEnabled,
-      displayText: !prev.isEnabled ? 'PÅ' : 'AV'
-    }));
-  };
 
   // Handle export functionality
   const handleExport = () => {
@@ -270,14 +249,6 @@ export default function Dashboard() {
               className="border-t"
             />
           )}
-
-          {/* Enhanced Status Bar */}
-          <EnhancedStatusBar
-            connectionStatus={connectionStatus}
-            customerView={customerView}
-            onCustomerViewToggle={handleCustomerViewToggle}
-            className="border-t"
-          />
         </div>
       </div>
     </div>

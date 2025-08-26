@@ -95,6 +95,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
         {/* Supplier Filter */}
         <div className="relative">
           <select
+            id="supplier-filter"
+            name="supplier"
             value={filters.supplier}
             onChange={(e) => handleFilterChange('supplier', e.target.value)}
             className="
@@ -117,6 +119,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
         {/* Category Filter */}
         <div className="relative">
           <select
+            id="category-filter"
+            name="category"
             value={filters.category}
             onChange={(e) => handleFilterChange('category', e.target.value)}
             className="
@@ -139,6 +143,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
         {/* Stock Filter */}
         <div className="relative">
           <select
+            id="stock-filter"
+            name="stock"
             value={filters.stock}
             onChange={(e) => handleFilterChange('stock', e.target.value)}
             className="
@@ -165,7 +171,7 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
       {/* Right side: Item count */}
       <div className="flex items-center">
         <span className="text-sm text-neutral-600 font-medium">
-          {totalItems.toLocaleString('no-NO')} produkter
+          {totalItems} produkter
         </span>
       </div>
     </div>

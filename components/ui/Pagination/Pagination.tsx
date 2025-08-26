@@ -170,7 +170,7 @@ export const Pagination: FC<PaginationProps> = ({
           </span>
           <span> of </span>
           <span className="font-medium text-neutral-900">
-            {totalItems.toLocaleString('no')}
+            {totalItems}
           </span>
           <span> {itemLabel}</span>
         </div>
