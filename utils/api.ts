@@ -9,7 +9,7 @@ import { Product, ProductSearchQuery } from '../types';
 
 // API Configuration
 const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || '/api',
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_ENDPOINT || '/api',
   timeout: 10000,
   enableLogging: process.env.NODE_ENV === 'development'
 };

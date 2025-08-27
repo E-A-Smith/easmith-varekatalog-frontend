@@ -12,7 +12,10 @@ const nextConfig: NextConfig = {
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['api-dev.varekatalog.byggern.no'],
+    domains: [
+      'api-dev.varekatalog.byggern.no',  // Legacy API domain
+      'y53p9uarcj.execute-api.eu-west-1.amazonaws.com'  // AWS API Gateway
+    ],
   },
 
   // Security headers (handled by Amplify/CloudFront)
@@ -39,7 +42,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-dev.varekatalog.byggern.no https://*.amazonaws.com; frame-ancestors 'none';"
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-dev.varekatalog.byggern.no https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com https://*.amazonaws.com; frame-ancestors 'none';"
           }
         ]
       }
@@ -56,14 +59,21 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', '@aws-sdk/client-cognito-identity-provider'],
   },
 
-  // PWA-like caching for offline support
+  // API proxy for development only (production uses direct API calls)
   async rewrites() {
-    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    if (!apiEndpoint) {
+    // Only enable proxy in development - production should call API directly
+    if (process.env.NODE_ENV === 'production') {
       return [];
     }
+    
+    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT || process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!apiEndpoint) {
+      console.warn('No API endpoint configured for proxy rewrites');
+      return [];
+    }
+    
     return [
-      // API proxy for development
+      // API proxy for development environment
       {
         source: '/api/:path*',
         destination: `${apiEndpoint}/:path*`,

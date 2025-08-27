@@ -71,7 +71,9 @@ utils/                # Utilities
 **API Integration**:
 - `utils/api.ts` provides `SimpleApiClient` with timeout handling
 - Mock data fallback in `useProductSearch` hook when API unavailable
-- Environment variables: `NEXT_PUBLIC_API_ENDPOINT`, `NEXT_PUBLIC_REGION`
+- Environment variables: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_API_ENDPOINT`, `NEXT_PUBLIC_REGION`
+- Development proxy in `next.config.ts` (disabled in production)
+- AWS Cognito authentication configured
 
 ## 🔧 Critical Configuration Requirements
 
@@ -334,11 +336,55 @@ wide: 1920px+          /* Maximum productivity layout */
 - **Build artifacts**: `.next/` directory
 - **Security headers**: CSP, HSTS configured in `next.config.ts`
 
-**Environment Variables** (set in Amplify Console):
-```
-NEXT_PUBLIC_API_ENDPOINT=https://api-dev.varekatalog.byggern.no
+**Environment Variables Configuration**:
+
+**Local Development** (`.env.local` - not committed):
+```bash
+# Primary API Configuration (DEV Environment)
+NEXT_PUBLIC_API_BASE_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_API_ENDPOINT=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
 NEXT_PUBLIC_REGION=eu-west-1
+
+# AWS Cognito Authentication (DEV Environment)
+NEXT_PUBLIC_COGNITO_CLIENT_ID=vuuc11qdf11tnst6i3c7fhc6p
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 ```
+
+**AWS Amplify Deployment Strategy** (Updated 2024):
+```bash
+# ✅ DECISION: ALL environment variables moved to config files
+# ❌ NO variables configured in Amplify Console
+# ✅ Automatic environment resolution based on branch deployment
+```
+
+**Environment Management Philosophy**:
+- **Version Controlled**: All environment configs are part of the codebase
+- **Branch-Based**: `develop` branch uses `.env.development`, `main` uses `.env.production`
+- **Single Source of Truth**: No duplicate configuration in Amplify Console
+- **Developer Experience**: New developers get correct config with `git clone`
+- **Consistency**: Local development matches deployed environment exactly
+
+**Environment File Structure** (Following 2024 Best Practices):
+- `.env.local` - Local development overrides (gitignored)
+- `.env.development` - Development environment defaults (used by develop branch)
+- `.env.production` - Production environment defaults (used by main/master branch)
+- API proxy automatically disabled in production builds
+
+**Migration Completed**: All Amplify Console environment variables removed (2024-12-28)
+
+**⚠️ CRITICAL: Environment Variable Policy**:
+- **DO NOT** add environment variables in AWS Amplify Console
+- **DO** update the appropriate `.env.*` files in the codebase
+- **EXCEPTION**: Only use Amplify Console for truly secret variables (API keys, passwords) that shouldn't be version controlled
+- **BRANCH MAPPING**: 
+  - `develop` branch → `.env.development` 
+  - `main`/`master` branch → `.env.production`
+- **VERIFICATION**: Check Amplify build logs for "Loaded env from .env.{environment}" confirmation
+
+**For New Environments/Branches**:
+1. Create corresponding `.env.{environment}` file
+2. Let Next.js automatic environment resolution handle the rest
+3. No manual Amplify Console configuration needed
 
 ## 🧪 Testing Strategy
 
