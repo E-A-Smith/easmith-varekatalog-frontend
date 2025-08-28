@@ -165,12 +165,6 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
 
       </div>
 
-      {/* Right side: Item count */}
-      <div className="flex items-center">
-        <span className="text-sm text-neutral-600 font-medium">
-          {totalItems} produkter
-        </span>
-      </div>
     </div>
   );
 };
