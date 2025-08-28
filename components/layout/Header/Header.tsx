@@ -20,16 +20,16 @@ export const Header: FC<HeaderProps> = ({
       data-testid={testId}
     >
       <div className="max-w-7xl mx-auto px-6 h-full">
-        <div className="flex items-center justify-between h-full">
+        <div className="flex items-center gap-8 h-full">
           
-          {/* Logo Section */}
-          <div className="flex items-center">
-            <Logo height={40} className="flex-shrink-0" />
+          {/* Logo Section - More horizontal space */}
+          <div className="flex items-center flex-shrink-0">
+            <Logo height={56} className="flex-shrink-0" />
           </div>
 
-          {/* Search Section - Center */}
+          {/* Search Section - Left aligned, fixed position */}
           {showSearch && onSearch && (
-            <div className="flex-1 max-w-2xl mx-8">
+            <div className="flex-1 max-w-2xl">
               <SearchBar 
                 onSearch={onSearch}
                 placeholder="🔍 Søk etter produkter eller kategorier..."
