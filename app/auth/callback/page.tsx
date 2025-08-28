@@ -106,7 +106,13 @@ export default function AuthCallback() {
   }
 
   // Store tokens securely (implement proper storage strategy)
-  async function storeTokensSecurely(tokens: any) {
+  async function storeTokensSecurely(tokens: {
+    access_token: string;
+    refresh_token: string;
+    id_token: string;
+    expires_in: number;
+    scope?: string;
+  }) {
     // For now, store in sessionStorage (implement proper security later)
     // In production, should use HTTP-only cookies or secure storage
     sessionStorage.setItem('access_token', tokens.access_token);
