@@ -28,7 +28,7 @@ export default function AuthLogout() {
         // Construct Azure AD logout URL
         const logoutParams = new URLSearchParams({
           client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
-          post_logout_redirect_uri: `${window.location.origin}/`,
+          post_logout_redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/` : '/',
         });
 
         const logoutUrl = `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/logout?${logoutParams.toString()}`;
@@ -36,7 +36,9 @@ export default function AuthLogout() {
         // Small delay to ensure cleanup is complete
         setTimeout(() => {
           // Redirect to Azure AD logout to clear SSO session
-          window.location.href = logoutUrl;
+          if (typeof window !== 'undefined') {
+            window.location.href = logoutUrl;
+          }
         }, 1000);
 
       } catch (error) {

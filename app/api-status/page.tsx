@@ -247,7 +247,7 @@ export default function ApiStatusPage() {
         {/* Navigation */}
         <div className="mt-8 text-center">
           <Button 
-            onClick={() => window.location.href = '/'}
+            onClick={() => typeof window !== 'undefined' && (window.location.href = '/')}
             variant="outline"
           >
             ← Tilbake til hovedside

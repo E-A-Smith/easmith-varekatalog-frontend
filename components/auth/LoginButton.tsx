@@ -86,7 +86,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
       const authParams = new URLSearchParams({
         response_type: 'code',
         client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
-        redirect_uri: `${window.location.origin}/auth/callback`,
+        redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '/auth/callback',
         scope: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog:search',
         state: generateStateParameter(),
         prompt: 'login',
@@ -97,10 +97,14 @@ export const LoginButton: FC<LoginButtonProps> = ({
       const authUrl = `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/authorize?${authParams.toString()}`;
       
       // Store state in session storage for CSRF protection
-      sessionStorage.setItem('oauth_state', authParams.get('state') || '');
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('oauth_state', authParams.get('state') || '');
+      }
       
       // Redirect to Azure AD OAuth authorization endpoint
-      window.location.href = authUrl;
+      if (typeof window !== 'undefined') {
+        window.location.href = authUrl;
+      }
       
     } catch (error) {
       console.error('OAuth login error:', error);

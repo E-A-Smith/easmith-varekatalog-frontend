@@ -82,7 +82,7 @@ export default function AuthCallback() {
       grant_type: 'authorization_code',
       client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
       code: code,
-      redirect_uri: `${window.location.origin}/auth/callback`,
+      redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '/auth/callback',
       scope: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog:search',
     });
 

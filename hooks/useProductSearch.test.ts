@@ -163,7 +163,7 @@ describe('useProductSearch Hook', () => {
       
       // Should have results from mock data
       expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0].navn).toContain('Rør');
+      expect(result.current.searchState.results[0]?.navn).toContain('Rör');
       expect(result.current.searchState.error).toContain('Bruker lokal data');
       expect(result.current.searchState.error).toContain('Nettverksfeil');
     });
@@ -210,7 +210,7 @@ describe('useProductSearch Hook', () => {
       });
       
       expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0].navn).toContain('Ventil');
+      expect(result.current.searchState.results[0]?.navn).toContain('Ventil');
       
       // Search for "NIBE" (produsent)
       await act(async () => {
@@ -218,7 +218,7 @@ describe('useProductSearch Hook', () => {
       });
       
       expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0].produsent).toBe('NIBE');
+      expect(result.current.searchState.results[0]?.produsent).toBe('NIBE');
       
       // Search for VVS number
       await act(async () => {
@@ -226,7 +226,7 @@ describe('useProductSearch Hook', () => {
       });
       
       expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0].vvsnr).toBe('VVS12345');
+      expect(result.current.searchState.results[0]?.vvsnr).toBe('VVS12345');
     });
     
     it('should search by category in mock data', async () => {
@@ -241,7 +241,7 @@ describe('useProductSearch Hook', () => {
       });
       
       expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0].kategori).toContain('Ovner');
+      expect(result.current.searchState.results[0]?.kategori).toContain('Ovner');
     });
     
     it('should handle unknown error types', async () => {
@@ -337,27 +337,30 @@ describe('useProductSearch Hook', () => {
       });
       
       const product = result.current.searchState.results[0];
+      expect(product).toBeDefined();
       
-      // Validate product structure
-      expect(product).toHaveProperty('id');
-      expect(product).toHaveProperty('navn');
-      expect(product).toHaveProperty('vvsnr');
-      expect(product).toHaveProperty('lagerstatus');
-      expect(product).toHaveProperty('anbrekk');
-      expect(product).toHaveProperty('produsent');
-      expect(product).toHaveProperty('pris');
-      expect(product).toHaveProperty('kategori');
-      expect(product).toHaveProperty('beskrivelse');
-      
-      // Validate price structure
-      expect(product.pris).toHaveProperty('salgspris');
-      expect(product.pris).toHaveProperty('valuta');
-      expect(product.pris).toHaveProperty('inkludertMva');
-      
-      // Validate Norwegian values
-      expect(['På lager', 'Få igjen', 'Utsolgt']).toContain(product.lagerstatus);
-      expect(['Ja', 'Nei']).toContain(product.anbrekk);
-      expect(product.pris.valuta).toBe('NOK');
+      if (product) {
+        // Validate product structure
+        expect(product).toHaveProperty('id');
+        expect(product).toHaveProperty('navn');
+        expect(product).toHaveProperty('vvsnr');
+        expect(product).toHaveProperty('lagerstatus');
+        expect(product).toHaveProperty('anbrekk');
+        expect(product).toHaveProperty('produsent');
+        expect(product).toHaveProperty('pris');
+        expect(product).toHaveProperty('kategori');
+        expect(product).toHaveProperty('beskrivelse');
+        
+        // Validate price structure
+        expect(product.pris).toHaveProperty('salgspris');
+        expect(product.pris).toHaveProperty('valuta');
+        expect(product.pris).toHaveProperty('inkludertMva');
+        
+        // Validate Norwegian values
+        expect(['På lager', 'Få igjen', 'Utsolgt']).toContain(product.lagerstatus);
+        expect(['Ja', 'Nei']).toContain(product.anbrekk);
+        expect(product.pris?.valuta).toBe('NOK');
+      }
     });
   });
 });
