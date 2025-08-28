@@ -250,6 +250,25 @@ export default config;
 **Cause**: Mixing Tailwind v3 and v4 syntax
 **Solution**: Ensure consistent v4 configuration across all files
 
+**Issue 5: "You are using a non-standard NODE_ENV value" warning (RECURRING)**
+```bash
+⚠ You are using a non-standard "NODE_ENV" value in your environment. 
+This creates inconsistencies in the project and is strongly advised against.
+```
+**Cause**: Shell environment has NODE_ENV set to "development" (non-standard value)
+**Solution**: Set NODE_ENV to "production" for builds:
+```bash
+# For one-time build
+export NODE_ENV=production && npm run build
+
+# Or unset NODE_ENV entirely (Next.js handles this automatically)
+unset NODE_ENV && npm run build
+
+# Check current NODE_ENV value
+echo $NODE_ENV
+```
+**Note**: This is a recurring issue in this development environment. Next.js expects NODE_ENV to be either "production", "test", or unset. The value "development" is non-standard and causes warnings.
+
 **Design System Migration Benefits**:
 - ✅ **Single Source of Truth**: All design tokens centralized in `tailwind.config.ts`
 - ✅ **Original Design Preserved**: `#1E3A5F` and `#FF6B35` restored as authentic Byggern colors

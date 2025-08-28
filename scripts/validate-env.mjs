@@ -9,8 +9,12 @@
  *   npm run validate-env (add to package.json scripts)
  */
 
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env files
 function loadEnvFiles() {
