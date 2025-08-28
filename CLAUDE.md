@@ -355,28 +355,27 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 # EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
-**AWS Amplify Deployment Strategy** (Updated 2024):
+**AWS Amplify Deployment Strategy** (Updated 2025-08-28):
 ```bash
-# ✅ DECISION: ALL environment variables moved to config files
-# ❌ NO variables configured in Amplify Console
-# ✅ Automatic environment resolution based on branch deployment
+# ❌ PROBLEM DISCOVERED: Amplify doesn't respect Next.js .env file conventions
+# ✅ SOLUTION: Environment variables must be configured in Amplify branch settings
+# ⚠️ CRITICAL: .env.production is ALWAYS loaded by Next.js in Amplify builds
 ```
 
-**Environment Management Philosophy**:
-- **Version Controlled**: All environment configs are part of the codebase
-- **Branch-Based**: `develop` branch uses `.env.development`, `main` uses `.env.production`
-- **Local Override**: `.env.local` overrides deployed environment for local development
-- **Single Source of Truth**: No duplicate configuration in Amplify Console
-- **Developer Experience**: New developers get correct config with `git clone`
-- **Deployment vs Development**: Different endpoints for local testing vs deployed integration
+**Environment Management Philosophy** (CORRECTED):
+- **Amplify Branch Variables**: Critical variables configured directly in AWS Amplify Console
+- **Version Controlled Files**: `.env.*` files for documentation and local development only
+- **Single Source of Truth**: AWS Amplify branch environment variables (not .env files)
+- **Branch Behavior**: Each Amplify branch has its own environment variable configuration
+- **Build Process**: Amplify env vars override and supplement .env file contents
 
-**Environment File Structure** (Following 2024 Best Practices):
-- `.env.local` - Local development overrides (uses Next.js API routes with mock data)
-- `.env.development` - AWS Amplify dev deployment (uses AWS API Gateway DEV stage)  
-- `.env.production` - AWS Amplify production deployment (uses AWS API Gateway PROD stage)
-- API proxy disabled (uses direct API calls)
+**Environment File Structure** (ACTUAL BEHAVIOR):
+- `.env.local` - Local development overrides (not deployed)
+- `.env.development` - ⚠️ IGNORED by Amplify (for local reference only)
+- `.env.production` - ⚠️ ALWAYS loaded by Amplify regardless of branch stage
+- **Amplify Branch Settings**: Where actual deployment environment variables are configured
 
-**Migration Completed**: All Amplify Console environment variables removed (2024-12-28)
+**CRITICAL DISCOVERY**: Amplify branch stage (DEVELOPMENT/PRODUCTION) does NOT affect .env file loading
 
 **⚠️ CRITICAL: Environment Variable Policy**:
 - **PUBLIC VARIABLES**: Use `NEXT_PUBLIC_*` prefix and store in `.env.*` files (version controlled)
@@ -388,15 +387,21 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 - ✅ **API Endpoints**: `https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev`
 - ✅ **Method**: POST requests to `/search` endpoint with JSON payload
 - ⚠️ **Future**: If API keys are added, follow server-side proxy pattern above
-- **BRANCH MAPPING**: 
-  - `develop` branch → `.env.development` 
-  - `main`/`master` branch → `.env.production`
-- **VERIFICATION**: Check Amplify build logs for "Loaded env from .env.{environment}" confirmation
+- **ACTUAL BRANCH MAPPING** (Corrected): 
+  - ALL branches load `.env.production` (Next.js behavior in Amplify)
+  - Branch-specific variables must be configured in Amplify Console per branch
+- **VERIFICATION**: Amplify logs show "- Environments: .env.production" regardless of branch
 
-**For New Environments/Branches**:
-1. Create corresponding `.env.{environment}` file
-2. Let Next.js automatic environment resolution handle the rest
-3. No manual Amplify Console configuration needed
+**For New Environments/Branches** (CORRECTED PROCESS):
+1. Configure environment variables in AWS Amplify branch settings
+2. Update `.env.production` with safe defaults (if needed)
+3. Never rely on `.env.development` for Amplify deployments
+
+**Example: Setting Branch Environment Variables**:
+```bash
+aws amplify update-branch --app-id APP_ID --branch-name develop \
+  --environment-variables NEXT_PUBLIC_VAR1=value1,NEXT_PUBLIC_VAR2=value2
+```
 
 ## 🧪 Testing Strategy
 
