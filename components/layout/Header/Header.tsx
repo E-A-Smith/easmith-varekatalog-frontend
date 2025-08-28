@@ -22,9 +22,9 @@ export const Header: FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-6 h-full">
         <div className="flex items-center gap-8 h-full">
           
-          {/* Logo Section - More horizontal space */}
-          <div className="flex items-center flex-shrink-0">
-            <Logo height={56} className="flex-shrink-0" />
+          {/* Logo Section - Simple structure like byggern.no */}
+          <div className="flex-shrink-0">
+            <Logo height={56} />
           </div>
 
           {/* Search Section - Left aligned, fixed position */}

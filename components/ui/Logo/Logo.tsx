@@ -12,14 +12,13 @@ interface LogoProps {
 
 export const Logo: FC<LogoProps> = ({ height = 32, className = '' }) => {
   return (
-    <div className={`flex items-center ${className}`}>
-      <svg 
-        viewBox="0 0 595 269" 
-        xmlns="http://www.w3.org/2000/svg" 
-        height={height}
-        className="w-auto"
-        aria-label="Byggern logo"
-      >
+    <svg 
+      viewBox="0 0 595 269" 
+      xmlns="http://www.w3.org/2000/svg" 
+      height={height}
+      className={`w-auto ${className}`}
+      aria-label="Byggern logo"
+    >
         <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
           <g fillRule="nonzero">
             <g id="Bygger'n" fill="#FFDC32">
@@ -35,7 +34,6 @@ export const Logo: FC<LogoProps> = ({ height = 32, className = '' }) => {
           </g>
         </g>
       </svg>
-    </div>
   );
 };
 
