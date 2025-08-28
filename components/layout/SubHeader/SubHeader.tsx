@@ -17,7 +17,6 @@ export const SubHeader: FC<SubHeaderProps> = ({
       className={`
         h-9 
         bg-neutral-50 
-        border-b border-neutral-200
         flex items-center justify-between
         px-6
         ${className}

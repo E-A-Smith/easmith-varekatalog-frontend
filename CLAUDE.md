@@ -15,7 +15,8 @@ This is a **standalone frontend repository** extracted from the main varekatalog
 
 ```bash
 # Essential commands
-npm run dev         # Development server (Next.js 15)
+./scripts/start-dev.sh    # PREFERRED: Development server startup script (handles port conflicts)
+npm run dev         # Development server (Next.js 15) - use start-dev.sh instead
 npm run build       # Production build
 npm run start       # Start production server
 npm run type-check  # TypeScript validation (strict mode)
