@@ -74,7 +74,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
         onClick={handleLogin}
         className="h-6 px-2 text-xs border-byggern-blue/20 text-byggern-blue hover:bg-byggern-blue/5"
       >
-        🔒 Logg inn
+        🔒
       </Button>
     </div>
   );

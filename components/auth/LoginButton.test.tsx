@@ -23,14 +23,14 @@ describe('LoginButton', () => {
   it('renders login button when not authenticated', () => {
     render(<LoginButton />);
     
-    expect(screen.getByRole('button', { name: /logg inn/i })).toBeInTheDocument();
-    expect(screen.getByText('🔒 Logg inn')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /🔒/i })).toBeInTheDocument();
+    expect(screen.getByText('🔒')).toBeInTheDocument();
   });
 
   it('applies compact mode styles when compact prop is true', () => {
     render(<LoginButton compact />);
     
-    const button = screen.getByRole('button', { name: /logg inn/i });
+    const button = screen.getByRole('button', { name: /🔒/i });
     expect(button).toBeInTheDocument();
   });
 
