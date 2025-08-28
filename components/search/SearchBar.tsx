@@ -79,14 +79,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  const handleClear = () => {
-    setSearchQuery('');
-    // Clear debounce timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    onSearch(''); // Clear search results
-  };
 
   // Size-based styling
   const sizeClasses = {
@@ -135,16 +127,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         >
           {isSearching ? 'Søker...' : 'Søk'}
         </Button>
-        
-        {searchQuery && (
-          <Button
-            onClick={handleClear}
-            variant="outline"
-            size={currentSize.button as 'sm' | 'md' | 'lg'}
-          >
-            Tøm
-          </Button>
-        )}
       </div>
       
       {size !== 'sm' && (

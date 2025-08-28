@@ -7,38 +7,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        byggern: {
-          // Byggern Brand Colors (from globals.css - source of truth)
-          blue: '#1E3A5F',
-          orange: '#FF6B35',
-          // Legacy aliases for backward compatibility
-          primary: '#1E3A5F',
-          'primary-hover': '#1a3250',  // Darker variant for hover
-          gold: '#d4af37',  // Keep existing gold
-          yellow: '#FFDC32', // Keep existing yellow 
-          success: '#28A745', // From globals.css semantic colors
-          header: '#4D4D4D',  // Keep existing header color
-        },
-        semantic: {
-          success: '#28A745',
-          warning: '#FFC107',
-          error: '#DC3545',
-          info: '#17A2B8',
-        },
-        neutral: {
-          50: '#F8F9FA',
-          100: '#E9ECEF',
-          200: '#DEE2E6',
-          300: '#CED4DA',
-          400: '#ADB5BD',
-          500: '#6C757D',
-          600: '#495057',
-          700: '#343A40',
-          800: '#212529',
-          900: '#161719',
-        },
-      },
+      // Colors are now defined in globals.css using Tailwind v4 syntax
       fontFamily: {
         // Primary font from globals.css (Inter as default)
         sans: ['Inter', 'system-ui', 'sans-serif'],

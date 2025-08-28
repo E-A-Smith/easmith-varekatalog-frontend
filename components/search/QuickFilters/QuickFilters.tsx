@@ -9,7 +9,7 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { ChevronDown, Zap } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
 
 export const QuickFilters: FC<QuickFiltersProps> = ({
@@ -87,11 +87,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
       px-6
       ${className || ''}
     `}>
-      {/* Left side: Lightning icon and filter dropdowns */}
+      {/* Left side: Filter dropdowns */}
       <div className="flex items-center gap-3">
-        {/* Lightning bolt icon */}
-        <Zap className="w-4 h-4 text-byggern-orange" />
-        
         {/* Supplier Filter */}
         <div className="relative">
           <select

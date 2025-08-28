@@ -34,7 +34,6 @@ export interface PaginationButtonProps {
 }
 
 export interface PaginationNavigationProps {
-  direction: 'previous' | 'next';
   disabled: boolean;
   onClick: () => void;
   label: string;

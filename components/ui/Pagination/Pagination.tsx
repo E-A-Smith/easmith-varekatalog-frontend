@@ -57,7 +57,6 @@ const PaginationButton: FC<PaginationButtonProps> = ({
  * Navigation button (Previous/Next) component
  */
 const PaginationNavigation: FC<PaginationNavigationProps> = ({ 
-  direction, 
   disabled, 
   onClick, 
   label 
@@ -76,7 +75,7 @@ const PaginationNavigation: FC<PaginationNavigationProps> = ({
       )}
       aria-label={label}
     >
-      <span>{direction === 'previous' ? '◀ ' : ''}{label}{direction === 'next' ? ' ▶' : ''}</span>
+      <span>{label}</span>
     </button>
   );
 };
@@ -170,7 +169,6 @@ export const Pagination: FC<PaginationProps> = ({
           <div className="flex items-center gap-1">
             {/* Previous button */}
             <PaginationNavigation
-              direction="previous"
               disabled={currentPage === 1}
               onClick={() => onPageChange(currentPage - 1)}
               label={previousLabel}
@@ -202,7 +200,6 @@ export const Pagination: FC<PaginationProps> = ({
 
             {/* Next button */}
             <PaginationNavigation
-              direction="next"
               disabled={currentPage === totalPages}
               onClick={() => onPageChange(currentPage + 1)}
               label={nextLabel}

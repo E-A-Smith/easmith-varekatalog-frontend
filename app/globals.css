@@ -1,9 +1,38 @@
 @import "tailwindcss";
 
 /* 
- * Design tokens are now managed in tailwind.config.ts
- * This file contains only essential base styles that Tailwind doesn't handle
+ * Tailwind v4 Design System - Colors defined using @theme directive
+ * Source of truth for all Byggern brand colors
  */
+
+@theme {
+  /* Byggern Brand Colors */
+  --color-byggern-primary: #1E3A5F;
+  --color-byggern-blue: #1E3A5F;
+  --color-byggern-orange: #FF6B35;
+  --color-byggern-gold: #d4af37;
+  --color-byggern-yellow: #FFDC32;
+  --color-byggern-success: #3dcc4a;
+  --color-byggern-header: #4D4D4D;
+  
+  /* Semantic Colors */
+  --color-semantic-success: #28A745;
+  --color-semantic-warning: #FFC107;
+  --color-semantic-error: #DC3545;
+  --color-semantic-info: #17A2B8;
+  
+  /* Neutral Scale */
+  --color-neutral-50: #F8F9FA;
+  --color-neutral-100: #E9ECEF;
+  --color-neutral-200: #DEE2E6;
+  --color-neutral-300: #CED4DA;
+  --color-neutral-400: #ADB5BD;
+  --color-neutral-500: #6C757D;
+  --color-neutral-600: #495057;
+  --color-neutral-700: #343A40;
+  --color-neutral-800: #212529;
+  --color-neutral-900: #161719;
+}
 
 /* Base Styles */
 @layer base {
