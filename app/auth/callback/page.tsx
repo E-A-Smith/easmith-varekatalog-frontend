@@ -185,4 +185,7 @@ export default function AuthCallback() {
       </div>
     );
   }
+
+  // Fallback return (should never be reached due to state management)
+  return null;
 }
