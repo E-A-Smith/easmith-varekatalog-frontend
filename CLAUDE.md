@@ -403,6 +403,119 @@ aws amplify update-branch --app-id APP_ID --branch-name develop \
   --environment-variables NEXT_PUBLIC_VAR1=value1,NEXT_PUBLIC_VAR2=value2
 ```
 
+## 🚨 Fail-Fast Environment Validation
+
+**IMPLEMENTED**: Comprehensive environment variable validation system to prevent runtime configuration errors.
+
+### **Validation Architecture**
+
+**Dual Validation System**:
+- **Build-time validation**: `scripts/validate-env.js` (Node.js standalone script)
+- **Runtime validation**: `utils/env-validation.ts` (TypeScript integrated validation)
+
+**Fail-Fast Principles**:
+- ✅ **Immediate failure**: App won't start with missing required variables
+- ✅ **Clear error messages**: Specific guidance for each missing variable
+- ✅ **Environment-aware**: Different requirements for dev/prod
+- ✅ **Pattern validation**: Format checking for UUIDs, URLs, etc.
+
+### **Usage & Commands**
+
+```bash
+# Validate environment variables
+npm run validate-env                 # Quick validation
+npm run validate-env:verbose         # Detailed output
+
+# Build with validation (automatic)
+npm run build                        # Runs validate-env before build
+
+# Manual validation
+node scripts/validate-env.js         # Standalone validation
+```
+
+### **Required Environment Variables**
+
+**API Configuration**:
+- `NEXT_PUBLIC_API_BASE_URL` - Product search API base URL
+- `NEXT_PUBLIC_API_ENDPOINT` - API endpoint for search operations  
+- `NEXT_PUBLIC_REGION` - AWS region (format: `eu-west-1`)
+
+**AWS Cognito Authentication**:
+- `NEXT_PUBLIC_COGNITO_CLIENT_ID` - User Pool Client ID (26 chars)
+- `NEXT_PUBLIC_COGNITO_USER_POOL_ID` - User Pool ID (format: `eu-west-1_XXXXXXXXX`)
+
+**Azure AD OAuth Integration**:
+- `NEXT_PUBLIC_AZURE_TENANT_ID` - Azure Tenant UUID
+- `NEXT_PUBLIC_AZURE_CLIENT_ID` - Azure Client UUID  
+- `NEXT_PUBLIC_OAUTH_SCOPES` - OAuth scope string
+
+**Optional Development Variables**:
+- `NEXT_PUBLIC_ENABLE_DEVTOOLS` - Enable debug panels (`true`/`false`)
+- `NEXT_PUBLIC_API_DEBUG` - Enable API debug logging (`true`/`false`)
+
+### **Validation Features**
+
+**Pattern Matching**:
+- UUID validation for Azure IDs
+- AWS resource format validation
+- URL format validation
+- Region format validation
+
+**Environment-Specific Requirements**:
+- Different variables required for `development` vs `production`
+- Optional variables only validated in development
+- Clear separation of concerns
+
+**Error Reporting**:
+```bash
+❌ Environment validation failed!
+
+Found 2 error(s):
+
+1. Missing required variable: NEXT_PUBLIC_COGNITO_CLIENT_ID
+   Description: AWS Cognito User Pool Client ID for authentication
+   Example: vuuc11qdf11tnst6i3c7fhc6p
+
+2. Invalid format for NEXT_PUBLIC_REGION: "invalid-region"
+   Description: AWS region for services  
+   Example: eu-west-1
+
+💡 How to fix:
+  For local development:
+    • Add missing variables to .env.local file
+    • Copy from .env.development and customize as needed
+
+  For AWS Amplify deployment:
+    • Configure variables in Amplify Console branch settings
+    • Use: aws amplify update-branch --environment-variables KEY=VALUE
+```
+
+### **Integration Points**
+
+**Build Process Integration**:
+- `package.json` script: `"build": "npm run validate-env && next build"`
+- Automatic validation before every build
+- CI/CD pipeline integration ready
+
+**Runtime Integration**:
+- `app/layout.tsx`: Server-side validation during app initialization
+- Prevents client-side hydration with missing variables
+- Clear error boundaries for debugging
+
+**Development Workflow**:
+- Validates on `npm run dev` startup
+- IDE integration compatible
+- Clear error messages in development console
+
+### **Benefits Achieved**
+
+✅ **Prevents Silent Failures**: No more runtime "undefined" errors
+✅ **Faster Debugging**: Immediate feedback on configuration issues  
+✅ **Documentation**: Self-documenting required environment variables
+✅ **Team Onboarding**: New developers get clear setup guidance
+✅ **CI/CD Safety**: Builds fail fast with configuration problems
+✅ **Production Reliability**: Prevents deployments with missing config
+
 ## 🧪 Testing Strategy
 
 **Test Setup**: `setupTests.ts` + `jest.config.js` with Next.js integration

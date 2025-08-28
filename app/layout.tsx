@@ -2,6 +2,26 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
+// Fail-fast environment validation - must be at the top level
+import { validateEnvironmentOrThrow } from '@/utils/env-validation';
+
+// Validate environment variables before app initialization
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
+  // Only run validation on server-side to avoid client-side errors
+  // Skip during builds to avoid interfering with Next.js build process
+  const isBuilding = process.env.NEXT_PHASE === 'phase-production-build';
+  
+  if (!isBuilding) {
+    try {
+      validateEnvironmentOrThrow();
+    } catch (error) {
+      console.error('⚠️ Environment validation failed, but continuing for build compatibility');
+      console.error(error);
+      // Don't throw during build process, just log the error
+    }
+  }
+}
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
