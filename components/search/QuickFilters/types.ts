@@ -9,15 +9,9 @@ export interface FilterState {
   
   /** Selected category filter */
   category: string;
-  
-  /** Selected stock status filter */
-  stock: string;
 }
 
 export interface QuickFiltersProps {
-  /** Total number of items being filtered */
-  totalItems?: number;
-  
   /** Callback when filters change */
   onFiltersChange?: (filters: FilterState) => void;
   

@@ -13,14 +13,12 @@ import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
 
 export const QuickFilters: FC<QuickFiltersProps> = ({
-  totalItems = 0,
   onFiltersChange,
   className
 }) => {
   const [filters, setFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
-    category: 'Alle kategorier', 
-    stock: 'Alle'
+    category: 'Alle kategorier'
   });
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
@@ -70,13 +68,6 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
     'Maling og lakk'
   ];
 
-  const stockOptions = [
-    'Alle',
-    'På lager',
-    'Få igjen', 
-    'Utsolgt',
-    'Bestillingsvare'
-  ];
 
 
   return (
@@ -137,31 +128,6 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
           <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
         </div>
 
-        {/* Stock Filter */}
-        <div className="relative">
-          <select
-            id="stock-filter"
-            name="stock"
-            value={filters.stock}
-            onChange={(e) => handleFilterChange('stock', e.target.value)}
-            className="
-              appearance-none bg-transparent
-              text-sm font-medium text-neutral-700
-              pr-6 pl-1 py-1
-              border-none outline-none
-              cursor-pointer
-              hover:text-byggern-blue
-              transition-colors duration-150
-            "
-          >
-            {stockOptions.map(option => (
-              <option key={option} value={option}>
-                Lager: {option}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
-        </div>
 
       </div>
 
