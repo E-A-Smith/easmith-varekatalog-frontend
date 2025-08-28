@@ -134,7 +134,51 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Perform search
+    // Check if we should use external API (now requires OAuth authentication)
+    const externalApiUrl = process.env.EXTERNAL_API_URL;
+    
+    if (externalApiUrl) {
+      // Call external API - NOTE: OAuth authentication now required
+      try {
+        const externalResponse = await fetch(`${externalApiUrl}/search`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+            // NOTE: Authorization header would be needed for OAuth
+            // 'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({
+            søketekst: query,
+            side: 1,
+            sideStørrelse: limit,
+            sortering: 'relevans'
+          }),
+          signal: AbortSignal.timeout(10000) // 10 second timeout
+        });
+        
+        if (externalResponse.ok) {
+          const externalData = await externalResponse.json();
+          return NextResponse.json(externalData);
+        } else if (externalResponse.status === 401) {
+          // OAuth authentication required - return specific error
+          console.warn('External API requires authentication (OAuth):', externalResponse.status);
+          return NextResponse.json({
+            success: false,
+            error: 'Authentication required',
+            message: 'API now requires OAuth authentication. Please implement login flow.',
+            authRequired: true,
+            timestamp: new Date().toISOString(),
+          }, { status: 401 });
+        } else {
+          console.warn('External API failed:', externalResponse.status);
+        }
+      } catch (error) {
+        console.warn('External API error:', error);
+      }
+    }
+
+    // Fallback to mock data
     const results = searchProducts(query);
     
     // Apply pagination
@@ -191,7 +235,51 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { query = '', filters = {}, sort = {}, limit = 50, offset = 0 } = body;
 
-    // Perform search with filters (simplified implementation)
+    // Check if we should use external API (now requires OAuth authentication)
+    const externalApiUrl = process.env.EXTERNAL_API_URL;
+    
+    if (externalApiUrl) {
+      // Call external API - NOTE: OAuth authentication now required
+      try {
+        const externalResponse = await fetch(`${externalApiUrl}/search`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+            // NOTE: Authorization header would be needed for OAuth
+            // 'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({
+            søketekst: query,
+            side: 1,
+            sideStørrelse: limit,
+            sortering: 'relevans'
+          }),
+          signal: AbortSignal.timeout(10000) // 10 second timeout
+        });
+        
+        if (externalResponse.ok) {
+          const externalData = await externalResponse.json();
+          return NextResponse.json(externalData);
+        } else if (externalResponse.status === 401) {
+          // OAuth authentication required - return specific error
+          console.warn('External API requires authentication (OAuth):', externalResponse.status);
+          return NextResponse.json({
+            success: false,
+            error: 'Authentication required',
+            message: 'API now requires OAuth authentication. Please implement login flow.',
+            authRequired: true,
+            timestamp: new Date().toISOString(),
+          }, { status: 401 });
+        } else {
+          console.warn('External API failed, falling back to mock data:', externalResponse.status);
+        }
+      } catch (error) {
+        console.warn('External API error, falling back to mock data:', error);
+      }
+    }
+
+    // Fallback to mock data - perform search with filters (simplified implementation)
     let results = searchProducts(query);
     
     // Apply basic filters

@@ -40,9 +40,10 @@ export class SimpleApiClient {
       method?: 'GET' | 'POST';
       body?: unknown;
       params?: Record<string, string | number>;
+      token?: string;
     } = {}
   ): Promise<T> {
-    const { method = 'GET', body, params } = options;
+    const { method = 'GET', body, params, token } = options;
     
     // Build URL with params
     let url = `${API_CONFIG.baseUrl}${endpoint}`;
@@ -54,12 +55,19 @@ export class SimpleApiClient {
       url += `?${searchParams.toString()}`;
     }
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+
+    // Add Authorization header if token is provided
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const fetchOptions: RequestInit = {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
+      headers,
       signal: AbortSignal.timeout(API_CONFIG.timeout)
     };
 
@@ -73,8 +81,21 @@ export class SimpleApiClient {
       const response = await fetch(url, fetchOptions);
       
       if (!response.ok) {
+        // Try to get error details from response
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = `${errorData.error}: ${errorData.message || errorData.error}`;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch {
+          // If we can't parse JSON error, use status text
+        }
+        
         throw new ApiError(
-          `HTTP ${response.status}: ${response.statusText}`,
+          errorMessage,
           response.status
         );
       }
@@ -98,9 +119,10 @@ export class SimpleApiClient {
     }
   }
 
-  async healthCheck(): Promise<boolean> {
+  async healthCheck(token?: string): Promise<boolean> {
     try {
-      const response = await this.request<{ status: string }>('/health');
+      const options = token ? { token } : {};
+      const response = await this.request<{ status: string }>('/health', options);
       this.log('Health check response:', response);
       // Check if the response indicates healthy status
       return response && (response as { status?: string }).status === 'healthy';
@@ -110,29 +132,73 @@ export class SimpleApiClient {
     }
   }
 
-  async searchProducts(query: ProductSearchQuery): Promise<Product[]> {
-    // Use GET endpoint with query parameters for simpler implementation
-    const searchParams = {
-      q: query.søketekst || '',
-      limit: String(query.sideStørrelse || 50),
-      offset: String(((query.side || 1) - 1) * (query.sideStørrelse || 50))
+  async searchProducts(query: ProductSearchQuery, token?: string): Promise<Product[]> {
+    // Use POST endpoint as required by the AWS API Gateway
+    const searchBody = {
+      søketekst: query.søketekst || '',
+      side: query.side || 1,
+      sideStørrelse: query.sideStørrelse || 50,
+      sortering: query.sortering || 'relevans'
     };
     
-    const result = await this.request<{ 
-      success: boolean; 
-      results: Product[]; 
-      total: number;
-      responseTime: string;
-    }>('/search', { 
-      method: 'GET',
-      params: searchParams
-    });
+    this.log('Searching products:', searchBody);
     
-    return result.results || [];
+    try {
+      // Try with authentication token first if available
+      const options = token ? 
+        { method: 'POST' as const, body: searchBody, token } :
+        { method: 'POST' as const, body: searchBody };
+      
+      const result = await this.request<{ 
+        success: boolean; 
+        results: Product[]; 
+        total: number;
+        responseTime: string;
+      }>('/search', options);
+      
+      // Handle different response formats
+      if (Array.isArray(result)) {
+        return result;
+      }
+      
+      return result.results || [];
+
+    } catch (error) {
+      // If authentication fails but we have a token, try without token (public access)
+      if (token && error instanceof ApiError && error.status === 401) {
+        this.log('Authenticated request failed, trying public access...');
+        
+        try {
+          const publicResult = await this.request<{ 
+            success: boolean; 
+            results: Product[]; 
+            total: number;
+            responseTime: string;
+          }>('/search', { method: 'POST', body: searchBody });
+          
+          if (Array.isArray(publicResult)) {
+            return publicResult;
+          }
+          
+          return publicResult.results || [];
+        } catch (publicError) {
+          this.log('Public access also failed:', publicError);
+          // Create enhanced error message indicating both attempts failed
+          throw new ApiError(
+            `${error.message} (public access failed)`,
+            error.status
+          );
+        }
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
   }
 
-  async getProduct(id: string): Promise<Product> {
-    return this.request<Product>(`/products/${id}`);
+  async getProduct(id: string, token?: string): Promise<Product> {
+    const options = token ? { token } : {};
+    return this.request<Product>(`/products/${id}`, options);
   }
 }
 

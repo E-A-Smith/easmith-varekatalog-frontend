@@ -340,14 +340,17 @@ wide: 1920px+          /* Maximum productivity layout */
 
 **Local Development** (`.env.local` - not committed):
 ```bash
-# Primary API Configuration (DEV Environment)
-NEXT_PUBLIC_API_BASE_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
-NEXT_PUBLIC_API_ENDPOINT=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+# API Configuration - Local Development (uses built-in Next.js API routes)
+NEXT_PUBLIC_API_BASE_URL=/api
+NEXT_PUBLIC_API_ENDPOINT=/api
 NEXT_PUBLIC_REGION=eu-west-1
 
-# AWS Cognito Authentication (DEV Environment)
+# AWS Cognito Authentication - DEV Environment
 NEXT_PUBLIC_COGNITO_CLIENT_ID=vuuc11qdf11tnst6i3c7fhc6p
 NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
+
+# External AWS API Gateway (requires authentication)
+# EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
 **AWS Amplify Deployment Strategy** (Updated 2024):
@@ -360,22 +363,29 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 **Environment Management Philosophy**:
 - **Version Controlled**: All environment configs are part of the codebase
 - **Branch-Based**: `develop` branch uses `.env.development`, `main` uses `.env.production`
+- **Local Override**: `.env.local` overrides deployed environment for local development
 - **Single Source of Truth**: No duplicate configuration in Amplify Console
 - **Developer Experience**: New developers get correct config with `git clone`
-- **Consistency**: Local development matches deployed environment exactly
+- **Deployment vs Development**: Different endpoints for local testing vs deployed integration
 
 **Environment File Structure** (Following 2024 Best Practices):
-- `.env.local` - Local development overrides (gitignored)
-- `.env.development` - Development environment defaults (used by develop branch)
-- `.env.production` - Production environment defaults (used by main/master branch)
-- API proxy automatically disabled in production builds
+- `.env.local` - Local development overrides (uses Next.js API routes with mock data)
+- `.env.development` - AWS Amplify dev deployment (uses AWS API Gateway DEV stage)  
+- `.env.production` - AWS Amplify production deployment (uses AWS API Gateway PROD stage)
+- API proxy disabled (uses direct API calls)
 
 **Migration Completed**: All Amplify Console environment variables removed (2024-12-28)
 
 **⚠️ CRITICAL: Environment Variable Policy**:
-- **DO NOT** add environment variables in AWS Amplify Console
-- **DO** update the appropriate `.env.*` files in the codebase
-- **EXCEPTION**: Only use Amplify Console for truly secret variables (API keys, passwords) that shouldn't be version controlled
+- **PUBLIC VARIABLES**: Use `NEXT_PUBLIC_*` prefix and store in `.env.*` files (version controlled)
+- **SECRET VARIABLES**: Use plain names (no `NEXT_PUBLIC_*`) and store in AWS Amplify Console only
+- **SECURITY**: API keys, passwords, and tokens must NEVER be in version-controlled files
+
+**API Access Configuration**:
+- ✅ **Current Status**: AWS API Gateway configured for public access (no authentication required)
+- ✅ **API Endpoints**: `https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev`
+- ✅ **Method**: POST requests to `/search` endpoint with JSON payload
+- ⚠️ **Future**: If API keys are added, follow server-side proxy pattern above
 - **BRANCH MAPPING**: 
   - `develop` branch → `.env.development` 
   - `main`/`master` branch → `.env.production`

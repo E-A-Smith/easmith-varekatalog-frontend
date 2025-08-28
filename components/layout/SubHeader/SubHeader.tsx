@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { SubHeaderProps } from './types';
+import { LoginButton } from '@/components/auth/LoginButton';
 
 /**
  * SubHeader Component for Varekatalog
@@ -17,7 +18,7 @@ export const SubHeader: FC<SubHeaderProps> = ({
         h-9 
         bg-neutral-50 
         border-b border-neutral-200
-        flex items-center
+        flex items-center justify-between
         px-6
         ${className}
       `}
@@ -26,6 +27,9 @@ export const SubHeader: FC<SubHeaderProps> = ({
       <span className="text-sm text-neutral-700 font-medium">
         Varekatalog for Løvenskiold Logistikk levert av Byggern
       </span>
+      
+      {/* Login Button - positioned in upper right corner */}
+      <LoginButton compact className="flex-shrink-0" />
     </div>
   );
 };

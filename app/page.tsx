@@ -7,7 +7,9 @@ import { NOBBLink } from '../components/ui/NOBBLink';
 import { SubHeader, Header } from '../components/layout';
 import { QuickFilters } from '../components/search';
 import { useProductSearch } from '../hooks';
+import { useAuth } from '../hooks/useAuth';
 import { FilterState } from '../components/search/QuickFilters/types';
+import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
 
@@ -28,7 +30,8 @@ const catalogProducts: Product[] = [
 ];
 
 export default function Dashboard() {
-  const { searchState, searchProducts } = useProductSearch();
+  const { authState, getAccessToken } = useAuth();
+  const { searchState, searchProducts } = useProductSearch(authState.accessToken);
   const [filters, setFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
     category: 'Alle kategorier',
@@ -136,9 +139,9 @@ export default function Dashboard() {
   };
   
   // Determine which data to display and apply filters
-  const baseData = searchState.hasSearched && searchState.results.length > 0 
-    ? searchState.results 
-    : catalogProducts;
+  const baseData = searchState.hasSearched 
+    ? searchState.results  // Use API results (empty if API failed)
+    : catalogProducts;     // Only use local data if no search attempted
     
   const filteredData = applyFilters(baseData);
 
@@ -242,6 +245,9 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      
+      {/* Debug Panel - Only in development */}
+      {process.env.NODE_ENV === 'development' && <ApiDebugPanel />}
     </div>
   );
 }

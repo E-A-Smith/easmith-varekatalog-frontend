@@ -9,7 +9,35 @@ export async function GET() {
   try {
     const startTime = Date.now();
     
-    // Basic health checks
+    // Check if we should proxy to external API
+    const externalApiUrl = process.env.EXTERNAL_API_URL;
+    const apiKey = process.env.API_KEY;
+    
+    if (externalApiUrl && apiKey) {
+      // Try external health check first
+      try {
+        const externalResponse = await fetch(`${externalApiUrl}/health`, {
+          headers: {
+            'x-api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          signal: AbortSignal.timeout(5000) // 5 second timeout for health check
+        });
+        
+        if (externalResponse.ok) {
+          const externalData = await externalResponse.json();
+          return NextResponse.json({
+            ...externalData,
+            proxy: 'external-api',
+            localResponseTime: `${Date.now() - startTime}ms`
+          });
+        }
+      } catch (error) {
+        console.warn('External health check failed:', error);
+      }
+    }
+    
+    // Local health checks
     const healthChecks = {
       timestamp: new Date().toISOString(),
       status: 'healthy',
@@ -17,6 +45,7 @@ export async function GET() {
       environment: process.env.NODE_ENV || 'development',
       build: 'Phase 1.2',
       uptime: process.uptime ? Math.floor(process.uptime()) : 0,
+      proxy: 'local-mock',
     };
 
     // Simulate response time for monitoring

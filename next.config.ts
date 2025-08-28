@@ -59,26 +59,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', '@aws-sdk/client-cognito-identity-provider'],
   },
 
-  // API proxy for development only (production uses direct API calls)
+  // No API proxy needed - using local API routes directly
   async rewrites() {
-    // Only enable proxy in development - production should call API directly
-    if (process.env.NODE_ENV === 'production') {
-      return [];
-    }
-    
-    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT || process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (!apiEndpoint) {
-      console.warn('No API endpoint configured for proxy rewrites');
-      return [];
-    }
-    
-    return [
-      // API proxy for development environment
-      {
-        source: '/api/:path*',
-        destination: `${apiEndpoint}/:path*`,
-      },
-    ];
+    return [];
   },
 };
 
