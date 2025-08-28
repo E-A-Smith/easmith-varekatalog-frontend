@@ -333,7 +333,8 @@ wide: 1920px+          /* Maximum productivity layout */
 - **Node.js Version**: 20 LTS (AWS Amplify compatibility - Node.js 22 not yet supported)
 - **Local Development**: Node.js 22 LTS supported for local development
 - **Auto-deploy branch**: `develop` → https://develop.d226fk1z311q90.amplifyapp.com/
-- **Environment Stage**: DEVELOPMENT (loads .env.development correctly)
+- **Environment Stage**: DEVELOPMENT (uses Amplify branch environment variables)
+- **Environment Variables**: Configured directly in Amplify branch (not via .env files)
 - **Build artifacts**: `.next/` directory
 - **Security headers**: CSP, HSTS configured in `next.config.ts`
 
