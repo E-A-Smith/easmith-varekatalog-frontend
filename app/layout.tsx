@@ -37,6 +37,12 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Varekatalog - Digital produktkatalog",
   description: "Digital produktkatalog for Byggern - Rask og sikker produktsøk",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' }
+    ]
+  }
 };
 
 export default function RootLayout({
