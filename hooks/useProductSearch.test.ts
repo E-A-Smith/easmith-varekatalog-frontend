@@ -99,11 +99,8 @@ describe('useProductSearch Hook', () => {
       
       const { result } = renderHook(() => useProductSearch());
       
-      let loadingState: string | undefined;
-      
       act(() => {
         result.current.searchProducts('test');
-        loadingState = result.current.searchState.loadingState;
       });
       
       // Should be loading immediately after starting search

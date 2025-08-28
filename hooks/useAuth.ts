@@ -123,11 +123,13 @@ export const useAuth = (): AuthContext => {
         user.authenticateUser(authDetails, {
           onSuccess: resolve,
           onFailure: reject,
-          newPasswordRequired: (userAttributes, requiredAttributes) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          newPasswordRequired: (_userAttributes, _requiredAttributes) => {
             // Handle new password requirement if needed
             reject(new Error('New password required'));
           },
-          mfaRequired: (challengeName, challengeParameters) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          mfaRequired: (_challengeName, _challengeParameters) => {
             // Handle MFA if needed
             reject(new Error('MFA required'));
           },

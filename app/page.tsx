@@ -31,7 +31,7 @@ const catalogProducts: Product[] = [
 
 export default function Dashboard() {
   const { authState } = useAuth();
-  const { searchState, searchProducts } = useProductSearch(authState.accessToken);
+  const { searchState, searchProducts } = useProductSearch(authState.accessToken || undefined);
   const [filters, setFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
     category: 'Alle kategorier',
