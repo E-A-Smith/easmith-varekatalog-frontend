@@ -5,10 +5,10 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
@@ -188,4 +188,23 @@ export default function AuthCallback() {
 
   // Fallback return (should never be reached due to state management)
   return null;
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+          <div className="text-center">
+            <div className="animate-spin h-12 w-12 border-4 border-byggern-blue border-t-transparent rounded-full mx-auto mb-4" />
+            <h1 className="text-xl font-semibold text-neutral-800 mb-2">
+              Laster autentisering...
+            </h1>
+          </div>
+        </div>
+      }
+    >
+      <AuthCallbackContent />
+    </Suspense>
+  );
 }
