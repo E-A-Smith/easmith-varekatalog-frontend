@@ -9,6 +9,9 @@ export interface FilterState {
   
   /** Selected category filter */
   category: string;
+  
+  /** Selected stock status filter */
+  stock: string;
 }
 
 export interface QuickFiltersProps {

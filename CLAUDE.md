@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **standalone frontend repository** extracted from the main varekatalog monorepo at `/home/rydesp/dev/varekatalog/`.
 
-**Original Location**: `/home/rydesp/dev/varekatalog/src/frontend/`  
+
 **New Location**: `/home/rydesp/dev/easmith-varekatalog-frontend/` (this repository)
 
 ## 🚀 Development Commands
@@ -344,8 +344,6 @@ wide: 1920px+          /* Maximum productivity layout */
 - **Categories**: Building supplies categories (Sikkerhet, Beslag, Festing, etc.)
 
 **Search Performance Goal**: <2 second response time for store staff during customer interactions
-
-**API Fallback Strategy**: `useProductSearch` hook includes mock Norwegian product data when API unavailable
 
 ## 🔗 AWS Amplify Deployment
 
