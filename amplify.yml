@@ -13,7 +13,8 @@ applications:
               if [ "$AWS_BRANCH" = "develop" ]; then
                 echo "NEXT_PUBLIC_API_BASE_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev" >> .env.production
                 echo "NEXT_PUBLIC_API_ENDPOINT=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev" >> .env.production
-                echo "Configured development API endpoints for branch: $AWS_BRANCH"
+                echo "NEXT_PUBLIC_ENABLE_DEVTOOLS=true" >> .env.production
+                echo "Configured development API endpoints and devtools for branch: $AWS_BRANCH"
               fi
             - npm run build
         postBuild:

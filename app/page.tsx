@@ -245,8 +245,8 @@ export default function Dashboard() {
         </div>
       </div>
       
-      {/* Debug Panel - Only in development */}
-      {process.env.NODE_ENV === 'development' && <ApiDebugPanel />}
+      {/* Debug Panel - Only when devtools enabled */}
+      {process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true' && <ApiDebugPanel />}
     </div>
   );
 }

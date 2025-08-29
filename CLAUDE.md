@@ -397,7 +397,9 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 
 **ROOT CAUSE EXPLAINED**: Next.js automatically sets `NODE_ENV=production` for ALL build commands (`npm run build`, `next build`), regardless of Amplify branch. This causes Next.js to ALWAYS load `.env.production` during Amplify builds, even for the "develop" branch. This is Next.js designed behavior, not an Amplify bug.
 
-**SOLUTION IMPLEMENTED**: The `amplify.yml` now overrides `.env.production` with branch-specific API endpoints during build using the `$AWS_BRANCH` environment variable
+**SOLUTION IMPLEMENTED**: The `amplify.yml` now overrides `.env.production` with branch-specific API endpoints and development features during build using the `$AWS_BRANCH` environment variable
+
+**DEBUG PANEL FIX**: Changed from `NODE_ENV === 'development'` to `NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true'` check to ensure debug panel appears in both local development and Amplify development environments
 
 **⚠️ CRITICAL: Environment Variable Policy**:
 - **PUBLIC VARIABLES**: Use `NEXT_PUBLIC_*` prefix and store in `.env.*` files (version controlled)
