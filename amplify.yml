@@ -8,6 +8,13 @@ applications:
             - npm ci
         build:
           commands:
+            # Override production defaults with branch-specific values
+            - |
+              if [ "$AWS_BRANCH" = "develop" ]; then
+                echo "NEXT_PUBLIC_API_BASE_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev" >> .env.production
+                echo "NEXT_PUBLIC_API_ENDPOINT=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev" >> .env.production
+                echo "Configured development API endpoints for branch: $AWS_BRANCH"
+              fi
             - npm run build
         postBuild:
           commands:

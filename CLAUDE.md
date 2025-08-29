@@ -395,6 +395,10 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 
 **CRITICAL DISCOVERY**: Amplify branch stage (DEVELOPMENT/PRODUCTION) does NOT affect .env file loading
 
+**ROOT CAUSE EXPLAINED**: Next.js automatically sets `NODE_ENV=production` for ALL build commands (`npm run build`, `next build`), regardless of Amplify branch. This causes Next.js to ALWAYS load `.env.production` during Amplify builds, even for the "develop" branch. This is Next.js designed behavior, not an Amplify bug.
+
+**SOLUTION IMPLEMENTED**: The `amplify.yml` now overrides `.env.production` with branch-specific API endpoints during build using the `$AWS_BRANCH` environment variable
+
 **⚠️ CRITICAL: Environment Variable Policy**:
 - **PUBLIC VARIABLES**: Use `NEXT_PUBLIC_*` prefix and store in `.env.*` files (version controlled)
 - **SECRET VARIABLES**: Use plain names (no `NEXT_PUBLIC_*`) and store in AWS Amplify Console only
