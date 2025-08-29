@@ -18,7 +18,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
 }) => {
   const [filters, setFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
-    category: 'Alle kategorier'
+    category: 'Alle kategorier',
+    stock: 'Alle'
   });
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {

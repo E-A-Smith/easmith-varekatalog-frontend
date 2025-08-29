@@ -184,7 +184,6 @@ export default function Dashboard() {
       
       {/* Quick Filters section (36px) */}
       <QuickFilters 
-        totalItems={filteredData.length}
         onFiltersChange={(newFilters) => {
           setFilters(newFilters);
           resetPagination();
