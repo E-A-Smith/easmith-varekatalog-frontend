@@ -214,9 +214,37 @@ fontSize: {
 <p className="font-sans text-base text-neutral-600">
 ```
 
-## 🚨 TROUBLESHOOTING: Critical Tailwind v4 Configuration
+## 🚨 TROUBLESHOOTING: Critical Configuration Issues
 
-### **Common Issues & Solutions**
+### **Environment Variables in AWS Amplify + Next.js**
+
+**Issue: Environment variables not loading in Amplify deployment**
+```
+Error: API calls using /api instead of configured external endpoint
+Debug panel shows: Base URL: /api (should show external URL)
+```
+
+**Root Cause**: Next.js processes environment variables BEFORE amplify.yml build scripts execute.
+
+**Solution**: Configure environment variables directly in AWS Amplify Console:
+```bash
+# Via AWS CLI
+aws amplify update-branch --app-id YOUR_APP_ID --branch-name develop \
+  --environment-variables NEXT_PUBLIC_API_BASE_URL=https://external-api.com
+
+# Via Amplify Console UI: App Settings → Environment Variables → Branch-specific
+```
+
+**❌ NEVER do this** (injection happens too late):
+```yaml
+# amplify.yml
+build:
+  commands:
+    - echo "NEXT_PUBLIC_VAR=value" >> .env.production  # FAILS!
+    - npm run build
+```
+
+### **Tailwind CSS v4 Configuration Issues**
 
 **Issue 1: Tailwind CSS not loading (styles appear as black/white)**
 ```css
@@ -398,6 +426,40 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 **ROOT CAUSE EXPLAINED**: Next.js automatically sets `NODE_ENV=production` for ALL build commands (`npm run build`, `next build`), regardless of Amplify branch. This causes Next.js to ALWAYS load `.env.production` during Amplify builds, even for the "develop" branch. This is Next.js designed behavior, not an Amplify bug.
 
 **SOLUTION IMPLEMENTED**: Environment variables are configured directly in AWS Amplify Console for each branch. Build-time injection doesn't work because Next.js processes environment variables before the amplify.yml script runs.
+
+**CRITICAL LESSON: Next.js Environment Variable Processing Order**
+⚠️ **IMPORTANT**: Next.js reads and processes ALL environment variables (.env files + system environment) at the **START** of the build process, before any amplify.yml build commands execute. This means:
+
+❌ **What DOESN'T Work:**
+```yaml
+# amplify.yml - This approach FAILS
+build:
+  commands:
+    - echo "NEXT_PUBLIC_API_URL=..." >> .env.production  # TOO LATE!
+    - npm run build  # Next.js already processed environment
+```
+
+✅ **What WORKS:**
+```bash
+# Configure via AWS Amplify Console (before build starts)
+aws amplify update-branch --environment-variables KEY=VALUE
+
+# Or set in Amplify Console UI before deployment
+```
+
+**Correct AWS Amplify Environment Variable Workflow:**
+1. **Set variables in Amplify Console** (per branch)
+2. **Next.js sees them immediately** when build starts
+3. **Variables are baked into the client bundle** correctly
+
+**For Develop Branch (Configured via AWS CLI):**
+```bash
+NEXT_PUBLIC_API_BASE_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_API_ENDPOINT=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_ENABLE_DEVTOOLS=true
+```
+
+This ensures both local development and Amplify development environments use identical API endpoints and feature flags.
 
 **DEBUG PANEL FIX**: Changed from `NODE_ENV === 'development'` to `NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true'` check to ensure debug panel appears in both local development and Amplify development environments
 
