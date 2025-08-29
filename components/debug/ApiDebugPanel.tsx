@@ -193,7 +193,8 @@ export const ApiDebugPanel = () => {
       </div>
 
       <div className="text-xs text-neutral-500">
-        Environment: {process.env.NODE_ENV}
+        <div>Build Mode: {process.env.NODE_ENV} | Debug Mode: {process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true' ? 'Development' : 'Production'}</div>
+        <div className="mt-1">API Endpoint: {debugInfo.baseUrl}</div>
       </div>
     </div>
   );
