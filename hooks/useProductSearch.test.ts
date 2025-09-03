@@ -31,14 +31,22 @@ describe('useProductSearch Hook', () => {
   const mockProducts: Product[] = [
     {
       id: '1',
-      navn: 'VVS Rør 15mm',
+      navn: 'VVS Rör 15mm',
       vvsnr: 'VVS12345',
       lagerstatus: 'På lager',
       anbrekk: 'Nei',
       produsent: 'Uponor',
       pris: { salgspris: 15000, valuta: 'NOK', inkludertMva: true },
       kategori: 'Rør og koblingsutstyr',
-      beskrivelse: 'Kobberrør for varmt og kaldt vann'
+      beskrivelse: 'Kobberrør for varmt og kaldt vann',
+      // Required new fields for Phase 1
+      lh: 'TEST123',
+      nobbNumber: '41000001',
+      pakningAntall: 1,
+      prisenhet: 'STK',
+      lagerantall: 100,
+      grunnpris: 120.00,
+      nettopris: 150.00
     },
     {
       id: '2',
@@ -49,7 +57,15 @@ describe('useProductSearch Hook', () => {
       produsent: 'NIBE',
       pris: { salgspris: 35000, valuta: 'NOK', inkludertMva: true },
       kategori: 'Ovner og varme',
-      beskrivelse: 'Luft/vann-varmepumpe for enebolig'
+      beskrivelse: 'Luft/vann-varmepumpe for enebolig',
+      // Required new fields for Phase 1
+      lh: 'TEST456',
+      nobbNumber: '42000001',
+      pakningAntall: 1,
+      prisenhet: 'STK',
+      lagerantall: 5,
+      grunnpris: 28000.00,
+      nettopris: 35000.00
     }
   ];
   

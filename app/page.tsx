@@ -13,20 +13,224 @@ import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
 
-// Main product catalog data
+// Main product catalog data - Updated for 10-column table layout (Phase 1)
 const catalogProducts: Product[] = [
-  { id: '1', navn: 'Gipsplate 12,5mm 120x240cm', vvsnr: '98765432', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Gyproc', pris: { salgspris: 450, valuta: 'NOK', inkludertMva: true }, kategori: 'Byggematerialer' },
-  { id: '2', navn: 'Isolasjon steinull 50mm', vvsnr: '13579246', lagerstatus: 'Få igjen', anbrekk: 'Nei', produsent: 'Rockwool', pris: { salgspris: 125.5, valuta: 'NOK', inkludertMva: true }, kategori: 'Isolasjon' },
-  { id: '3', navn: 'Rørkryss 15mm messing', vvsnr: '24681357', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: 'Uponor', pris: { salgspris: 89.9, valuta: 'NOK', inkludertMva: true }, kategori: 'Rør og koblingsutstyr' },
-  { id: '4', navn: 'Parkett eik natur 14x140mm', vvsnr: '14725836', lagerstatus: 'Utsolgt', anbrekk: 'Nei', produsent: 'Tarkett', pris: { salgspris: 699, valuta: 'NOK', inkludertMva: true }, kategori: 'Gulv' },
-  { id: '5', navn: 'Vernebriller klar polykarbonat', vvsnr: '63749281', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: '3M', pris: { salgspris: 245, valuta: 'NOK', inkludertMva: true }, kategori: 'Sikkerhet' },
-  { id: '6', navn: 'Skrue treskrue 50mm galvanisert', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: 'Biltema', pris: { salgspris: 35.9, valuta: 'NOK', inkludertMva: true }, kategori: 'Skruer og bolter' },
-  { id: '7', navn: 'Beslag vinkelbeslag 90° stål', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Würth', pris: { salgspris: 89.5, valuta: 'NOK', inkludertMva: true }, kategori: 'Beslag' },
-  { id: '8', navn: 'Lim monteringslim 300ml', vvsnr: '11111111', lagerstatus: 'Utsolgt', anbrekk: 'Ja', produsent: 'Bostik', pris: { salgspris: 145, valuta: 'NOK', inkludertMva: true }, kategori: 'Lim og fugemasse' },
-  { id: '9', navn: 'Drill spiralbor 8mm HSS', vvsnr: '22222222', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: 'DeWalt', pris: { salgspris: 78.9, valuta: 'NOK', inkludertMva: true }, kategori: 'Verktøy' },
-  { id: '10', navn: 'Skrue gipsskrue 25mm', vvsnr: '33333333', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Essve', pris: { salgspris: 25.5, valuta: 'NOK', inkludertMva: true }, kategori: 'Skruer og bolter' },
-  { id: '11', navn: 'Maling vegmaling hvit 1L', vvsnr: '44444444', lagerstatus: 'Få igjen', anbrekk: 'Ja', produsent: 'Flügger', pris: { salgspris: 189, valuta: 'NOK', inkludertMva: true }, kategori: 'Maling og lakk' },
-  { id: '12', navn: 'Isolasjon steinull 100mm', vvsnr: '55555555', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Glava', pris: { salgspris: 234.5, valuta: 'NOK', inkludertMva: true }, kategori: 'Isolasjon' }
+  {
+    id: '1',
+    navn: 'SKRUE TRESKRUE 50MM GALVANISERT',
+    vvsnr: '12345678',
+    lagerstatus: 'På lager',
+    anbrekk: 'Ja',
+    produsent: 'BILTEMA',
+    kategori: 'Skruer og bolter',
+    pris: { salgspris: 35.9, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '123456',
+    nobbNumber: '60154545',
+    pakningAntall: 5,
+    lagerantall: 333,
+    prisenhet: 'STK',
+    grunnpris: 450.00,
+    nettopris: 562.50
+  },
+  {
+    id: '2',
+    navn: 'BESLAG VINKELBESLAG 90° STÅL',
+    vvsnr: '87654321',
+    lagerstatus: 'På lager',
+    anbrekk: 'Nei',
+    produsent: 'WÜRTH',
+    kategori: 'Beslag',
+    pris: { salgspris: 89.5, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '234567',
+    nobbNumber: '29252657',
+    pakningAntall: 1,
+    lagerantall: 127,
+    prisenhet: 'STK',
+    grunnpris: 89.50,
+    nettopris: 111.88
+  },
+  {
+    id: '3',
+    navn: 'ISOLASJON STEINULL 50MM',
+    vvsnr: '13579246',
+    lagerstatus: 'Få igjen',
+    anbrekk: 'Nei',
+    produsent: 'ROCKWOOL',
+    kategori: 'Isolasjon',
+    pris: { salgspris: 125.5, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '345678',
+    nobbNumber: '25704917',
+    pakningAntall: 10,
+    lagerantall: 23,
+    prisenhet: 'M2',
+    grunnpris: 125.50,
+    nettopris: 156.88
+  },
+  {
+    id: '4',
+    navn: 'VERNEBRILLER KLAR POLYKARBONAT',
+    vvsnr: '63749281',
+    lagerstatus: 'På lager',
+    anbrekk: 'Ja',
+    produsent: '3M',
+    kategori: 'Sikkerhet',
+    pris: { salgspris: 245, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '456789',
+    nobbNumber: '25704933',
+    pakningAntall: 1,
+    lagerantall: 89,
+    prisenhet: 'STK',
+    grunnpris: 245.00,
+    nettopris: 306.25
+  },
+  {
+    id: '5',
+    navn: 'RØRKRYSS 15MM MESSING',
+    vvsnr: '24681357',
+    lagerstatus: 'På lager',
+    anbrekk: 'Ja',
+    produsent: 'UPONOR',
+    kategori: 'Rør og koblingsutstyr',
+    pris: { salgspris: 89.9, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '567890',
+    nobbNumber: '60008533',
+    pakningAntall: 1,
+    lagerantall: 456,
+    prisenhet: 'STK',
+    grunnpris: 89.90,
+    nettopris: 112.38
+  },
+  {
+    id: '6',
+    navn: 'GIPSPLATE 12,5MM 120X240CM',
+    vvsnr: '98765432',
+    lagerstatus: 'På lager',
+    anbrekk: 'Nei',
+    produsent: 'GYPROC',
+    kategori: 'Byggematerialer',
+    pris: { salgspris: 450, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '678901',
+    nobbNumber: '60154715',
+    pakningAntall: 1,
+    lagerantall: 234,
+    prisenhet: 'STK',
+    grunnpris: 450.00,
+    nettopris: 562.50
+  },
+  {
+    id: '7',
+    navn: 'DRILL SPIRALBOR 8MM HSS',
+    vvsnr: '22222222',
+    lagerstatus: 'På lager',
+    anbrekk: 'Ja',
+    produsent: 'DEWALT',
+    kategori: 'Verktøy',
+    pris: { salgspris: 78.9, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '789012',
+    nobbNumber: '55841762',
+    pakningAntall: 1,
+    lagerantall: 78,
+    prisenhet: 'STK',
+    grunnpris: 78.90,
+    nettopris: 98.63
+  },
+  {
+    id: '8',
+    navn: 'LIM MONTERINGSLIM 300ML',
+    vvsnr: '11111111',
+    lagerstatus: 'Utsolgt',
+    anbrekk: 'Ja',
+    produsent: 'BOSTIK',
+    kategori: 'Lim og fugemasse',
+    pris: { salgspris: 145, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '890123',
+    nobbNumber: '27356237',
+    pakningAntall: 12,
+    lagerantall: 0,
+    prisenhet: 'STK',
+    grunnpris: 145.00,
+    nettopris: 181.25
+  },
+  {
+    id: '9',
+    navn: 'PARKETT EIK NATUR 14X140MM',
+    vvsnr: '14725836',
+    lagerstatus: 'Utsolgt',
+    anbrekk: 'Nei',
+    produsent: 'TARKETT',
+    kategori: 'Gulv',
+    pris: { salgspris: 699, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '901234',
+    nobbNumber: '60644213',
+    pakningAntall: 1,
+    lagerantall: 0,
+    prisenhet: 'M2',
+    grunnpris: 699.00,
+    nettopris: 873.75
+  },
+  {
+    id: '10',
+    navn: 'SKRUE GIPSSKRUE 25MM',
+    vvsnr: '33333333',
+    lagerstatus: 'På lager',
+    anbrekk: 'Nei',
+    produsent: 'ESSVE',
+    kategori: 'Skruer og bolter',
+    pris: { salgspris: 25.5, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '012345',
+    nobbNumber: '60153959',
+    pakningAntall: 100,
+    lagerantall: 1250,
+    prisenhet: 'POS',
+    grunnpris: 25.50,
+    nettopris: 31.88
+  },
+  {
+    id: '11',
+    navn: 'MALING VEGMALING HVIT 1L',
+    vvsnr: '44444444',
+    lagerstatus: 'Få igjen',
+    anbrekk: 'Ja',
+    produsent: 'FLÜGGER',
+    kategori: 'Maling og lakk',
+    pris: { salgspris: 189, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '112233',
+    nobbNumber: '60154545',
+    pakningAntall: 1,
+    lagerantall: 12,
+    prisenhet: 'STK',
+    grunnpris: 189.00,
+    nettopris: 236.25
+  },
+  {
+    id: '12',
+    navn: 'ISOLASJON STEINULL 100MM',
+    vvsnr: '55555555',
+    lagerstatus: 'På lager',
+    anbrekk: 'Nei',
+    produsent: 'GLAVA',
+    kategori: 'Isolasjon',
+    pris: { salgspris: 234.5, valuta: 'NOK', inkludertMva: true },
+    // New fields for 10-column layout
+    lh: '223344',
+    nobbNumber: '29252657',
+    pakningAntall: 5,
+    lagerantall: 67,
+    prisenhet: 'M2',
+    grunnpris: 234.50,
+    nettopris: 293.13
+  }
 ];
 
 export default function Dashboard() {
@@ -43,11 +247,12 @@ export default function Dashboard() {
   const itemsPerPage = 10;
 
 
-  // Define table columns for consistent display
+  // Define table columns for complete 10-column layout (Phase 1)
+  // Simulating "not logged in" state - showing **** for sensitive data
   const tableColumns = [
     { 
       key: 'lagerstatus', 
-      label: 'Status', 
+      label: '', 
       align: 'center' as const,
       render: (value: unknown) => {
         const status = value as string;
@@ -61,48 +266,67 @@ export default function Dashboard() {
         );
       }
     },
-    { key: 'navn', label: 'Produktnavn' },
-    { key: 'produsent', label: 'Leverandør' },
+    { key: 'navn', label: 'Product Name' },
+    { key: 'produsent', label: 'Supplier' },
     { 
-      key: 'vvsnr', 
-      label: 'VVS-nr', 
+      key: 'lh', 
+      label: 'LH', 
       align: 'center' as const,
       render: (value: unknown) => (
         <span className="font-mono text-sm text-neutral-700">{value as string}</span>
       )
     },
-    { key: 'anbrekk', label: 'Anbrekk', align: 'center' as const },
     { 
-      key: 'pris', 
-      label: 'Pris', 
-      align: 'right' as const,
-      render: (value: unknown) => {
-        if (!value) return <span className="text-neutral-500">—</span>;
-        
-        // Handle both old string format and new PriceInfo format
-        if (typeof value === 'string') {
-          return (
-            <span className="font-semibold text-neutral-800">
-              kr {value}
-            </span>
-          );
-        }
-        
-        // New PriceInfo format
-        const priceInfo = value as { salgspris: number; valuta: string };
-        return (
-          <span className="font-semibold text-neutral-800">
-            kr {priceInfo.salgspris.toFixed(2)}
-          </span>
-        );
-      }
-    },
-    { 
-      key: 'nobb-link', 
+      key: 'nobbNumber', 
       label: 'NOBB', 
       align: 'center' as const,
       render: (value: unknown, row: unknown) => (
-        <NOBBLink vvsNumber={(row as Product).vvsnr || ''} size="sm" />
+        <NOBBLink 
+          vvsNumber={(row as Product).nobbNumber || ''} 
+          displayText={(row as Product).nobbNumber || ''}
+          size="sm" 
+        />
+      )
+    },
+    { key: 'anbrekk', label: 'Anbr', align: 'center' as const },
+    { 
+      key: 'pakningAntall', 
+      label: '# i pakning', 
+      align: 'center' as const,
+      render: (value: unknown) => (
+        <span className="text-neutral-700">{value as number}</span>
+      )
+    },
+    { 
+      key: 'lagerantall', 
+      label: 'Lagerantall', 
+      align: 'right' as const,
+      render: () => (
+        <span className="text-neutral-400">****</span>
+      )
+    },
+    { 
+      key: 'prisenhet', 
+      label: 'Prisenhet', 
+      align: 'center' as const,
+      render: (value: unknown) => (
+        <span className="text-neutral-700">{value as string}</span>
+      )
+    },
+    { 
+      key: 'grunnpris', 
+      label: 'Grunnpris', 
+      align: 'right' as const,
+      render: () => (
+        <span className="text-neutral-400">****</span>
+      )
+    },
+    { 
+      key: 'nettopris', 
+      label: 'Nettopris', 
+      align: 'right' as const,
+      render: () => (
+        <span className="text-neutral-400">****</span>
       )
     }
   ];

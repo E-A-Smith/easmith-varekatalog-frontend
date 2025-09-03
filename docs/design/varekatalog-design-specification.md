@@ -65,7 +65,7 @@ The interface employs official Byggern colors, typography, and design patterns w
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-││ Varekatalog for Løvenskiold Logistikk levert av Byggern                        │ ← Sub Header (36px)
+││ Varekatalog for Løvenskiold Logistikk levert av Byggern                     🔒 │ ← Sub Header (36px)
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │ BYGGER'N-LOGO 🔍 [Søk etter produkter eller kategorier...]                    ☰│ ← Main Header (64px)
 └─────────────────────────────────────────────────────────────────────────────────┘
@@ -79,25 +79,39 @@ The interface employs official Byggern colors, typography, and design patterns w
 
 ### Main Interface - Professional Table Layout
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│ ⚡ [Alle leverandører▼] [Alle kategorier▼] [Lager: Alle▼] │ 1,247 produkter │ ← Quick Filters (36px)
-├─────────────────────────────────────────────────────────────────────────────────┤
-│ Product Catalog Table                                                           │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│●│Product Name                        │Supplier    │SKU     │Anbr│Price  │🔗NOBB│ ← Headers (40px)
-├─┼────────────────────────────────────┼────────────┼────────┼────┼───────┼──────┤
-│●│SKRUE TRESKRUE 50MM GALVANISERT    │BILTEMA     │12345   │ Ja │[Show] │ View │ ← 10-12 rows
-│●│BESLAG VINKELBESLAG 90° STÅL       │WÜRTH       │67890   │ Nei│[Hide] │ View │   (Efficient
-│×│LIM MONTERINGSLIM 300ML            │BOSTIK      │11111   │ Ja │ N/A   │ View │    scanning)
-│●│DRILL SPIRALBOR 8MM HSS            │DEWALT      │22222   │ Ja │[Show] │ View │
-├─┴────────────────────────────────────┴────────────┴────────┴────┴───────┴──────┤
-│ Showing 1-10 of 1,247 • [◀ Prev] [1][2][3]...[125] [Next ▶] • Export          │ ← Pagination
-├─────────────────────────────────────────────────────────────────────────────────┤
-│ 🌐 Online • Last sync: 14:30 • Response: 0.3s • Kundevisning: AV             │ ← Status Bar
-└─────────────────────────────────────────────────────────────────────────────────┘
+```Logged in variant:
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ [Alle leverandører ▼ ] [Alle kategorier ▼ ]                                                                                                       │ ← Quick Filters (36px)
+├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│●│Product Name                        │Supplier    │LH      │ 🔗NOBB    │ Anbr │ # i pakning │ Lagerantall │ Prisenhet │ Grunnpris │ Nettopris │   ← Headers (40px)
+├─┼────────────────────────────────────┼────────────┼────────┼──────────┼───────┼──────────────┼──────────────┼─────────┼─────────────┼────────┤
+│●│SKRUE TRESKRUE 50MM GALVANISERT     │BILTEMA     │123456  │ 41033994 │ Ja    │ 5            │ 333          │ STK     │ 450,00      │ 562,50 │
+│●│BESLAG VINKELBESLAG 90° STÅL        │WÜRTH       │678901  │ 41033995 │ Nei   │ 5            │ 31           │ POS     │ 450,00      │ 562,50 │
+│×│LIM MONTERINGSLIM 300ML             │BOSTIK      │111111  │ 41033996 │ Ja    │ 20           │ 590          │ POS     │ 450,00      │ 562,50 │
+│●│DRILL SPIRALBOR 8MM HSS             │DEWALT      │222222  │ 41033997 │ Ja    │ 5            │ 12           │ STK     │ 450,00      │ 562,50 │
+├─┴────────────────────────────────────┴────────────┴────────┴──────────┴───────┴──────────────┴──────────────┴─────────┴─────────────┴────────┤
+│ Showing 1-10 of 1,247 • [◀ Prev] [1][2][3]...[125] [Next ▶]                                                                                 │   ← Pagination
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
 ```
 
+```Not logged in variant:
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ [Alle leverandører ▼ ] [Alle kategorier ▼ ]                                                                                                       │ ← Quick Filters (36px)
+├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│●│Product Name                        │Supplier    │LH      │ 🔗NOBB    │ Anbr │ # i pakning │ Lagerantall │ Prisenhet │ Grunnpris │ Nettopris │   ← Headers (40px)
+├─┼────────────────────────────────────┼────────────┼────────┼──────────┼───────┼──────────────┼──────────────┼─────────┼─────────────┼────────┤
+│●│SKRUE TRESKRUE 50MM GALVANISERT     │BILTEMA     │123456  │ 41033994 │ Ja    │ 5            │ ****         │ STK     │ ****        │ ****   │
+│●│BESLAG VINKELBESLAG 90° STÅL        │WÜRTH       │678901  │ 41033995 │ Nei   │ 5            │ ****         │ POS     │ ****        │ ****   │
+│×│LIM MONTERINGSLIM 300ML             │BOSTIK      │111111  │ 41033996 │ Ja    │ 20           │ ****         │ POS     │ ****        │ ****   │
+│●│DRILL SPIRALBOR 8MM HSS             │DEWALT      │222222  │ 41033997 │ Ja    │ 5            │ ****         │ STK     │ ****        │ ****   │
+├─┴────────────────────────────────────┴────────────┴────────┴──────────┴───────┴──────────────┴──────────────┴─────────┴─────────────┴────────┤
+│ Showing 1-10 of 1,247 • [◀ Prev] [1][2][3]...[125] [Next ▶]                                                                               │   ← Pagination
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+```
 ### Visual Status Indicators
 - **In Stock**: `●` Green circle (Byggern success color)
 - **Out of Stock**: `×` Red cross (clear unavailability)

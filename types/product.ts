@@ -52,6 +52,29 @@ export interface Product {
   
   /** Last updated timestamp */
   sistOppdatert?: Date;
+
+  // NEW FIELDS FOR 10-COLUMN TABLE LAYOUT (Phase 1)
+  
+  /** LH code (internal reference) */
+  lh: string;
+  
+  /** NOBB reference number for external links */
+  nobbNumber: string;
+  
+  /** Package quantity (# i pakning) */
+  pakningAntall: number;
+  
+  /** Stock quantity (Lagerantall) - OAuth inventory scope dependent */
+  lagerantall?: number;
+  
+  /** Price unit (STK, POS, etc.) */
+  prisenhet: string;
+  
+  /** Base price (Grunnpris) - OAuth prices scope dependent */
+  grunnpris?: number;
+  
+  /** Net price (Nettopris) - OAuth prices scope dependent */
+  nettopris?: number;
 }
 
 // Stock status enum matching Norwegian terminology
