@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserSession } from 'amazon-cognito-identity-js';
+import type { OAuthScope, UserPermissions } from '@/types/product';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -14,6 +15,9 @@ interface AuthState {
   user: CognitoUser | null;
   accessToken: string | null;
   error: string | null;
+  // NEW: OAuth scope-based permissions (Phase 2)
+  scopes: OAuthScope[];
+  permissions: UserPermissions;
 }
 
 interface AuthContext {
@@ -34,8 +38,8 @@ const authConfig = {
   azureTenantId: process.env.NEXT_PUBLIC_AZURE_TENANT_ID!,
   azureClientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID!,
   
-  // OAuth scopes (matches backend scope architecture)
-  scopes: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog:search',
+  // OAuth scopes (only premium features - search is public)
+  scopes: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog/prices varekatalog/inventory',
   
   // OAuth URLs
   authorizationUrl: `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/authorize`,
@@ -50,14 +54,72 @@ const userPool = new CognitoUserPool({
   ClientId: authConfig.clientId,
 });
 
+// JWT token parsing and scope extraction (Phase 2)
+const parseJwtPayload = (token: string): any => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3 || !parts[1]) {
+      throw new Error('Invalid JWT format');
+    }
+    
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to parse JWT payload:', error);
+    return {};
+  }
+};
+
+const extractScopesFromToken = (token: string): OAuthScope[] => {
+  try {
+    const payload = parseJwtPayload(token);
+    // Azure AD puts scopes in the 'scp' claim as space-separated string
+    const scopeString = payload.scp || '';
+    const scopes = scopeString
+      .split(' ')
+      .filter((scope: string) => scope.startsWith('varekatalog/'))
+      .filter((scope: string): scope is OAuthScope => 
+        ['varekatalog/prices', 'varekatalog/inventory'].includes(scope)
+      );
+    
+    return scopes;
+  } catch (error) {
+    console.error('Failed to extract scopes from token:', error);
+    return [];
+  }
+};
+
+const calculatePermissions = (scopes: OAuthScope[]): UserPermissions => {
+  return {
+    canSearch: true, // Search is always public - no authentication required
+    canViewPrices: scopes.includes('varekatalog/prices'),
+    canViewInventory: scopes.includes('varekatalog/inventory'),
+  };
+};
+
+const getDefaultAuthState = (): AuthState => ({
+  isAuthenticated: false,
+  isLoading: true,
+  user: null,
+  accessToken: null,
+  error: null,
+  scopes: [],
+  permissions: {
+    canSearch: true, // Search is always public
+    canViewPrices: false,
+    canViewInventory: false,
+  },
+});
+
 export const useAuth = (): AuthContext => {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    isLoading: true,
-    user: null,
-    accessToken: null,
-    error: null,
-  });
+  const [authState, setAuthState] = useState<AuthState>(getDefaultAuthState());
 
   // Check if user is already authenticated on mount
   useEffect(() => {
@@ -79,12 +141,18 @@ export const useAuth = (): AuthContext => {
           });
 
           if (session.isValid()) {
+            const accessToken = session.getAccessToken().getJwtToken();
+            const scopes = extractScopesFromToken(accessToken);
+            const permissions = calculatePermissions(scopes);
+            
             setAuthState({
               isAuthenticated: true,
               isLoading: false,
               user: currentUser,
-              accessToken: session.getAccessToken().getJwtToken(),
+              accessToken,
               error: null,
+              scopes,
+              permissions,
             });
             return;
           }
@@ -93,13 +161,10 @@ export const useAuth = (): AuthContext => {
         console.error('Auth state check failed:', error);
       }
       
-      setAuthState(prev => ({
-        ...prev,
+      setAuthState({
+        ...getDefaultAuthState(),
         isLoading: false,
-        isAuthenticated: false,
-        user: null,
-        accessToken: null,
-      }));
+      });
     };
 
     checkAuthState();
@@ -136,12 +201,18 @@ export const useAuth = (): AuthContext => {
         });
       });
 
+      const accessToken = session.getAccessToken().getJwtToken();
+      const scopes = extractScopesFromToken(accessToken);
+      const permissions = calculatePermissions(scopes);
+      
       setAuthState({
         isAuthenticated: true,
         isLoading: false,
         user: user,
-        accessToken: session.getAccessToken().getJwtToken(),
+        accessToken,
         error: null,
+        scopes,
+        permissions,
       });
     } catch (error) {
       console.error('Sign in failed:', error);
@@ -162,11 +233,8 @@ export const useAuth = (): AuthContext => {
       }
       
       setAuthState({
-        isAuthenticated: false,
+        ...getDefaultAuthState(),
         isLoading: false,
-        user: null,
-        accessToken: null,
-        error: null,
       });
     } catch (error) {
       console.error('Sign out failed:', error);
@@ -197,23 +265,27 @@ export const useAuth = (): AuthContext => {
       });
 
       if (session.isValid()) {
+        const accessToken = session.getAccessToken().getJwtToken();
+        const scopes = extractScopesFromToken(accessToken);
+        const permissions = calculatePermissions(scopes);
+        
         setAuthState(prev => ({
           ...prev,
-          accessToken: session.getAccessToken().getJwtToken(),
+          accessToken,
           error: null,
+          scopes,
+          permissions,
         }));
       } else {
         throw new Error('Session invalid');
       }
     } catch (error) {
       console.error('Session refresh failed:', error);
-      setAuthState(prev => ({
-        ...prev,
-        isAuthenticated: false,
-        user: null,
-        accessToken: null,
+      setAuthState({
+        ...getDefaultAuthState(),
+        isLoading: false,
         error: error instanceof Error ? error.message : 'Session refresh failed',
-      }));
+      });
     }
   }, []);
 

@@ -326,6 +326,16 @@ export type CreateProductData = Omit<Product, 'id' | 'sistOppdatert'>;
 // Helper type for updating products (partial with required id)
 export type UpdateProductData = Partial<Omit<Product, 'id'>> & { id: string };
 
+// OAuth scope types (Phase 2) - Search is public, only premium features need scopes
+export type OAuthScope = 'varekatalog/prices' | 'varekatalog/inventory';
+
+// User permissions interface (Phase 2) - Search is always public
+export interface UserPermissions {
+  canViewPrices: boolean;
+  canViewInventory: boolean;
+  canSearch: true; // Always true - search is public
+}
+
 // Helper type for product table display
 export interface ProductTableColumn {
   /** Column key matching Product property */

@@ -5,6 +5,86 @@
 
 import { Product, ProductSearchQuery } from '@/types/product';
 
+// Backend field mapping (Phase 2)
+interface BackendProduct {
+  VVSnr: string;           // → id/nobbNumber
+  varenavn: string;        // → navn
+  leverandørNavn?: string; // → produsent
+  lagerstatus?: string;    // → lagerstatus
+  kanAnbrekke?: string;    // → anbrekk ('1' = 'Ja', '' = 'Nei')
+  enhet?: string;          // → prisenhet
+  lh?: string;             // → lh (LH/Løvenskjold number)
+  pakningAntall?: number;  // → pakningAntall (package quantity)
+  lagerantall?: number;    // → lagerantall (requires 'varekatalog/inventory' scope)
+  grunnpris?: number;      // → grunnpris (requires 'varekatalog/prices' scope)
+  nettopris?: number;      // → nettopris (requires 'varekatalog/prices' scope)
+  EAN?: string;
+  varebeskrivelse?: string;
+  størrelse?: string;
+}
+
+/**
+ * Transform backend product to frontend Product format (Phase 2)
+ */
+function transformBackendProduct(backendProduct: BackendProduct): Product {
+  const product: Product = {
+    id: backendProduct.VVSnr,
+    navn: backendProduct.varenavn,
+    vvsnr: backendProduct.VVSnr,
+    lagerstatus: (backendProduct.lagerstatus as Product['lagerstatus']) || 'Ikke tilgjengelig',
+    anbrekk: backendProduct.kanAnbrekke === '1' ? 'Ja' : 'Nei',
+    
+    // New Phase 2 fields with OAuth scope-dependent availability
+    lh: backendProduct.lh || backendProduct.VVSnr, // Fallback to VVSnr
+    nobbNumber: backendProduct.VVSnr, // NOBB number same as VVSnr
+    pakningAntall: backendProduct.pakningAntall || 1,
+    prisenhet: backendProduct.enhet || 'STK',
+  };
+
+  // Optional fields - only add if they exist
+  if (backendProduct.leverandørNavn) {
+    product.produsent = backendProduct.leverandørNavn;
+  }
+  
+  if (backendProduct.varebeskrivelse) {
+    product.beskrivelse = backendProduct.varebeskrivelse;
+  }
+  
+  if (backendProduct.EAN) {
+    product.ean = backendProduct.EAN;
+  }
+  
+  if (backendProduct.VVSnr) {
+    product.nobbNummer = backendProduct.VVSnr; // Legacy field
+  }
+  
+  if (backendProduct.enhet) {
+    product.enhet = backendProduct.enhet;
+  }
+  
+  // OAuth scope-dependent fields (only add if authorized and available)
+  if (backendProduct.lagerantall !== undefined) {
+    product.lagerantall = backendProduct.lagerantall;
+  }
+  
+  if (backendProduct.grunnpris !== undefined) {
+    product.grunnpris = backendProduct.grunnpris;
+  }
+  
+  if (backendProduct.nettopris !== undefined) {
+    product.nettopris = backendProduct.nettopris;
+    
+    // Price structure for legacy compatibility
+    product.pris = {
+      salgspris: backendProduct.nettopris,
+      valuta: 'NOK',
+      inkludertMva: true
+    };
+  }
+
+  return product;
+}
+
 /**
  * API Error class for handling API-specific errors
  */
@@ -175,18 +255,23 @@ export class SimpleApiClient {
         : { method: 'POST' as const, body: searchBody };
 
       const result = await this.request<{
-        results?: Product[];
+        results?: BackendProduct[];
         success?: boolean;
         total?: number;
         responseTime?: string;
-      } | Product[]>('/search', options);
+      } | BackendProduct[]>('/search', options);
 
-      // Handle different response formats
+      // Handle different response formats and transform backend data
+      let backendProducts: BackendProduct[];
+      
       if (Array.isArray(result)) {
-        return result;
+        backendProducts = result;
+      } else {
+        backendProducts = result.results || [];
       }
 
-      return result.results || [];
+      // Transform backend products to frontend format
+      return backendProducts.map(transformBackendProduct);
 
     } catch (error) {
       // Progressive enhancement: retry without authentication if 401
@@ -213,7 +298,8 @@ export class SimpleApiClient {
       ? { token: accessToken }
       : {};
 
-    return await this.request<Product>(`/products/${id}`, options);
+    const backendProduct = await this.request<BackendProduct>(`/products/${id}`, options);
+    return transformBackendProduct(backendProduct);
   }
 }
 

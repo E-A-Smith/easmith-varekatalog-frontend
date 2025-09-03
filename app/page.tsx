@@ -10,6 +10,7 @@ import { useProductSearch } from '../hooks';
 import { useAuth } from '../hooks/useAuth';
 import { FilterState } from '../components/search/QuickFilters/types';
 import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
+import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
 
@@ -247,8 +248,8 @@ export default function Dashboard() {
   const itemsPerPage = 10;
 
 
-  // Define table columns for complete 10-column layout (Phase 1)
-  // Simulating "not logged in" state - showing **** for sensitive data
+  // Define table columns for complete 10-column layout (Phase 2)
+  // Real authentication-based data masking using OAuth scopes
   const tableColumns = [
     { 
       key: 'lagerstatus', 
@@ -301,9 +302,10 @@ export default function Dashboard() {
       key: 'lagerantall', 
       label: 'Lagerantall', 
       align: 'right' as const,
-      render: () => (
-        <span className="text-neutral-400">****</span>
-      )
+      render: (value: unknown) => 
+        authState.permissions.canViewInventory && value !== undefined
+          ? <span className="text-neutral-700">{value as number}</span>
+          : <span className="text-neutral-400">****</span>
     },
     { 
       key: 'prisenhet', 
@@ -317,17 +319,19 @@ export default function Dashboard() {
       key: 'grunnpris', 
       label: 'Grunnpris', 
       align: 'right' as const,
-      render: () => (
-        <span className="text-neutral-400">****</span>
-      )
+      render: (value: unknown) => 
+        authState.permissions.canViewPrices && value !== undefined
+          ? <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>
+          : <span className="text-neutral-400">****</span>
     },
     { 
       key: 'nettopris', 
       label: 'Nettopris', 
       align: 'right' as const,
-      render: () => (
-        <span className="text-neutral-400">****</span>
-      )
+      render: (value: unknown) => 
+        authState.permissions.canViewPrices && value !== undefined
+          ? <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>
+          : <span className="text-neutral-400">****</span>
     }
   ];
 
@@ -469,8 +473,13 @@ export default function Dashboard() {
         </div>
       </div>
       
-      {/* Debug Panel - Only when devtools enabled */}
-      {process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true' && <ApiDebugPanel />}
+      {/* Debug Panels - Only when devtools enabled */}
+      {process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true' && (
+        <>
+          <ApiDebugPanel />
+          <AuthDebugPanel />
+        </>
+      )}
     </div>
   );
 }
