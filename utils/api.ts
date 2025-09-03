@@ -31,7 +31,7 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     id: backendProduct.VVSnr,
     navn: backendProduct.varenavn,
     vvsnr: backendProduct.VVSnr,
-    lagerstatus: (backendProduct.lagerstatus as Product['lagerstatus']) || 'Ikke tilgjengelig',
+    lagerstatus: (backendProduct.lagerstatus as Product['lagerstatus']) || 'Utsolgt',
     anbrekk: backendProduct.kanAnbrekke === '1' ? 'Ja' : 'Nei',
     
     // New Phase 2 fields with OAuth scope-dependent availability
@@ -39,6 +39,11 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     nobbNumber: backendProduct.VVSnr, // NOBB number same as VVSnr
     pakningAntall: backendProduct.pakningAntall || 1,
     prisenhet: backendProduct.enhet || 'STK',
+    
+    // Security-filtered fields (null when unauthorized, values when authorized)
+    lagerantall: backendProduct.lagerantall !== undefined ? backendProduct.lagerantall : null,
+    grunnpris: backendProduct.grunnpris !== undefined ? backendProduct.grunnpris : null,
+    nettopris: backendProduct.nettopris !== undefined ? backendProduct.nettopris : null,
   };
 
   // Optional fields - only add if they exist
@@ -62,19 +67,8 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     product.enhet = backendProduct.enhet;
   }
   
-  // OAuth scope-dependent fields (only add if authorized and available)
-  if (backendProduct.lagerantall !== undefined) {
-    product.lagerantall = backendProduct.lagerantall;
-  }
-  
-  if (backendProduct.grunnpris !== undefined) {
-    product.grunnpris = backendProduct.grunnpris;
-  }
-  
+  // Legacy price structure for compatibility (if nettopris is available)
   if (backendProduct.nettopris !== undefined) {
-    product.nettopris = backendProduct.nettopris;
-    
-    // Price structure for legacy compatibility
     product.pris = {
       salgspris: backendProduct.nettopris,
       valuta: 'NOK',

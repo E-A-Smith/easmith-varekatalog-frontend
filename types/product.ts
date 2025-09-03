@@ -64,27 +64,23 @@ export interface Product {
   /** Package quantity (# i pakning) */
   pakningAntall: number;
   
-  /** Stock quantity (Lagerantall) - OAuth inventory scope dependent */
-  lagerantall?: number;
-  
   /** Price unit (STK, POS, etc.) */
   prisenhet: string;
   
-  /** Base price (Grunnpris) - OAuth prices scope dependent */
-  grunnpris?: number;
+  /** Stock quantity (Lagerantall) - null when unauthorized, number when authorized */
+  lagerantall: number | null;
   
-  /** Net price (Nettopris) - OAuth prices scope dependent */
-  nettopris?: number;
+  /** Base price (Grunnpris) - null when unauthorized, number when authorized */
+  grunnpris: number | null;
+  
+  /** Net price (Nettopris) - null when unauthorized, number when authorized */
+  nettopris: number | null;
 }
 
-// Stock status enum matching Norwegian terminology
+// Stock status enum - simplified to binary states (updated per design)
 export type LagerStatus = 
-  | 'På lager'      // In stock
-  | 'Få igjen'      // Low stock
-  | 'Utsolgt'       // Out of stock
-  | 'Bestillingsvare' // Special order
-  | 'Utgått'        // Discontinued
-  | 'Ikke tilgjengelig'; // Not available
+  | 'På lager'      // In stock (● Green circle)
+  | 'Utsolgt';      // Out of stock (× Red cross)
 
 // Partial quantity status (Anbrekk)
 export type AnbrekkStatus = 'Ja' | 'Nei';
@@ -367,7 +363,7 @@ export const isProduct = (obj: unknown): obj is Product => {
 };
 
 export const isLagerStatus = (status: string): status is LagerStatus => {
-  return ['På lager', 'Få igjen', 'Utsolgt', 'Bestillingsvare', 'Utgått', 'Ikke tilgjengelig'].includes(status);
+  return ['På lager', 'Utsolgt'].includes(status);
 };
 
 export const isAnbrekkStatus = (status: string): status is AnbrekkStatus => {

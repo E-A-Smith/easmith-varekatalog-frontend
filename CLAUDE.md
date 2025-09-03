@@ -632,3 +632,4 @@ npm test -- --coverage     # Coverage report
 ---
 
 **Related Repositories**: Main backend at `/home/rydesp/dev/varekatalog/` contains infrastructure (CloudFormation), Lambda functions, and complete system documentation.
+- Always use provided script for running local server

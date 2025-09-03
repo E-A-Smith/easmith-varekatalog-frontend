@@ -115,9 +115,6 @@ The interface employs official Byggern colors, typography, and design patterns w
 ### Visual Status Indicators
 - **In Stock**: `●` Green circle (Byggern success color)
 - **Out of Stock**: `×` Red cross (clear unavailability)
-- **Stock Status**: Color-coded backgrounds for instant recognition
-- **Anbrekk Status**: Clear "Ja/Nei" partial quantity indicators
-- **Price Visibility**: Toggle for customer-facing scenarios
 
 ---
 

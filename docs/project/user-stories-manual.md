@@ -42,10 +42,10 @@
 
 ---
 
-## Existing User Stories (From Product Manager Output)
+## User Stories
 
 ### US-001: Core Product Search
-**User Story**: As a store staff member, I want to search for products by name, SKU, or barcode so that I can quickly find what customers are asking about.
+**User Story**: As a store staff member, I want to search for products by name, NOBB number, or LH code so that I can quickly find what customers are asking about.
 
 **Acceptance Criteria**:
 - Search responds in <1 second for retail environment
@@ -59,7 +59,7 @@
 
 **Acceptance Criteria**:
 - Shows current stock quantities (requires `varekatalog/inventory` scope)
-- Visual indicators for stock status (På lager, Utsolgt, Få igjen)
+- Visual indicators for stock status (● På lager, × Utsolgt)
 - Updates inventory status within 5 minutes of changes
 - Shows partial quantity availability (Anbrekk: Ja/Nei)
 
@@ -72,15 +72,6 @@
 - Displays pricing information (requires `varekatalog/prices` scope)
 - Links to external product documentation (NOBB system)
 
-### US-004: Search History and Favorites
-**User Story**: As a frequent user, I want to access my recent searches and favorite products so that I can work more efficiently.
-
-**Acceptance Criteria**:
-- Stores last 10 search queries locally
-- Provides quick access to frequently searched items
-- Syncs favorites across devices when authenticated
-- Respects authentication levels for saved data
-
 ---
 
 ## New Search-Focused User Stories
@@ -92,8 +83,16 @@
 
 **Acceptance Criteria**:
 - ✅ Search functionality works without authentication
-- ✅ Returns basic product information (name, supplier, NOBB links)
-- ✅ Shows placeholder "****" for sensitive data (prices, inventory)
+- ✅ Returns complete public product information:
+  - Stock status indicator (● På lager, × Utsolgt)
+  - Product name (navn)
+  - Supplier/manufacturer (produsent)
+  - LH code (internal reference)
+  - NOBB external link (🔗NOBB)
+  - Partial quantity indicator (Anbr: Ja/Nei)
+  - Package quantity (# i pakning)
+  - Price unit (Prisenhet: STK, POS, etc.)
+- ✅ Shows placeholder "****" for sensitive data (stock quantities, prices)
 - ✅ Maintains same table layout for all authentication states
 - ✅ Provides clear visual indication of limited access
 - ✅ Includes link to authenticate for full access
@@ -155,6 +154,20 @@
 **Priority**: P1 (High) - Domain expertise requirement  
 **Personas**: Mike (learning products), Lisa (technical questions)
 
+#### US-105A: Product Description Search Matching (P1)
+**User Story**: As a staff member searching for products, I want search results to match text in the product description field (Varebeskrivelse) so that I can find products using descriptive terms even when I don't know the exact product name.
+
+**Acceptance Criteria**:
+- ✅ Search matches text within the Varebeskrivelse field
+- ✅ Description matches are ranked appropriately in search results
+- ✅ Partial word matching in product descriptions
+- ✅ Norwegian character support in description search (æ, ø, å)
+- ✅ Description text highlighted in search results when matched
+- ✅ Works across all authentication levels (public and authenticated)
+
+**Priority**: P1 (High) - Search completeness requirement  
+**Personas**: All personas - especially Mike (learning products), Lisa (detailed customer questions)
+
 #### US-106: Multi-Device Responsive Search (P1)
 **User Story**: As a staff member working both at the counter and on the shop floor, I want consistent search functionality across PC, tablet, and mobile devices so that I can help customers anywhere in the store.
 
@@ -209,23 +222,10 @@
 **Priority**: P0 (Critical) - System reliability  
 **Personas**: All personas - business continuity requirement
 
-#### US-110: Search Analytics & Performance Monitoring (P2)
-**User Story**: As a system administrator, I want to monitor search performance and usage patterns so that I can optimize the system and identify issues.
-
-**Acceptance Criteria**:
-- ✅ Response time tracking for all searches
-- ✅ Usage analytics by authentication level
-- ✅ Error rate monitoring and alerting
-- ✅ Popular search terms tracking
-- ✅ Performance degradation alerts
-
-**Priority**: P2 (Medium) - System optimization  
-**Personas**: Anna (management oversight), system administrators
-
 ### Search Integration Stories
 
-#### US-111: NOBB System Integration (P1)
-**User Story**: As a staff member, I want direct links to NOBB product specifications so that I can access detailed technical documentation for customer inquiries.
+#### US-111: NOBB External Links (P1)
+**User Story**: As a staff member, I want external links to NOBB product specifications so that I can access detailed technical documentation for customer inquiries.
 
 **Acceptance Criteria**:
 - ✅ NOBB links functional in all authentication states
@@ -254,23 +254,21 @@
 
 ## Priority Summary
 
-### P0 (Critical) - 6 stories - MVP Implementation
+### P0 (Critical) - 5 stories - MVP Implementation
 - US-101: Public Product Search
 - US-102: Inventory-Scoped Staff Search  
 - US-103: Full Access Management Search
 - US-104: Sub-Second Search Performance
 - US-109: Robust Error Handling & Fallbacks
 
-### P1 (High) - 5 stories - Phase 1 Enhancement
+### P1 (High) - 7 stories - Phase 1 Enhancement
 - US-105: Norwegian Building Supplies Domain Expertise
+- US-105A: Product Description Search Matching
 - US-106: Multi-Device Responsive Search
 - US-107: Customer View Privacy Mode
 - US-108: Search Result Relevance & Sorting
-- US-111: NOBB System Integration
+- US-111: NOBB External Links
 - US-112: Search Context Persistence
-
-### P2 (Medium) - 1 story - Future Enhancement
-- US-110: Search Analytics & Performance Monitoring
 
 ---
 

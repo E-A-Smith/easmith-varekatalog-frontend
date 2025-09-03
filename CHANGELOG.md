@@ -2,7 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2024-12-28
+## [Unreleased] - 2025-01-03
+
+### Added
+- **Comprehensive User Stories Documentation** (`docs/project/user-stories.md`)
+  - 5 detailed user personas with authentication contexts
+  - 12 search-focused user stories with acceptance criteria
+  - Authentication-aware search experience specifications
+  - Complete coverage of public, basic staff, and full staff access levels
+  - Mobile/responsive search experience requirements
+  - Priority levels (P0/P1/P2) for development planning
+
+### Changed
+- Updated project documentation structure with dedicated user story specifications
+
+---
+
+## [Previous] - 2024-12-28
 
 ### Added
 - Environment variable configuration files (`.env.local`, `.env.development`, `.env.production`)

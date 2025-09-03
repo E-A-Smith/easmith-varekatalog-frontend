@@ -29,10 +29,10 @@ const catalogProducts: Product[] = [
     lh: '123456',
     nobbNumber: '60154545',
     pakningAntall: 5,
-    lagerantall: 333,
+    lagerantall: null, // Simulating unauthenticated state
     prisenhet: 'STK',
-    grunnpris: 450.00,
-    nettopris: 562.50
+    grunnpris: null, // Simulating unauthenticated state
+    nettopris: null // Simulating unauthenticated state
   },
   {
     id: '2',
@@ -47,16 +47,16 @@ const catalogProducts: Product[] = [
     lh: '234567',
     nobbNumber: '29252657',
     pakningAntall: 1,
-    lagerantall: 127,
+    lagerantall: 127, // Simulating authenticated state
     prisenhet: 'STK',
-    grunnpris: 89.50,
-    nettopris: 111.88
+    grunnpris: 89.50, // Simulating authenticated state
+    nettopris: 111.88 // Simulating authenticated state
   },
   {
     id: '3',
     navn: 'ISOLASJON STEINULL 50MM',
     vvsnr: '13579246',
-    lagerstatus: 'Få igjen',
+    lagerstatus: 'På lager',
     anbrekk: 'Nei',
     produsent: 'ROCKWOOL',
     kategori: 'Isolasjon',
@@ -65,10 +65,10 @@ const catalogProducts: Product[] = [
     lh: '345678',
     nobbNumber: '25704917',
     pakningAntall: 10,
-    lagerantall: 23,
+    lagerantall: null, // Simulating unauthenticated state
     prisenhet: 'M2',
-    grunnpris: 125.50,
-    nettopris: 156.88
+    grunnpris: null, // Simulating unauthenticated state
+    nettopris: null // Simulating unauthenticated state
   },
   {
     id: '4',
@@ -200,7 +200,7 @@ const catalogProducts: Product[] = [
     id: '11',
     navn: 'MALING VEGMALING HVIT 1L',
     vvsnr: '44444444',
-    lagerstatus: 'Få igjen',
+    lagerstatus: 'På lager',
     anbrekk: 'Ja',
     produsent: 'FLÜGGER',
     kategori: 'Maling og lakk',
@@ -256,10 +256,13 @@ export default function Dashboard() {
       label: '', 
       align: 'center' as const,
       render: (value: unknown) => {
-        const status = value as string;
+        // Status column: show empty space when status is null, status indicators when present
+        if (value === null) {
+          return <span className="w-6 h-6 inline-block"></span>; // Empty space maintaining layout
+        }
         return (
           <StatusIndicator 
-            status={status as LagerStatus} 
+            status={value as LagerStatus} 
             visualOnly={true}
             size="md"
             className="w-6 h-6"
@@ -303,7 +306,7 @@ export default function Dashboard() {
       label: 'Lagerantall', 
       align: 'right' as const,
       render: (value: unknown) => 
-        authState.permissions.canViewInventory && value !== undefined
+        value !== null
           ? <span className="text-neutral-700">{value as number}</span>
           : <span className="text-neutral-400">****</span>
     },
@@ -320,7 +323,7 @@ export default function Dashboard() {
       label: 'Grunnpris', 
       align: 'right' as const,
       render: (value: unknown) => 
-        authState.permissions.canViewPrices && value !== undefined
+        value !== null
           ? <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>
           : <span className="text-neutral-400">****</span>
     },
@@ -329,7 +332,7 @@ export default function Dashboard() {
       label: 'Nettopris', 
       align: 'right' as const,
       render: (value: unknown) => 
-        authState.permissions.canViewPrices && value !== undefined
+        value !== null
           ? <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>
           : <span className="text-neutral-400">****</span>
     }
