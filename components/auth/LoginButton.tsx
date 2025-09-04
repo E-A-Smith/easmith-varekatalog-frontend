@@ -86,8 +86,8 @@ export const LoginButton: FC<LoginButtonProps> = ({
       const authParams = new URLSearchParams({
         response_type: 'code',
         client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
-        redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '/auth/callback',
-        scope: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog:search',
+        redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback',
+        scope: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.prices api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.inventory',
         state: generateStateParameter(),
         prompt: 'login',
         // Use Azure AD as identity provider (as per backend configuration)

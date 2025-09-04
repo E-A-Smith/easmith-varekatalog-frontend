@@ -84,7 +84,18 @@ const extractScopesFromToken = (token: string): OAuthScope[] => {
     const scopeString = payload.scp || '';
     const scopes = scopeString
       .split(' ')
-      .filter((scope: string) => scope.startsWith('varekatalog/'))
+      .filter((scope: string) => 
+        // Handle both formats: full API format and short format
+        scope.includes('varekatalog.prices') || 
+        scope.includes('varekatalog.inventory') ||
+        scope.startsWith('varekatalog/')
+      )
+      .map((scope: string) => {
+        // Normalize to short format for internal use
+        if (scope.includes('varekatalog.prices')) return 'varekatalog/prices';
+        if (scope.includes('varekatalog.inventory')) return 'varekatalog/inventory';
+        return scope;
+      })
       .filter((scope: string): scope is OAuthScope => 
         ['varekatalog/prices', 'varekatalog/inventory'].includes(scope)
       );
