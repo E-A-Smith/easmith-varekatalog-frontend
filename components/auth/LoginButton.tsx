@@ -21,7 +21,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
   className = '', 
   compact = false 
 }) => {
-  const { authState, signOut } = useAuth();
+  const { authState, signIn, signOut } = useAuth();
   const { isAuthenticated, isLoading, user, error } = authState;
 
   // Show loading state
@@ -44,7 +44,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
           <span className="w-2 h-2 bg-green-500 rounded-full" title="Innlogget" />
           {!compact && (
             <span className="text-xs text-neutral-700 font-medium">
-              {user.getUsername()}
+              {user.given_name || user.username}
             </span>
           )}
         </div>
@@ -71,51 +71,11 @@ export const LoginButton: FC<LoginButtonProps> = ({
       <Button
         variant="outline"
         size="sm"
-        onClick={handleLogin}
+        onClick={signIn}
         className="h-6 px-2 text-xs border-byggern-blue/20 text-byggern-blue hover:bg-byggern-blue/5"
       >
         🔒
       </Button>
     </div>
   );
-
-  // OAuth login handler
-  function handleLogin() {
-    try {
-      // Generate OAuth authorization URL with Azure AD integration
-      const authParams = new URLSearchParams({
-        response_type: 'code',
-        client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
-        redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback',
-        scope: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.prices api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.inventory',
-        state: generateStateParameter(),
-        prompt: 'login',
-        // Use Azure AD as identity provider (as per backend configuration)
-        identity_provider: 'AzureAD'
-      });
-
-      const authUrl = `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/authorize?${authParams.toString()}`;
-      
-      // Store state in session storage for CSRF protection
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('oauth_state', authParams.get('state') || '');
-      }
-      
-      // Redirect to Azure AD OAuth authorization endpoint
-      if (typeof window !== 'undefined') {
-        window.location.href = authUrl;
-      }
-      
-    } catch (error) {
-      console.error('OAuth login error:', error);
-      alert('Login feil - kontakt IT-support');
-    }
-  }
-
-  // Generate cryptographically secure state parameter for CSRF protection
-  function generateStateParameter(): string {
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-  }
 };
