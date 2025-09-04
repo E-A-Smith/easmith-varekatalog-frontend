@@ -41,7 +41,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
     return (
       <div className={clsx('flex items-center gap-2', className)}>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-green-500 rounded-full" title="Innlogget" />
+          <span className="text-green-500" title="Innlogget">🔓</span>
           {!compact && (
             <span className="text-xs text-neutral-700 font-medium">
               {user.getUsername()}
