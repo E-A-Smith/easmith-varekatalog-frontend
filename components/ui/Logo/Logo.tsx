@@ -10,10 +10,10 @@ interface LogoProps {
   className?: string;
 }
 
-export const Logo: FC<LogoProps> = ({ height = 32, className = '' }) => {
+export const Logo: FC<LogoProps> = ({ height = 25, className = '' }) => {
   return (
     <svg 
-      viewBox="0 0 595 269" 
+      viewBox="0 -8 595 135" 
       xmlns="http://www.w3.org/2000/svg" 
       height={height}
       className={`w-auto ${className}`}
