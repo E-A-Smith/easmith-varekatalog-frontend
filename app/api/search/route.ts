@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Try to call the real backend API first
-    const externalApiUrl = process.env.EXTERNAL_API_URL;
+    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
     
     if (externalApiUrl) {
       try {
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     const { query = '', filters = {}, sort = {}, limit = 50, offset = 0 } = body;
 
     // Try to call the real backend API first
-    const externalApiUrl = process.env.EXTERNAL_API_URL;
+    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
     
     if (externalApiUrl) {
       try {
