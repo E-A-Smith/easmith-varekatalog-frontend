@@ -27,6 +27,7 @@ export const ApiDebugPanel = () => {
   });
 
   const [isVisible, setIsVisible] = useState(false);
+  const [testQuery, setTestQuery] = useState('terrassefornyer');
 
   useEffect(() => {
     testHealthCheck();
@@ -68,7 +69,7 @@ export const ApiDebugPanel = () => {
 
     try {
       const result = await apiClient.searchProducts({
-        søketekst: 'test',
+        søketekst: testQuery.trim() || 'test',
         side: 1,
         sideStørrelse: 5,
         sortering: 'relevans'
@@ -167,13 +168,27 @@ export const ApiDebugPanel = () => {
             debugInfo.searchTest.status === 'success' ? 'bg-green-500' : 
             debugInfo.searchTest.status === 'error' ? 'bg-red-500' : 'bg-neutral-300'
           }`}></span>
+        </div>
+        
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            value={testQuery}
+            onChange={(e) => setTestQuery(e.target.value)}
+            placeholder="Enter search query..."
+            className="flex-1 px-2 py-1 text-sm border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-byggern-primary"
+          />
           <button 
             onClick={testSearch}
             disabled={debugInfo.searchTest.status === 'loading'}
-            className="text-sm bg-neutral-100 hover:bg-neutral-200 px-2 py-1 rounded disabled:opacity-50"
+            className="text-sm bg-byggern-primary hover:bg-byggern-primary/90 text-white px-3 py-1 rounded disabled:opacity-50"
           >
-            Test Search
+            {debugInfo.searchTest.status === 'loading' ? 'Testing...' : 'Test Search'}
           </button>
+        </div>
+        
+        <div className="text-xs text-neutral-600 mb-2">
+          Query: "{testQuery || 'test'}" • Page: 1 • Size: 5 • Sort: relevance
         </div>
         
         {debugInfo.searchTest.error && (
