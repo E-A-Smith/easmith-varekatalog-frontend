@@ -1,6 +1,6 @@
 /**
- * OAuth Logout Page for Varekatalog  
- * Handles user logout and session cleanup
+ * Cognito OAuth Logout Page for Varekatalog  
+ * Handles user logout and session cleanup via AWS Cognito
  */
 
 'use client';
@@ -14,32 +14,36 @@ export default function AuthLogout() {
   useEffect(() => {
     const handleLogout = async () => {
       try {
-        // Clear all stored tokens and user data
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('refresh_token'); 
-        sessionStorage.removeItem('id_token');
-        sessionStorage.removeItem('token_expiry');
-        sessionStorage.removeItem('user_scopes');
+        // Clear all Cognito tokens and user data
+        sessionStorage.removeItem('cognito_access_token');
+        sessionStorage.removeItem('cognito_id_token');
+        sessionStorage.removeItem('cognito_refresh_token');
+        sessionStorage.removeItem('cognito_token_expiry');
+        sessionStorage.removeItem('pkce_code_verifier');
         sessionStorage.removeItem('oauth_state');
 
-        // Also clear any localStorage items
+        // Also clear any legacy localStorage items
         localStorage.removeItem('auth_user');
 
-        // Construct Azure AD logout URL
+        // Construct Cognito logout URL with correct parameters
+        const cognitoDomain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || 'varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com';
+        const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || '';
+        
         const logoutParams = new URLSearchParams({
-          client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
-          post_logout_redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/` : '/',
+          client_id: clientId,
+          logout_uri: `${window.location.origin}/`,
+          redirect_uri: `${window.location.origin}/`,
         });
 
-        const logoutUrl = `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/logout?${logoutParams.toString()}`;
+        const logoutUrl = `https://${cognitoDomain}/logout?${logoutParams.toString()}`;
 
         // Small delay to ensure cleanup is complete
         setTimeout(() => {
-          // Redirect to Azure AD logout to clear SSO session
+          // Redirect to Cognito logout to clear SSO session (which will clear Azure AD session)
           if (typeof window !== 'undefined') {
             window.location.href = logoutUrl;
           }
-        }, 1000);
+        }, 500);
 
       } catch (error) {
         console.error('Logout error:', error);
