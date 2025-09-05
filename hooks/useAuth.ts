@@ -1,61 +1,86 @@
 /**
- * Authentication hook for Varekatalog using AWS Cognito OAuth
- * Implements OAuth 2.0/OpenID Connect with Azure AD integration
+ * Authentication hook for Varekatalog using AWS Cognito Hosted UI OAuth
+ * Implements OAuth 2.0/OpenID Connect with Azure AD as identity provider through Cognito
  */
 
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserSession } from 'amazon-cognito-identity-js';
 import type { OAuthScope, UserPermissions } from '@/types/product';
 
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: CognitoUser | null;
+  user: CognitoUserInfo | null;
   accessToken: string | null;
   error: string | null;
-  // NEW: OAuth scope-based permissions (Phase 2)
   scopes: OAuthScope[];
   permissions: UserPermissions;
 }
 
+interface CognitoUserInfo {
+  username: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  identities?: Array<{
+    userId: string;
+    providerName: string;
+    providerType: string;
+  }>;
+}
+
 interface AuthContext {
   authState: AuthState;
-  signIn: (username: string, password: string) => Promise<void>;
+  signIn: () => void;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
 }
 
-// OAuth configuration from environment (aligned with backend architecture)
+// Cognito OAuth configuration (correct architecture)
 const authConfig = {
-  // Cognito User Pool configuration
-  userPoolId: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID!,
+  // Cognito OAuth domain (from backend configuration)
+  cognitoDomain: process.env.NEXT_PUBLIC_COGNITO_DOMAIN || 'varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com',
   clientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
   
-  // Azure AD OAuth configuration (matches backend)
-  azureTenantId: process.env.NEXT_PUBLIC_AZURE_TENANT_ID!,
-  azureClientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID!,
-  
-  // OAuth scopes (only premium features - search is public)
-  scopes: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog/prices varekatalog/inventory',
-  
-  // OAuth URLs
-  authorizationUrl: `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/authorize`,
-  tokenUrl: `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/token`,
+  // OAuth scopes (Cognito resource server scopes)
+  scopes: ['openid', 'profile', 'email', 'varekatalog/prices', 'varekatalog/inventory'],
   
   // Redirect URIs
   redirectUri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback',
+  
+  // OAuth endpoints (Cognito Hosted UI)
+  get authorizationUrl() {
+    return `https://${this.cognitoDomain}/oauth2/authorize`;
+  },
+  
+  get tokenUrl() {
+    return `https://${this.cognitoDomain}/oauth2/token`;
+  },
+  
+  get logoutUrl() {
+    return `https://${this.cognitoDomain}/logout`;
+  }
 };
 
-const userPool = new CognitoUserPool({
-  UserPoolId: authConfig.userPoolId,
-  ClientId: authConfig.clientId,
-});
-
 // JWT token parsing and scope extraction (Phase 2)
-const parseJwtPayload = (token: string): any => {
+interface JwtPayload {
+  sub?: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  'cognito:username'?: string;
+  identities?: Array<{
+    userId: string;
+    providerName: string;
+    providerType: string;
+  }>;
+  scope?: string;
+  [key: string]: unknown;
+}
+
+const parseJwtPayload = (token: string): JwtPayload => {
   try {
     const parts = token.split('.');
     if (parts.length !== 3 || !parts[1]) {
@@ -80,11 +105,14 @@ const parseJwtPayload = (token: string): any => {
 const extractScopesFromToken = (token: string): OAuthScope[] => {
   try {
     const payload = parseJwtPayload(token);
-    // Azure AD puts scopes in the 'scp' claim as space-separated string
-    const scopeString = payload.scp || '';
+    // Cognito puts scopes in the 'scope' claim as space-separated string
+    const scopeString = payload.scope || '';
     const scopes = scopeString
       .split(' ')
-      .filter((scope: string) => scope.startsWith('varekatalog/'))
+      .filter((scope: string) => 
+        // Filter for varekatalog scopes only
+        scope.startsWith('varekatalog/')
+      )
       .filter((scope: string): scope is OAuthScope => 
         ['varekatalog/prices', 'varekatalog/inventory'].includes(scope)
       );
@@ -118,6 +146,26 @@ const getDefaultAuthState = (): AuthState => ({
   },
 });
 
+// PKCE utility functions for OAuth 2.0 security
+const generateCodeVerifier = (): string => {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode.apply(null, Array.from(array)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+};
+
+const generateCodeChallenge = async (verifier: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(digest))))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+};
+
 export const useAuth = (): AuthContext => {
   const [authState, setAuthState] = useState<AuthState>(getDefaultAuthState());
 
@@ -125,40 +173,53 @@ export const useAuth = (): AuthContext => {
   useEffect(() => {
     const checkAuthState = async () => {
       try {
-        const currentUser = userPool.getCurrentUser();
+        // Check for stored Cognito tokens
+        const accessToken = sessionStorage.getItem('cognito_access_token');
+        const idToken = sessionStorage.getItem('cognito_id_token');
+        const tokenExpiry = sessionStorage.getItem('cognito_token_expiry');
         
-        if (currentUser) {
-          const session = await new Promise<CognitoUserSession>((resolve, reject) => {
-            currentUser.getSession((error: Error | null, session: CognitoUserSession | null) => {
-              if (error) {
-                reject(error);
-              } else if (session) {
-                resolve(session);
-              } else {
-                reject(new Error('No session found'));
-              }
-            });
-          });
-
-          if (session.isValid()) {
-            const accessToken = session.getAccessToken().getJwtToken();
+        if (accessToken && idToken && tokenExpiry) {
+          const expiryTime = parseInt(tokenExpiry, 10);
+          
+          if (Date.now() < expiryTime) {
+            // Token is still valid
+            const userPayload = parseJwtPayload(idToken);
             const scopes = extractScopesFromToken(accessToken);
             const permissions = calculatePermissions(scopes);
+            
+            const userInfo: CognitoUserInfo = {
+              username: userPayload['cognito:username'] || userPayload.sub || 'unknown',
+              ...(userPayload.email && { email: userPayload.email }),
+              ...(userPayload.given_name && { given_name: userPayload.given_name }),
+              ...(userPayload.family_name && { family_name: userPayload.family_name }),
+              ...(userPayload.identities && { identities: userPayload.identities }),
+            };
             
             setAuthState({
               isAuthenticated: true,
               isLoading: false,
-              user: currentUser,
+              user: userInfo,
               accessToken,
               error: null,
               scopes,
               permissions,
             });
             return;
+          } else {
+            // Token expired, clear tokens (avoid circular dependency)
+            sessionStorage.removeItem('cognito_access_token');
+            sessionStorage.removeItem('cognito_id_token');
+            sessionStorage.removeItem('cognito_refresh_token');
+            sessionStorage.removeItem('cognito_token_expiry');
           }
         }
       } catch (error) {
         console.error('Auth state check failed:', error);
+        // Clear invalid tokens
+        sessionStorage.removeItem('cognito_access_token');
+        sessionStorage.removeItem('cognito_id_token');
+        sessionStorage.removeItem('cognito_refresh_token');
+        sessionStorage.removeItem('cognito_token_expiry');
       }
       
       setAuthState({
@@ -170,72 +231,76 @@ export const useAuth = (): AuthContext => {
     checkAuthState();
   }, []);
 
-  const signIn = useCallback(async (username: string, password: string): Promise<void> => {
-    setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
-
+  const signIn = useCallback((): void => {
     try {
-      const user = new CognitoUser({
-        Username: username,
-        Pool: userPool,
-      });
-
-      const authDetails = new AuthenticationDetails({
-        Username: username,
-        Password: password,
-      });
-
-      const session = await new Promise<CognitoUserSession>((resolve, reject) => {
-        user.authenticateUser(authDetails, {
-          onSuccess: resolve,
-          onFailure: reject,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          newPasswordRequired: (_userAttributes, _requiredAttributes) => {
-            // Handle new password requirement if needed
-            reject(new Error('New password required'));
-          },
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          mfaRequired: (_challengeName, _challengeParameters) => {
-            // Handle MFA if needed
-            reject(new Error('MFA required'));
-          },
-        });
-      });
-
-      const accessToken = session.getAccessToken().getJwtToken();
-      const scopes = extractScopesFromToken(accessToken);
-      const permissions = calculatePermissions(scopes);
+      // Generate PKCE parameters for security
+      const codeVerifier = generateCodeVerifier();
+      const state = generateCodeVerifier(); // Use same function for state parameter
       
-      setAuthState({
-        isAuthenticated: true,
-        isLoading: false,
-        user: user,
-        accessToken,
-        error: null,
-        scopes,
-        permissions,
+      // Store PKCE verifier and state for callback
+      sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+      sessionStorage.setItem('oauth_state', state);
+      
+      // Generate code challenge
+      generateCodeChallenge(codeVerifier).then(codeChallenge => {
+        const authParams = new URLSearchParams({
+          response_type: 'code',
+          client_id: authConfig.clientId,
+          redirect_uri: authConfig.redirectUri,
+          scope: authConfig.scopes.join(' '),
+          state: state,
+          code_challenge: codeChallenge,
+          code_challenge_method: 'S256',
+          // Force Azure AD login through Cognito
+          identity_provider: 'AzureAD'
+        });
+
+        const authUrl = `${authConfig.authorizationUrl}?${authParams.toString()}`;
+        
+        // Redirect to Cognito Hosted UI
+        window.location.href = authUrl;
+      }).catch(error => {
+        console.error('Failed to generate OAuth parameters:', error);
+        setAuthState(prev => ({
+          ...prev,
+          error: 'Failed to start authentication',
+        }));
       });
+      
     } catch (error) {
       console.error('Sign in failed:', error);
       setAuthState(prev => ({
         ...prev,
-        isLoading: false,
         error: error instanceof Error ? error.message : 'Sign in failed',
       }));
-      throw error;
     }
   }, []);
 
   const signOut = useCallback(async (): Promise<void> => {
     try {
-      const currentUser = userPool.getCurrentUser();
-      if (currentUser) {
-        currentUser.signOut();
-      }
+      // Clear local tokens
+      sessionStorage.removeItem('cognito_access_token');
+      sessionStorage.removeItem('cognito_id_token');
+      sessionStorage.removeItem('cognito_refresh_token');
+      sessionStorage.removeItem('cognito_token_expiry');
+      sessionStorage.removeItem('pkce_code_verifier');
+      sessionStorage.removeItem('oauth_state');
       
+      // Update state immediately
       setAuthState({
         ...getDefaultAuthState(),
         isLoading: false,
       });
+      
+      // Redirect to Cognito logout URL for complete logout
+      const logoutParams = new URLSearchParams({
+        client_id: authConfig.clientId,
+        logout_uri: window.location.origin,
+      });
+      
+      const logoutUrl = `${authConfig.logoutUrl}?${logoutParams.toString()}`;
+      window.location.href = logoutUrl;
+      
     } catch (error) {
       console.error('Sign out failed:', error);
       setAuthState(prev => ({
@@ -247,40 +312,72 @@ export const useAuth = (): AuthContext => {
 
   const refreshSession = useCallback(async (): Promise<void> => {
     try {
-      const currentUser = userPool.getCurrentUser();
-      if (!currentUser) {
-        throw new Error('No current user');
+      const refreshToken = sessionStorage.getItem('cognito_refresh_token');
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
       }
 
-      const session = await new Promise<CognitoUserSession>((resolve, reject) => {
-        currentUser.getSession((error: Error | null, session: CognitoUserSession | null) => {
-          if (error) {
-            reject(error);
-          } else if (session) {
-            resolve(session);
-          } else {
-            reject(new Error('No session found'));
-          }
-        });
+      const tokenParams = new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: authConfig.clientId,
+        refresh_token: refreshToken,
       });
 
-      if (session.isValid()) {
-        const accessToken = session.getAccessToken().getJwtToken();
-        const scopes = extractScopesFromToken(accessToken);
-        const permissions = calculatePermissions(scopes);
-        
-        setAuthState(prev => ({
-          ...prev,
-          accessToken,
-          error: null,
-          scopes,
-          permissions,
-        }));
-      } else {
-        throw new Error('Session invalid');
+      const response = await fetch(authConfig.tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: tokenParams.toString(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Token refresh failed: ${errorData.error_description || errorData.error}`);
       }
+
+      const tokens = await response.json();
+      
+      // Store new tokens
+      sessionStorage.setItem('cognito_access_token', tokens.access_token);
+      sessionStorage.setItem('cognito_id_token', tokens.id_token);
+      if (tokens.refresh_token) {
+        sessionStorage.setItem('cognito_refresh_token', tokens.refresh_token);
+      }
+      sessionStorage.setItem('cognito_token_expiry', (Date.now() + tokens.expires_in * 1000).toString());
+
+      // Update auth state
+      const userPayload = parseJwtPayload(tokens.id_token);
+      const scopes = extractScopesFromToken(tokens.access_token);
+      const permissions = calculatePermissions(scopes);
+      
+      const userInfo: CognitoUserInfo = {
+        username: userPayload['cognito:username'] || userPayload.sub || 'unknown',
+        ...(userPayload.email && { email: userPayload.email }),
+        ...(userPayload.given_name && { given_name: userPayload.given_name }),
+        ...(userPayload.family_name && { family_name: userPayload.family_name }),
+        ...(userPayload.identities && { identities: userPayload.identities }),
+      };
+      
+      setAuthState({
+        isAuthenticated: true,
+        isLoading: false,
+        user: userInfo,
+        accessToken: tokens.access_token,
+        error: null,
+        scopes,
+        permissions,
+      });
+      
     } catch (error) {
       console.error('Session refresh failed:', error);
+      
+      // Clear invalid tokens
+      sessionStorage.removeItem('cognito_access_token');
+      sessionStorage.removeItem('cognito_id_token');
+      sessionStorage.removeItem('cognito_refresh_token');
+      sessionStorage.removeItem('cognito_token_expiry');
+      
       setAuthState({
         ...getDefaultAuthState(),
         isLoading: false,
@@ -291,33 +388,27 @@ export const useAuth = (): AuthContext => {
 
   const getAccessToken = useCallback(async (): Promise<string | null> => {
     try {
-      // If we have a current token and it's not expired, return it
-      if (authState.accessToken && authState.user) {
-        const session = await new Promise<CognitoUserSession>((resolve, reject) => {
-          authState.user!.getSession((error: Error | null, session: CognitoUserSession | null) => {
-            if (error) {
-              reject(error);
-            } else if (session) {
-              resolve(session);
-            } else {
-              reject(new Error('No session found'));
-            }
-          });
-        });
-
-        if (session.isValid()) {
-          return session.getAccessToken().getJwtToken();
+      // Check if current token is still valid
+      const tokenExpiry = sessionStorage.getItem('cognito_token_expiry');
+      const accessToken = sessionStorage.getItem('cognito_access_token');
+      
+      if (accessToken && tokenExpiry) {
+        const expiryTime = parseInt(tokenExpiry, 10);
+        
+        if (Date.now() < expiryTime - 60000) { // Refresh 1 minute before expiry
+          return accessToken;
         }
       }
       
       // Try to refresh session
       await refreshSession();
-      return authState.accessToken;
+      return sessionStorage.getItem('cognito_access_token');
+      
     } catch (error) {
       console.error('Failed to get access token:', error);
       return null;
     }
-  }, [authState.accessToken, authState.user, refreshSession]);
+  }, [refreshSession]);
 
   return {
     authState,

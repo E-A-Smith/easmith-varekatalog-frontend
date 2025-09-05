@@ -2,19 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2025-01-03
+## [Unreleased] - 2025-09-05
 
 ### Added
-- **Comprehensive User Stories Documentation** (`docs/project/user-stories.md`)
-  - 5 detailed user personas with authentication contexts
-  - 12 search-focused user stories with acceptance criteria
-  - Authentication-aware search experience specifications
-  - Complete coverage of public, basic staff, and full staff access levels
-  - Mobile/responsive search experience requirements
-  - Priority levels (P0/P1/P2) for development planning
+- **🎉 PRODUCTION-READY OAuth 2.0 Authentication System** (`hooks/useAuth.ts`, `components/auth/`, `app/auth/callback/`)
+  - **AWS Cognito Hosted UI integration** with Azure AD identity provider delegation
+  - **OAuth 2.0 + PKCE security implementation** (SHA-256 code challenge)
+  - **Enterprise SSO via Azure AD** through Cognito identity provider
+  - **JWT Bearer token authentication** compatible with API Gateway Cognito Authorizer
+  - **Scope-based permissions system** (`varekatalog/prices`, `varekatalog/inventory`)
+  - **Cross-environment deployment support** (local, Amplify, production)
+  - **Norwegian localization** for all authentication UI components
+  - **Comprehensive authentication debug panel** for development
+
+### Fixed
+- **Content Security Policy (CSP)** configuration to allow Cognito OAuth token endpoints (`https://*.amazoncognito.com`)
+- Authentication flow now properly redirects through Cognito Hosted UI instead of direct Azure AD integration
 
 ### Changed
-- Updated project documentation structure with dedicated user story specifications
+- **Complete authentication architecture refactor** from direct Azure AD OAuth to Cognito-managed OAuth
+- Updated project documentation (`CLAUDE.md`) with comprehensive authentication implementation details
+- Enhanced security headers configuration with OAuth endpoint support
+
+### Removed
+- **Authentication flow fix plan** (`docs/project/authentication-flow-fix-plan.md`) - implementation completed successfully
 
 ---
 

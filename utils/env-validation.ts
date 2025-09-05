@@ -94,8 +94,8 @@ const ENVIRONMENT_SCHEMA: EnvironmentSchema[] = [
     description: 'OAuth scopes for varekatalog backend compatibility',
     required: true,
     environments: ['development', 'production'],
-    pattern: /^[\w\s:]+$/,
-    example: 'openid profile email varekatalog:search varekatalog:prices varekatalog:inventory'
+    pattern: /^[\w\s:\/\-\.]+$/,
+    example: 'openid profile email api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.prices api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.inventory'
   },
 
   // Optional Development Features
