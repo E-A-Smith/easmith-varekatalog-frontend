@@ -49,9 +49,9 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     prisenhet: backendProduct.prisenhet || 'STK',
     
     // Security-filtered fields (null when unauthorized, values when authorized)
-    lagerantall: backendProduct.lagerantall,
-    grunnpris: backendProduct.grunnpris,
-    nettopris: backendProduct.nettopris,
+    lagerantall: backendProduct.lagerantall ?? null,
+    grunnpris: backendProduct.grunnpris ?? null,
+    nettopris: backendProduct.nettopris ?? null,
   };
 
   // Optional fields - only add if they exist in the API response
@@ -68,7 +68,7 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
   }
   
   if (backendProduct.kategori) {
-    product.kategori = backendProduct.kategori;
+    (product as any).kategori = backendProduct.kategori;
   }
   
   if (backendProduct.vvsnr) {
@@ -80,7 +80,7 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
   }
   
   // Legacy price structure for compatibility (if nettopris is available)
-  if (backendProduct.nettopris !== undefined) {
+  if (backendProduct.nettopris !== undefined && backendProduct.nettopris !== null) {
     product.pris = {
       salgspris: backendProduct.nettopris,
       valuta: 'NOK',
@@ -237,7 +237,7 @@ export class SimpleApiClient {
    */
   async searchProducts(
     query: ProductSearchQuery, 
-    accessToken?: string
+    _accessToken?: string // TODO: Implement authentication
   ): Promise<Product[]> {
     // Convert legacy query format to new API format
     const searchBody = {

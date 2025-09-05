@@ -188,7 +188,7 @@ export const ApiDebugPanel = () => {
         </div>
         
         <div className="text-xs text-neutral-600 mb-2">
-          Query: "{testQuery || 'test'}" • Page: 1 • Size: 5 • Sort: relevance
+          Query: &ldquo;{testQuery || 'test'}&rdquo; • Page: 1 • Size: 5 • Sort: relevance
         </div>
         
         {debugInfo.searchTest.error && (

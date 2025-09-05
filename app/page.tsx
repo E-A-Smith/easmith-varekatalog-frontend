@@ -13,7 +13,6 @@ import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
 import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
-import { isProduct } from '@/types/product';
 // Import filter helper utilities
 import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
 
