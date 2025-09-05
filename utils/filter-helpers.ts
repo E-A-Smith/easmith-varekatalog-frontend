@@ -146,7 +146,7 @@ export function validateFilterValue(currentValue: string, availableOptions: stri
   }
   
   // Return the first option (default "Alle leverandører" or "Alle kategorier")
-  return availableOptions[0];
+  return availableOptions[0] ?? 'Alle';
 }
 
 /**

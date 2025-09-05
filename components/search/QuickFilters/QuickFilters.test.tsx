@@ -208,8 +208,6 @@ describe('QuickFilters', () => {
       render(
         <QuickFilters 
           onFiltersChange={mockOnFiltersChange}
-          supplierOptions={undefined}
-          categoryOptions={null as string[] | null}
         />
       );
       

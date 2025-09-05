@@ -7,6 +7,8 @@ import { LoginButton } from './LoginButton';
 
 // Mock CognitoUser for authenticated tests
 const mockUser = {
+  username: 'test@example.com',
+  email: 'test@example.com',
   getUsername: () => 'test@example.com'
 };
 
@@ -28,8 +30,17 @@ describe('LoginButton', () => {
         user: null,
         accessToken: null,
         error: null,
+        scopes: [],
+        permissions: {
+          canSearch: true,
+          canViewPrices: false,
+          canViewInventory: false,
+        },
       },
+      signIn: jest.fn(),
       signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
     });
 
     render(<LoginButton />);
@@ -46,8 +57,17 @@ describe('LoginButton', () => {
         user: mockUser,
         accessToken: 'mock-token',
         error: null,
+        scopes: ['varekatalog/prices', 'varekatalog/inventory'],
+        permissions: {
+          canSearch: true,
+          canViewPrices: true,
+          canViewInventory: true,
+        },
       },
+      signIn: jest.fn(),
       signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
     });
 
     render(<LoginButton />);
@@ -65,8 +85,17 @@ describe('LoginButton', () => {
         user: null,
         accessToken: null,
         error: null,
+        scopes: [],
+        permissions: {
+          canSearch: true,
+          canViewPrices: false,
+          canViewInventory: false,
+        },
       },
+      signIn: jest.fn(),
       signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
     });
 
     render(<LoginButton compact />);
@@ -83,8 +112,17 @@ describe('LoginButton', () => {
         user: null,
         accessToken: null,
         error: null,
+        scopes: [],
+        permissions: {
+          canSearch: true,
+          canViewPrices: false,
+          canViewInventory: false,
+        },
       },
+      signIn: jest.fn(),
       signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
     });
 
     const customClass = 'custom-test-class';

@@ -40,7 +40,7 @@ const mockProducts: Product[] = [
     produsent: 'Würth', // Duplicate supplier
     kategori: 'Festing'
   }
-] as Product[];
+] as unknown as Product[];
 
 describe('getUniqueSuppliers', () => {
   it('should return unique suppliers sorted alphabetically with Norwegian locale', () => {
@@ -54,12 +54,12 @@ describe('getUniqueSuppliers', () => {
   });
 
   it('should handle null input by returning ["Alle leverandører"]', () => {
-    const result = getUniqueSuppliers(null as Product[]);
+    const result = getUniqueSuppliers(null as unknown as unknown as Product[]);
     expect(result).toEqual(['Alle leverandører']);
   });
 
   it('should handle undefined input by returning ["Alle leverandører"]', () => {
-    const result = getUniqueSuppliers(undefined as Product[]);
+    const result = getUniqueSuppliers(undefined as unknown as unknown as Product[]);
     expect(result).toEqual(['Alle leverandører']);
   });
 
@@ -67,7 +67,7 @@ describe('getUniqueSuppliers', () => {
     const productsWithoutSupplier = [
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', kategori: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'TestSupplier', kategori: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueSuppliers(productsWithoutSupplier);
     expect(result).toEqual(['Alle leverandører', 'TestSupplier']);
@@ -78,7 +78,7 @@ describe('getUniqueSuppliers', () => {
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: '', kategori: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: '   ', kategori: 'Test' },
       { id: '3', navn: 'Test 3', vvsnr: '11111111', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'ValidSupplier', kategori: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueSuppliers(productsWithEmptySupplier);
     expect(result).toEqual(['Alle leverandører', 'ValidSupplier']);
@@ -88,7 +88,7 @@ describe('getUniqueSuppliers', () => {
     const productsWithOnlyEmptySuppliers = [
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: '', kategori: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', kategori: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueSuppliers(productsWithOnlyEmptySuppliers);
     expect(result).toEqual(['Alle leverandører']);
@@ -98,7 +98,7 @@ describe('getUniqueSuppliers', () => {
     const productsWithWhitespace = [
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: '  Biltema  ', kategori: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Würth', kategori: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueSuppliers(productsWithWhitespace);
     expect(result).toEqual(['Alle leverandører', 'Biltema', 'Würth']);
@@ -109,7 +109,7 @@ describe('getUniqueSuppliers', () => {
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: 'Øst Leverandør', kategori: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Åse Byggvarer', kategori: 'Test' },
       { id: '3', navn: 'Test 3', vvsnr: '11111111', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Ærlig AS', kategori: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueSuppliers(productsWithNorwegianChars);
     expect(result).toEqual(['Alle leverandører', 'Ærlig AS', 'Øst Leverandør', 'Åse Byggvarer']);
@@ -120,7 +120,7 @@ describe('getUniqueSuppliers', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     
     // Test with invalid data that will cause an error
-    const invalidData = 'not-an-array' as unknown as Product[];
+    const invalidData = 'not-an-array' as unknown as unknown as Product[];
     const result = getUniqueSuppliers(invalidData);
     expect(result).toEqual(['Alle leverandører']);
     
@@ -140,12 +140,12 @@ describe('getUniqueCategories', () => {
   });
 
   it('should handle null input by returning ["Alle kategorier"]', () => {
-    const result = getUniqueCategories(null as Product[]);
+    const result = getUniqueCategories(null as unknown as unknown as Product[]);
     expect(result).toEqual(['Alle kategorier']);
   });
 
   it('should handle undefined input by returning ["Alle kategorier"]', () => {
-    const result = getUniqueCategories(undefined as Product[]);
+    const result = getUniqueCategories(undefined as unknown as unknown as Product[]);
     expect(result).toEqual(['Alle kategorier']);
   });
 
@@ -153,7 +153,7 @@ describe('getUniqueCategories', () => {
     const productsWithoutCategory = [
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', produsent: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Test', kategori: 'TestCategory' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueCategories(productsWithoutCategory);
     expect(result).toEqual(['Alle kategorier', 'TestCategory']);
@@ -164,7 +164,7 @@ describe('getUniqueCategories', () => {
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', kategori: '', produsent: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', kategori: '   ', produsent: 'Test' },
       { id: '3', navn: 'Test 3', vvsnr: '11111111', lagerstatus: 'På lager', anbrekk: 'Nei', kategori: 'ValidCategory', produsent: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueCategories(productsWithEmptyCategory);
     expect(result).toEqual(['Alle kategorier', 'ValidCategory']);
@@ -174,7 +174,7 @@ describe('getUniqueCategories', () => {
     const productsWithOnlyEmptyCategories = [
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', kategori: '', produsent: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', produsent: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueCategories(productsWithOnlyEmptyCategories);
     expect(result).toEqual(['Alle kategorier']);
@@ -184,7 +184,7 @@ describe('getUniqueCategories', () => {
     const productsWithWhitespace = [
       { id: '1', navn: 'Test', vvsnr: '12345678', lagerstatus: 'På lager', anbrekk: 'Ja', kategori: '  Sikkerhet  ', produsent: 'Test' },
       { id: '2', navn: 'Test 2', vvsnr: '87654321', lagerstatus: 'På lager', anbrekk: 'Nei', kategori: 'Beslag', produsent: 'Test' }
-    ] as Product[];
+    ] as unknown as Product[];
     
     const result = getUniqueCategories(productsWithWhitespace);
     expect(result).toEqual(['Alle kategorier', 'Beslag', 'Sikkerhet']);
@@ -195,7 +195,7 @@ describe('getUniqueCategories', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     
     // Test with invalid data that will cause an error
-    const invalidData = 'not-an-array' as unknown as Product[];
+    const invalidData = 'not-an-array' as unknown as unknown as Product[];
     const result = getUniqueCategories(invalidData);
     expect(result).toEqual(['Alle kategorier']);
     
@@ -222,12 +222,12 @@ describe('validateFilterValue', () => {
   });
 
   it('should return "Alle" when availableOptions is null', () => {
-    const result = validateFilterValue('SomeValue', null as string[]);
+    const result = validateFilterValue('SomeValue', null as unknown as string[]);
     expect(result).toBe('Alle');
   });
 
   it('should return "Alle" when availableOptions is undefined', () => {
-    const result = validateFilterValue('SomeValue', undefined as string[]);
+    const result = validateFilterValue('SomeValue', undefined as unknown as string[]);
     expect(result).toBe('Alle');
   });
 
