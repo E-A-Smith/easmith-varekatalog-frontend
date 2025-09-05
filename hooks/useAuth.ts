@@ -296,7 +296,6 @@ export const useAuth = (): AuthContext => {
       const logoutParams = new URLSearchParams({
         client_id: authConfig.clientId,
         logout_uri: `${window.location.origin}/`,
-        redirect_uri: `${window.location.origin}/`,
       });
       
       const logoutUrl = `${authConfig.logoutUrl}?${logoutParams.toString()}`;
