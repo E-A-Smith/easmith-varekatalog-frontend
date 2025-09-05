@@ -15,6 +15,23 @@ All notable changes to this project will be documented in this file.
   - **Norwegian localization** for all authentication UI components
   - **Comprehensive authentication debug panel** for development
 
+- **Dynamic Filter Values Feature** - Filters now populate dynamically based on search results and catalog data
+  - Filter options (suppliers/categories) update in real-time based on current dataset
+  - Improved UX: Only show suppliers/categories that exist in current results
+  - Norwegian locale sorting support for filter options (æ, ø, å)
+  - Performance optimized with memoization using `useMemo`
+  - Enhanced error handling: Display only "Alle leverandører"/"Alle kategorier" when no valid options available (replaces static fallbacks)
+  - New utility functions: `getUniqueSuppliers()`, `getUniqueCategories()`, `validateFilterValue()`
+  - Comprehensive unit tests with >90% coverage including edge cases
+
+- **Comprehensive User Stories Documentation** (`docs/project/user-stories.md`)
+  - 5 detailed user personas with authentication contexts
+  - 12 search-focused user stories with acceptance criteria
+  - Authentication-aware search experience specifications
+  - Complete coverage of public, basic staff, and full staff access levels
+  - Mobile/responsive search experience requirements
+  - Priority levels (P0/P1/P2) for development planning
+
 ### Fixed
 - **Content Security Policy (CSP)** configuration to allow Cognito OAuth token endpoints (`https://*.amazoncognito.com`)
 - Authentication flow now properly redirects through Cognito Hosted UI instead of direct Azure AD integration
@@ -23,6 +40,8 @@ All notable changes to this project will be documented in this file.
 - **Complete authentication architecture refactor** from direct Azure AD OAuth to Cognito-managed OAuth
 - Updated project documentation (`CLAUDE.md`) with comprehensive authentication implementation details
 - Enhanced security headers configuration with OAuth endpoint support
+- **BREAKING**: QuickFilters component now requires dynamic options via props (no static fallbacks)
+- Simplified `applyFilters` function to use consistent Norwegian default values ("Alle leverandører"/"Alle kategorier")
 
 ### Removed
 - **Authentication flow fix plan** (`docs/project/authentication-flow-fix-plan.md`) - implementation completed successfully

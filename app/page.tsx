@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Table, Pagination } from '../components/ui';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { NOBBLink } from '../components/ui/NOBBLink';
@@ -13,6 +13,8 @@ import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
 import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
+// Import filter helper utilities
+import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
 
 // Main product catalog data - Updated for 10-column table layout (Phase 1)
 const catalogProducts: Product[] = [
@@ -339,27 +341,27 @@ export default function Dashboard() {
   ];
 
   // Apply filters to data
-  const applyFilters = (data: Product[]) => {
+  const applyFilters = (data: Product[], filterState: FilterState) => {
     let filteredData = [...data];
     
     // Filter by supplier
-    if (filters.supplier !== 'Alle leverandører') {
+    if (filterState.supplier !== 'Alle leverandører') {
       filteredData = filteredData.filter(product => 
-        product.produsent?.toLowerCase() === filters.supplier.toLowerCase()
+        product.produsent?.toLowerCase() === filterState.supplier.toLowerCase()
       );
     }
     
     // Filter by category
-    if (filters.category !== 'Alle kategorier') {
+    if (filterState.category !== 'Alle kategorier') {
       filteredData = filteredData.filter(product => 
-        product.kategori?.toLowerCase() === filters.category.toLowerCase()
+        product.kategori?.toLowerCase() === filterState.category.toLowerCase()
       );
     }
     
     // Filter by stock status
-    if (filters.stock !== 'Alle') {
+    if (filterState.stock !== 'Alle') {
       filteredData = filteredData.filter(product => 
-        product.lagerstatus === filters.stock
+        product.lagerstatus === filterState.stock
       );
     }
     
@@ -369,12 +371,38 @@ export default function Dashboard() {
     return filteredData;
   };
   
-  // Determine which data to display and apply filters
+  // Determine which data to display
   const baseData = searchState.hasSearched 
     ? searchState.results  // Use API results (empty if API failed)
     : catalogProducts;     // Only use local data if no search attempted
+  
+  // Calculate dynamic filter options based on current data
+  const supplierOptions = useMemo(() => {
+    return getUniqueSuppliers(baseData);
+  }, [baseData]);
+
+  const categoryOptions = useMemo(() => {
+    return getUniqueCategories(baseData);
+  }, [baseData]);
+
+  // Validate current filter values against available options
+  const validatedFilters = useMemo(() => {
+    return {
+      supplier: validateFilterValue(filters.supplier, supplierOptions),
+      category: validateFilterValue(filters.category, categoryOptions),
+      stock: filters.stock // Stock options remain static
+    };
+  }, [filters, supplierOptions, categoryOptions]);
+
+  // Update filters if validation changed them
+  useEffect(() => {
+    if (validatedFilters.supplier !== filters.supplier || 
+        validatedFilters.category !== filters.category) {
+      setFilters(validatedFilters);
+    }
+  }, [validatedFilters, filters]);
     
-  const filteredData = applyFilters(baseData);
+  const filteredData = applyFilters(baseData, validatedFilters);
 
   // Pagination calculations
   const totalItems = filteredData.length;
@@ -415,8 +443,15 @@ export default function Dashboard() {
       
       {/* Quick Filters section (36px) */}
       <QuickFilters 
+        supplierOptions={supplierOptions}
+        categoryOptions={categoryOptions}
+        filters={filters}
         onFiltersChange={(newFilters) => {
           setFilters(newFilters);
+          resetPagination();
+        }}
+        onFiltersReset={(resetFilters) => {
+          setFilters(resetFilters);
           resetPagination();
         }}
       />

@@ -8,66 +8,65 @@
 
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
+import { validateFilterValue } from '@/utils/filter-helpers';
 
 export const QuickFilters: FC<QuickFiltersProps> = ({
   onFiltersChange,
-  className
+  className,
+  supplierOptions,
+  categoryOptions,
+  filters: controlledFilters,
+  onFiltersReset
 }) => {
-  const [filters, setFilters] = useState<FilterState>({
+  // Use controlled filters if provided, otherwise use internal state
+  const [internalFilters, setInternalFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
     category: 'Alle kategorier',
     stock: 'Alle'
   });
+  
+  const filters = controlledFilters || internalFilters;
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-    onFiltersChange?.(newFilters);
+    
+    if (controlledFilters) {
+      // In controlled mode, just notify parent
+      onFiltersChange?.(newFilters);
+    } else {
+      // In uncontrolled mode, update internal state
+      setInternalFilters(newFilters);
+      onFiltersChange?.(newFilters);
+    }
   };
 
-  // Supplier options based on Norwegian building supplies market
-  const supplierOptions = [
-    'Alle leverandører',
-    'Biltema',
-    'Würth', 
-    'Bostik',
-    'DeWalt',
-    'Essve',
-    'Flügger',
-    'Glava',
-    'Gyproc',
-    'Rockwool',
-    'Uponor',
-    'Tarkett',
-    '3M',
-    'Roto',
-    'Mapei',
-    'Monier',
-    'Nexans'
-  ];
-
-  // Category options for Norwegian building supplies
-  const categoryOptions = [
-    'Alle kategorier',
-    'Sikkerhet',
-    'Beslag', 
-    'Festing',
-    'Skruer og bolter',
-    'Byggematerialer',
-    'Isolasjon',
-    'Rør og koblingsutstyr',
-    'Elektro',
-    'Gulv',
-    'Vindus- og dørbeslag',
-    'Lim og fugemasse',
-    'Takmateriell',
-    'Ventilasjon',
-    'Verktøy',
-    'Maling og lakk'
-  ];
+  // Use dynamic options or fallback to default options
+  const currentSupplierOptions = supplierOptions || ['Alle leverandører'];
+  const currentCategoryOptions = categoryOptions || ['Alle kategorier'];
+  
+  // Validate current filter values against available options
+  useEffect(() => {
+    const validatedSupplier = validateFilterValue(filters.supplier, currentSupplierOptions);
+    const validatedCategory = validateFilterValue(filters.category, currentCategoryOptions);
+    
+    if (validatedSupplier !== filters.supplier || validatedCategory !== filters.category) {
+      const resetFilters = {
+        ...filters,
+        supplier: validatedSupplier,
+        category: validatedCategory
+      };
+      
+      if (controlledFilters && onFiltersReset) {
+        onFiltersReset(resetFilters);
+      } else {
+        setInternalFilters(resetFilters);
+        onFiltersChange?.(resetFilters);
+      }
+    }
+  }, [currentSupplierOptions, currentCategoryOptions, filters.supplier, filters.category, controlledFilters, onFiltersReset, onFiltersChange]);
 
 
 
@@ -98,7 +97,7 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
               transition-colors duration-150
             "
           >
-            {supplierOptions.map(option => (
+            {currentSupplierOptions.map(option => (
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
@@ -122,7 +121,7 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
               transition-colors duration-150
             "
           >
-            {categoryOptions.map(option => (
+            {currentCategoryOptions.map(option => (
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
