@@ -16,225 +16,8 @@ import type { Product, LagerStatus } from '@/types/product';
 // Import filter helper utilities
 import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
 
-// Main product catalog data - Updated for 10-column table layout (Phase 1)
-const catalogProducts: Product[] = [
-  {
-    id: '1',
-    navn: 'SKRUE TRESKRUE 50MM GALVANISERT',
-    vvsnr: '12345678',
-    lagerstatus: 'På lager',
-    anbrekk: 'Ja',
-    produsent: 'BILTEMA',
-    kategori: 'Skruer og bolter',
-    pris: { salgspris: 35.9, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '123456',
-    nobbNumber: '60154545',
-    pakningAntall: 5,
-    lagerantall: null, // Simulating unauthenticated state
-    prisenhet: 'STK',
-    grunnpris: null, // Simulating unauthenticated state
-    nettopris: null // Simulating unauthenticated state
-  },
-  {
-    id: '2',
-    navn: 'BESLAG VINKELBESLAG 90° STÅL',
-    vvsnr: '87654321',
-    lagerstatus: 'På lager',
-    anbrekk: 'Nei',
-    produsent: 'WÜRTH',
-    kategori: 'Beslag',
-    pris: { salgspris: 89.5, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '234567',
-    nobbNumber: '29252657',
-    pakningAntall: 1,
-    lagerantall: 127, // Simulating authenticated state
-    prisenhet: 'STK',
-    grunnpris: 89.50, // Simulating authenticated state
-    nettopris: 111.88 // Simulating authenticated state
-  },
-  {
-    id: '3',
-    navn: 'ISOLASJON STEINULL 50MM',
-    vvsnr: '13579246',
-    lagerstatus: 'På lager',
-    anbrekk: 'Nei',
-    produsent: 'ROCKWOOL',
-    kategori: 'Isolasjon',
-    pris: { salgspris: 125.5, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '345678',
-    nobbNumber: '25704917',
-    pakningAntall: 10,
-    lagerantall: null, // Simulating unauthenticated state
-    prisenhet: 'M2',
-    grunnpris: null, // Simulating unauthenticated state
-    nettopris: null // Simulating unauthenticated state
-  },
-  {
-    id: '4',
-    navn: 'VERNEBRILLER KLAR POLYKARBONAT',
-    vvsnr: '63749281',
-    lagerstatus: 'På lager',
-    anbrekk: 'Ja',
-    produsent: '3M',
-    kategori: 'Sikkerhet',
-    pris: { salgspris: 245, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '456789',
-    nobbNumber: '25704933',
-    pakningAntall: 1,
-    lagerantall: 89,
-    prisenhet: 'STK',
-    grunnpris: 245.00,
-    nettopris: 306.25
-  },
-  {
-    id: '5',
-    navn: 'RØRKRYSS 15MM MESSING',
-    vvsnr: '24681357',
-    lagerstatus: 'På lager',
-    anbrekk: 'Ja',
-    produsent: 'UPONOR',
-    kategori: 'Rør og koblingsutstyr',
-    pris: { salgspris: 89.9, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '567890',
-    nobbNumber: '60008533',
-    pakningAntall: 1,
-    lagerantall: 456,
-    prisenhet: 'STK',
-    grunnpris: 89.90,
-    nettopris: 112.38
-  },
-  {
-    id: '6',
-    navn: 'GIPSPLATE 12,5MM 120X240CM',
-    vvsnr: '98765432',
-    lagerstatus: 'På lager',
-    anbrekk: 'Nei',
-    produsent: 'GYPROC',
-    kategori: 'Byggematerialer',
-    pris: { salgspris: 450, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '678901',
-    nobbNumber: '60154715',
-    pakningAntall: 1,
-    lagerantall: 234,
-    prisenhet: 'STK',
-    grunnpris: 450.00,
-    nettopris: 562.50
-  },
-  {
-    id: '7',
-    navn: 'DRILL SPIRALBOR 8MM HSS',
-    vvsnr: '22222222',
-    lagerstatus: 'På lager',
-    anbrekk: 'Ja',
-    produsent: 'DEWALT',
-    kategori: 'Verktøy',
-    pris: { salgspris: 78.9, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '789012',
-    nobbNumber: '55841762',
-    pakningAntall: 1,
-    lagerantall: 78,
-    prisenhet: 'STK',
-    grunnpris: 78.90,
-    nettopris: 98.63
-  },
-  {
-    id: '8',
-    navn: 'LIM MONTERINGSLIM 300ML',
-    vvsnr: '11111111',
-    lagerstatus: 'Utsolgt',
-    anbrekk: 'Ja',
-    produsent: 'BOSTIK',
-    kategori: 'Lim og fugemasse',
-    pris: { salgspris: 145, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '890123',
-    nobbNumber: '27356237',
-    pakningAntall: 12,
-    lagerantall: 0,
-    prisenhet: 'STK',
-    grunnpris: 145.00,
-    nettopris: 181.25
-  },
-  {
-    id: '9',
-    navn: 'PARKETT EIK NATUR 14X140MM',
-    vvsnr: '14725836',
-    lagerstatus: 'Utsolgt',
-    anbrekk: 'Nei',
-    produsent: 'TARKETT',
-    kategori: 'Gulv',
-    pris: { salgspris: 699, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '901234',
-    nobbNumber: '60644213',
-    pakningAntall: 1,
-    lagerantall: 0,
-    prisenhet: 'M2',
-    grunnpris: 699.00,
-    nettopris: 873.75
-  },
-  {
-    id: '10',
-    navn: 'SKRUE GIPSSKRUE 25MM',
-    vvsnr: '33333333',
-    lagerstatus: 'På lager',
-    anbrekk: 'Nei',
-    produsent: 'ESSVE',
-    kategori: 'Skruer og bolter',
-    pris: { salgspris: 25.5, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '012345',
-    nobbNumber: '60153959',
-    pakningAntall: 100,
-    lagerantall: 1250,
-    prisenhet: 'POS',
-    grunnpris: 25.50,
-    nettopris: 31.88
-  },
-  {
-    id: '11',
-    navn: 'MALING VEGMALING HVIT 1L',
-    vvsnr: '44444444',
-    lagerstatus: 'På lager',
-    anbrekk: 'Ja',
-    produsent: 'FLÜGGER',
-    kategori: 'Maling og lakk',
-    pris: { salgspris: 189, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '112233',
-    nobbNumber: '60154545',
-    pakningAntall: 1,
-    lagerantall: 12,
-    prisenhet: 'STK',
-    grunnpris: 189.00,
-    nettopris: 236.25
-  },
-  {
-    id: '12',
-    navn: 'ISOLASJON STEINULL 100MM',
-    vvsnr: '55555555',
-    lagerstatus: 'På lager',
-    anbrekk: 'Nei',
-    produsent: 'GLAVA',
-    kategori: 'Isolasjon',
-    pris: { salgspris: 234.5, valuta: 'NOK', inkludertMva: true },
-    // New fields for 10-column layout
-    lh: '223344',
-    nobbNumber: '29252657',
-    pakningAntall: 5,
-    lagerantall: 67,
-    prisenhet: 'M2',
-    grunnpris: 234.50,
-    nettopris: 293.13
-  }
-];
+// No default products - start with empty search results
+const catalogProducts: Product[] = [];
 
 export default function Dashboard() {
   const { authState } = useAuth();
@@ -431,7 +214,7 @@ export default function Dashboard() {
 
   const displayTitle = searchState.hasSearched && searchState.query
     ? `Søkeresultater for "${searchState.query}" (${searchState.results.length} funnet)`
-    : `Produktkatalog (${catalogProducts.length} produkter)`;
+    : 'Produktkatalog';
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -481,13 +264,22 @@ export default function Dashboard() {
                 data={displayData}
                 columns={tableColumns}
               />
-            ) : (
+            ) : searchState.hasSearched ? (
               <div className="text-center py-12">
                 <p className="text-neutral-600">
                   Ingen produkter funnet for &quot;{searchState.query}&quot;
                 </p>
                 <p className="text-sm text-neutral-500 mt-2">
                   Prøv andre søkeord eller sjekk stavingen
+                </p>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-neutral-600">
+                  Søk etter produkter for å se resultater
+                </p>
+                <p className="text-sm text-neutral-500 mt-2">
+                  Bruk søkefeltet ovenfor for å finne produkter i katalogen
                 </p>
               </div>
             )}
