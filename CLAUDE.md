@@ -77,7 +77,7 @@ utils/                # Utilities
 **API Integration**:
 - `utils/api.ts` provides `SimpleApiClient` with timeout handling
 - Mock data fallback in `useProductSearch` hook when API unavailable
-- Environment variables: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_API_ENDPOINT`, `NEXT_PUBLIC_REGION`
+- Environment variables: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_REGION`
 - Development proxy in `next.config.ts` (disabled in production)
 - **AWS Cognito OAuth 2.0 authentication fully implemented and tested**
 
@@ -403,7 +403,6 @@ wide: 1920px+          /* Maximum productivity layout */
 ```bash
 # API Configuration - Local Development (uses built-in Next.js API routes)
 NEXT_PUBLIC_API_BASE_URL=/api
-NEXT_PUBLIC_API_ENDPOINT=/api
 NEXT_PUBLIC_REGION=eu-west-1
 
 # AWS Cognito Authentication - DEV Environment
@@ -468,7 +467,6 @@ aws amplify update-branch --environment-variables KEY=VALUE
 **For Develop Branch (Configured via AWS CLI):**
 ```bash
 NEXT_PUBLIC_API_BASE_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
-NEXT_PUBLIC_API_ENDPOINT=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
 NEXT_PUBLIC_ENABLE_DEVTOOLS=true
 ```
 
@@ -536,7 +534,7 @@ node scripts/validate-env.js         # Standalone validation
 
 **API Configuration**:
 - `NEXT_PUBLIC_API_BASE_URL` - Product search API base URL
-- `NEXT_PUBLIC_API_ENDPOINT` - API endpoint for search operations  
+  
 - `NEXT_PUBLIC_REGION` - AWS region (format: `eu-west-1`)
 
 **AWS Cognito Authentication**:
@@ -544,8 +542,7 @@ node scripts/validate-env.js         # Standalone validation
 - `NEXT_PUBLIC_COGNITO_USER_POOL_ID` - User Pool ID (format: `eu-west-1_XXXXXXXXX`)
 
 **Azure AD OAuth Integration**:
-- `NEXT_PUBLIC_AZURE_TENANT_ID` - Azure Tenant UUID
-- `NEXT_PUBLIC_AZURE_CLIENT_ID` - Azure Client UUID  
+  
 - `NEXT_PUBLIC_OAUTH_SCOPES` - OAuth scope string
 
 **Optional Development Variables**:

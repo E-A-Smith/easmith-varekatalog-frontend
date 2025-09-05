@@ -48,12 +48,7 @@ const REQUIRED_VARS = [
   {
     name: 'NEXT_PUBLIC_API_BASE_URL',
     description: 'Base URL for the product search API',
-    example: 'https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev'
-  },
-  {
-    name: 'NEXT_PUBLIC_API_ENDPOINT', 
-    description: 'API endpoint for search operations',
-    example: 'https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev'
+    example: '/api'
   },
   {
     name: 'NEXT_PUBLIC_REGION',
@@ -71,19 +66,9 @@ const REQUIRED_VARS = [
     example: 'eu-west-1_EIDmPWkK2'
   },
   {
-    name: 'NEXT_PUBLIC_AZURE_TENANT_ID',
-    description: 'Azure AD Tenant ID',
-    example: 'f0be9261-9717-4dc6-9ca2-b31924476526'
-  },
-  {
-    name: 'NEXT_PUBLIC_AZURE_CLIENT_ID',
-    description: 'Azure AD Client ID',
-    example: '31fc9aa9-223e-4bc5-a371-7b0d56a13075'
-  },
-  {
     name: 'NEXT_PUBLIC_OAUTH_SCOPES',
     description: 'OAuth scopes for backend compatibility',
-    example: 'openid profile email varekatalog:search varekatalog:prices varekatalog:inventory'
+    example: 'openid profile email varekatalog/prices varekatalog/inventory'
   }
 ];
 

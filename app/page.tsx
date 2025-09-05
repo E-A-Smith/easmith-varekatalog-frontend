@@ -13,6 +13,7 @@ import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
 import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
+import { isProduct } from '@/types/product';
 // Import filter helper utilities
 import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
 
@@ -125,7 +126,8 @@ export default function Dashboard() {
 
   // Apply filters to data
   const applyFilters = (data: Product[], filterState: FilterState) => {
-    let filteredData = [...data];
+    // First, filter out any invalid/malformed products using type guard
+    let filteredData = data.filter(product => isProduct(product));
     
     // Filter by supplier
     if (filterState.supplier !== 'Alle leverandører') {
@@ -148,8 +150,14 @@ export default function Dashboard() {
       );
     }
     
-    // Always sort by name alphabetically
-    filteredData.sort((a, b) => a.navn.localeCompare(b.navn, 'no'));
+    // Always sort by name alphabetically - with safe null/undefined handling
+    filteredData.sort((a, b) => {
+      // Ensure both products exist and have names
+      if (!a || !a.navn || !b || !b.navn) {
+        return 0; // Keep original order if either product is invalid
+      }
+      return a.navn.localeCompare(b.navn, 'no');
+    });
     
     return filteredData;
   };

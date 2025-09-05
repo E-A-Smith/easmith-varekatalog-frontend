@@ -32,16 +32,8 @@ const ENVIRONMENT_SCHEMA: EnvironmentSchema[] = [
     description: 'Base URL for the product search API',
     required: true,
     environments: ['development', 'production'],
-    pattern: /^https?:\/\/.+/,
-    example: 'https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev'
-  },
-  {
-    name: 'NEXT_PUBLIC_API_ENDPOINT',
-    description: 'API endpoint for search operations',
-    required: true,
-    environments: ['development', 'production'],
-    pattern: /^https?:\/\/.+/,
-    example: 'https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev'
+    pattern: /^(https?:\/\/.+|\/api)$/,
+    example: '/api'
   },
   {
     name: 'NEXT_PUBLIC_REGION',
@@ -70,23 +62,6 @@ const ENVIRONMENT_SCHEMA: EnvironmentSchema[] = [
     example: 'eu-west-1_EIDmPWkK2'
   },
 
-  // Azure AD OAuth Configuration
-  {
-    name: 'NEXT_PUBLIC_AZURE_TENANT_ID',
-    description: 'Azure AD Tenant ID for OAuth integration',
-    required: true,
-    environments: ['development', 'production'],
-    pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-    example: 'f0be9261-9717-4dc6-9ca2-b31924476526'
-  },
-  {
-    name: 'NEXT_PUBLIC_AZURE_CLIENT_ID',
-    description: 'Azure AD Client ID for OAuth integration',
-    required: true,
-    environments: ['development', 'production'],
-    pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-    example: '31fc9aa9-223e-4bc5-a371-7b0d56a13075'
-  },
 
   // OAuth Configuration
   {
@@ -95,7 +70,7 @@ const ENVIRONMENT_SCHEMA: EnvironmentSchema[] = [
     required: true,
     environments: ['development', 'production'],
     pattern: /^[\w\s:\/\-\.]+$/,
-    example: 'openid profile email api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.prices api://31fc9aa9-223e-4bc5-a371-7b0d56a13075/varekatalog.inventory'
+    example: 'openid profile email varekatalog/prices varekatalog/inventory'
   },
 
   // Optional Development Features

@@ -5,126 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock product data - will be replaced with real database queries
-const mockProducts = [
-  { 
-    id: '1',
-    navn: 'Gipsplate 12,5mm 120x240cm', 
-    vvsnr: '98765432', 
-    lagerstatus: 'På lager' as const, 
-    anbrekk: 'Nei' as const, 
-    produsent: 'Gyproc', 
-    pris: { salgspris: 450, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Byggematerialer' as const,
-    beskrivelse: 'Standard gipsplate for innervegger'
-  },
-  { 
-    id: '2',
-    navn: 'Isolasjon steinull 50mm', 
-    vvsnr: '13579246', 
-    lagerstatus: 'Få igjen' as const, 
-    anbrekk: 'Nei' as const, 
-    produsent: 'Rockwool', 
-    pris: { salgspris: 125.5, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Isolasjon' as const,
-    beskrivelse: 'Brannsikker steinull isolasjon'
-  },
-  { 
-    id: '3',
-    navn: 'Rørkryss 15mm messing', 
-    vvsnr: '24681357', 
-    lagerstatus: 'På lager' as const, 
-    anbrekk: 'Ja' as const, 
-    produsent: 'Uponor', 
-    pris: { salgspris: 89.9, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Rør og koblingsutstyr' as const,
-    beskrivelse: 'Rørkryss i messing for varme- og kjølesystemer'
-  },
-  { 
-    id: '4',
-    navn: 'Parkett eik natur 14x140mm', 
-    vvsnr: '14725836', 
-    lagerstatus: 'Utsolgt' as const, 
-    anbrekk: 'Nei' as const, 
-    produsent: 'Tarkett', 
-    pris: { salgspris: 699, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Gulv' as const,
-    beskrivelse: 'Naturlig eikeparkett med børstet overflate'
-  },
-  { 
-    id: '5',
-    navn: 'Vernebriller klar polykarbonat', 
-    vvsnr: '63749281', 
-    lagerstatus: 'På lager' as const, 
-    anbrekk: 'Ja' as const, 
-    produsent: '3M', 
-    pris: { salgspris: 245, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Sikkerhet' as const,
-    beskrivelse: 'Verneutstyr for øyne med anti-dugg behandling'
-  },
-  { 
-    id: '6',
-    navn: 'Skrue treskrue 50mm galvanisert', 
-    vvsnr: '12345678', 
-    lagerstatus: 'På lager' as const, 
-    anbrekk: 'Ja' as const, 
-    produsent: 'Biltema', 
-    pris: { salgspris: 35.9, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Skruer og bolter' as const,
-    beskrivelse: 'Galvaniserte skruer for utendørs bruk'
-  },
-  { 
-    id: '7',
-    navn: 'Beslag vinkelbeslag 90° stål', 
-    vvsnr: '87654321', 
-    lagerstatus: 'På lager' as const, 
-    anbrekk: 'Nei' as const, 
-    produsent: 'Würth', 
-    pris: { salgspris: 89.5, valuta: 'NOK' as const, inkludertMva: true },
-    kategori: 'Beslag' as const,
-    beskrivelse: 'Solid vinkelbeslag i forsinket stål'
-  }
-];
-
-// Norwegian text normalization function
-function normalizeNorwegianText(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/æ/g, 'ae')
-    .replace(/ø/g, 'o')
-    .replace(/å/g, 'a')
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim();
-}
-
-// Search function with Norwegian text support
-function searchProducts(query: string) {
-  if (!query || query.trim().length === 0) {
-    return mockProducts;
-  }
-
-  const normalizedQuery = normalizeNorwegianText(query);
-  const queryTerms = normalizedQuery.split(/\s+/).filter(term => term.length > 0);
-
-  return mockProducts.filter(product => {
-    // Search in multiple fields
-    const searchableText = [
-      product.navn,
-      product.produsent,
-      product.vvsnr,
-      product.kategori,
-      product.beskrivelse
-    ].join(' ');
-
-    const normalizedText = normalizeNorwegianText(searchableText);
-
-    // Check if any query term matches
-    return queryTerms.some(term => 
-      normalizedText.includes(term) || 
-      product.vvsnr.includes(term) // Direct VVS number match
-    );
-  });
-}
+// NO MORE MOCK DATA - All searches now use the real backend API
 
 export async function GET(request: NextRequest) {
   try {
@@ -134,81 +15,76 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Check if we should use external API (now requires OAuth authentication)
+    // Try to call the real backend API first
     const externalApiUrl = process.env.EXTERNAL_API_URL;
     
     if (externalApiUrl) {
-      // Call external API - NOTE: OAuth authentication now required
       try {
+        console.log(`[Search API] Calling backend: ${externalApiUrl}/search`);
         const externalResponse = await fetch(`${externalApiUrl}/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-            // NOTE: Authorization header would be needed for OAuth
-            // 'Authorization': `Bearer ${accessToken}`
+            // Note: For now using public access without OAuth token
+            // TODO: Add OAuth token from session when authentication is implemented
           },
           body: JSON.stringify({
-            søketekst: query,
-            side: 1,
-            sideStørrelse: limit,
-            sortering: 'relevans'
+            query: query,
+            pagination: {
+              offset: offset,
+              limit: limit
+            }
           }),
           signal: AbortSignal.timeout(10000) // 10 second timeout
         });
         
         if (externalResponse.ok) {
           const externalData = await externalResponse.json();
-          return NextResponse.json(externalData);
-        } else if (externalResponse.status === 401) {
-          // OAuth authentication required - return specific error
-          console.warn('External API requires authentication (OAuth):', externalResponse.status);
+          console.log(`[Search API] Backend returned ${externalData.products?.length || 0} products`);
+          
+          // Transform backend response to match frontend expected format
           return NextResponse.json({
-            success: false,
-            error: 'Authentication required',
-            message: 'API now requires OAuth authentication. Please implement login flow.',
-            authRequired: true,
+            success: true,
+            query,
+            total: externalData.total || externalData.products?.length || 0,
+            returned: externalData.products?.length || 0,
+            limit,
+            offset,
+            responseTime: `${Date.now() - startTime}ms`,
             timestamp: new Date().toISOString(),
-          }, { status: 401 });
+            results: externalData.products || [],
+            meta: {
+              source: 'backend-api',
+              norwegianTextSupported: true,
+              searchFields: ['navn', 'produsent', 'vvsnr', 'kategori', 'beskrivelse'],
+              features: {
+                fuzzySearch: true,
+                exactMatch: true,
+                pagination: true,
+              }
+            }
+          });
         } else {
-          console.warn('External API failed:', externalResponse.status);
+          console.warn(`[Search API] Backend API failed with status ${externalResponse.status}`);
+          const errorText = await externalResponse.text();
+          console.warn(`[Search API] Backend error response:`, errorText);
         }
       } catch (error) {
-        console.warn('External API error:', error);
+        console.error('[Search API] Backend API error:', error);
       }
     }
 
-    // Fallback to mock data
-    const results = searchProducts(query);
-    
-    // Apply pagination
-    const paginatedResults = results.slice(offset, offset + limit);
-    
-    const responseTime = Date.now() - startTime;
-
+    // No backend API available - return error
+    console.error('[Search API] No backend API configured or backend API failed');
     return NextResponse.json({
-      success: true,
-      query,
-      total: results.length,
-      returned: paginatedResults.length,
-      limit,
-      offset,
-      responseTime: `${responseTime}ms`,
+      success: false,
+      error: 'Backend API unavailable',
+      message: 'Search service is temporarily unavailable. Please try again later.',
       timestamp: new Date().toISOString(),
-      results: paginatedResults,
-      meta: {
-        norwegianTextSupported: true,
-        searchFields: ['navn', 'produsent', 'vvsnr', 'kategori', 'beskrivelse'],
-        features: {
-          fuzzySearch: true,
-          exactMatch: true,
-          pagination: true,
-        }
-      }
-    }, {
-      status: 200,
+    }, { 
+      status: 503,
       headers: {
-        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
         'Content-Type': 'application/json',
       }
     });
@@ -235,93 +111,57 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { query = '', filters = {}, sort = {}, limit = 50, offset = 0 } = body;
 
-    // Check if we should use external API (now requires OAuth authentication)
+    // Try to call the real backend API first
     const externalApiUrl = process.env.EXTERNAL_API_URL;
     
     if (externalApiUrl) {
-      // Call external API - NOTE: OAuth authentication now required
       try {
+        console.log(`[Search API] POST calling backend: ${externalApiUrl}/search`);
         const externalResponse = await fetch(`${externalApiUrl}/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-            // NOTE: Authorization header would be needed for OAuth
-            // 'Authorization': `Bearer ${accessToken}`
+            // Note: For now using public access without OAuth token
+            // TODO: Add OAuth token from session when authentication is implemented
           },
           body: JSON.stringify({
-            søketekst: query,
-            side: 1,
-            sideStørrelse: limit,
-            sortering: 'relevans'
+            query: query,
+            filters: filters,
+            sort: sort,
+            pagination: {
+              offset: offset,
+              limit: limit
+            }
           }),
           signal: AbortSignal.timeout(10000) // 10 second timeout
         });
         
         if (externalResponse.ok) {
           const externalData = await externalResponse.json();
+          console.log(`[Search API] Backend returned ${externalData.products?.length || 0} products`);
+          
+          // Return backend response directly (already in correct format)
           return NextResponse.json(externalData);
-        } else if (externalResponse.status === 401) {
-          // OAuth authentication required - return specific error
-          console.warn('External API requires authentication (OAuth):', externalResponse.status);
-          return NextResponse.json({
-            success: false,
-            error: 'Authentication required',
-            message: 'API now requires OAuth authentication. Please implement login flow.',
-            authRequired: true,
-            timestamp: new Date().toISOString(),
-          }, { status: 401 });
         } else {
-          console.warn('External API failed, falling back to mock data:', externalResponse.status);
+          console.warn(`[Search API] Backend API failed with status ${externalResponse.status}`);
+          const errorText = await externalResponse.text();
+          console.warn(`[Search API] Backend error response:`, errorText);
         }
       } catch (error) {
-        console.warn('External API error, falling back to mock data:', error);
+        console.error('[Search API] Backend API error:', error);
       }
     }
 
-    // Fallback to mock data - perform search with filters (simplified implementation)
-    let results = searchProducts(query);
-    
-    // Apply basic filters
-    if (filters.lagerstatus) {
-      results = results.filter(p => p.lagerstatus === filters.lagerstatus);
-    }
-    if (filters.produsent) {
-      results = results.filter(p => p.produsent.toLowerCase().includes(filters.produsent.toLowerCase()));
-    }
-    
-    // Apply basic sorting
-    if (sort.field) {
-      results.sort((a, b) => {
-        const aVal = (a as Record<string, unknown>)[sort.field] as string;
-        const bVal = (b as Record<string, unknown>)[sort.field] as string;
-        
-        if (sort.direction === 'desc') {
-          return bVal.localeCompare(aVal);
-        }
-        return aVal.localeCompare(bVal);
-      });
-    }
-    
-    // Apply pagination
-    const paginatedResults = results.slice(offset, offset + limit);
-    
-    const responseTime = Date.now() - startTime;
-
+    // No backend API available - return error
+    console.error('[Search API] No backend API configured or backend API failed');
     return NextResponse.json({
-      success: true,
-      query,
-      filters,
-      sort,
-      total: results.length,
-      returned: paginatedResults.length,
-      limit,
-      offset,
-      responseTime: `${responseTime}ms`,
+      success: false,
+      error: 'Backend API unavailable',
+      message: 'Search service is temporarily unavailable. Please try again later.',
       timestamp: new Date().toISOString(),
-      results: paginatedResults,
-    }, {
-      status: 200,
+    }, { 
+      status: 503,
       headers: {
         'Content-Type': 'application/json',
       }

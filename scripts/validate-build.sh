@@ -70,7 +70,7 @@ validate_environment() {
     fi
     
     # Check required environment variables
-    local required_vars=("NEXT_PUBLIC_API_ENDPOINT" "NEXT_PUBLIC_REGION")
+    local required_vars=("NEXT_PUBLIC_API_BASE_URL" "NEXT_PUBLIC_REGION")
     local missing_vars=()
     
     for var in "${required_vars[@]}"; do

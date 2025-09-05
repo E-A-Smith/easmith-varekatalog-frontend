@@ -21,7 +21,7 @@ interface ApiDebugInfo {
 
 export const ApiDebugPanel = () => {
   const [debugInfo, setDebugInfo] = useState<ApiDebugInfo>({
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_ENDPOINT || '/api',
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || '/api',
     healthCheck: { status: 'loading' },
     searchTest: { status: 'idle' }
   });

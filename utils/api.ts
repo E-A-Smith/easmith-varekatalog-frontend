@@ -103,9 +103,7 @@ export class SimpleApiClient {
 
   constructor() {
     // Get API base URL from environment
-    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 
-                   process.env.NEXT_PUBLIC_API_ENDPOINT || 
-                   '/api';
+    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
     this.timeout = 10000; // 10 second timeout
   }
 
@@ -229,63 +227,56 @@ export class SimpleApiClient {
     query: ProductSearchQuery, 
     accessToken?: string
   ): Promise<Product[]> {
+    // Convert legacy query format to new API format
     const searchBody = {
-      søketekst: query.søketekst || '',
-      side: query.side || 1,
-      sideStørrelse: query.sideStørrelse || 50,
-      sortering: query.sortering || 'relevans',
-      // Include optional filters if provided
-      ...(query.kategori && { kategori: query.kategori }),
-      ...(query.lagerstatus && { lagerstatus: query.lagerstatus }),
-      ...(query.produsent && { produsent: query.produsent }),
-      ...(query.prisområde && { prisområde: query.prisområde }),
-      ...(query.anbrekk && { anbrekk: query.anbrekk }),
+      query: query.søketekst || '',
+      limit: query.sideStørrelse || 50,
+      offset: ((query.side || 1) - 1) * (query.sideStørrelse || 50),
+      // Include filters if provided
+      filters: {
+        ...(query.kategori && { kategori: query.kategori }),
+        ...(query.lagerstatus && { lagerstatus: query.lagerstatus }),
+        ...(query.produsent && { produsent: query.produsent }),
+        ...(query.anbrekk && { anbrekk: query.anbrekk }),
+      },
+      sort: query.sortering === 'relevans' ? { field: '_score', order: 'desc' } : undefined
     };
 
     try {
-      // First try with authentication if token provided
-      const options = accessToken 
-        ? { method: 'POST' as const, body: searchBody, token: accessToken }
-        : { method: 'POST' as const, body: searchBody };
+      this.log('Searching with Next.js API route:', searchBody);
 
+      // Call our Next.js API route (no authentication needed - handled by route)
       const result = await this.request<{
-        products?: Product[];  // API already returns transformed products
-        results?: BackendProduct[];
+        products?: Product[];
+        results?: Product[]; // Could be in results field too
         success?: boolean;
         total?: number;
         responseTime?: string;
-      } | BackendProduct[]>('/search', options);
+      }>('/search', { method: 'POST' as const, body: searchBody });
 
-      // Handle different response formats
-      let products: Product[];
+      this.log('Search response:', result);
+
+      // Extract products from response
+      let products: Product[] = [];
       
-      if (Array.isArray(result)) {
-        // Legacy format - transform backend products
-        products = result.map(transformBackendProduct);
-      } else if (result.products) {
-        // New API format - products already transformed
+      if (result.products) {
         products = result.products;
-      } else {
-        // Fallback - transform backend products from results
-        const backendProducts = result.results || [];
-        products = backendProducts.map(transformBackendProduct);
+      } else if (result.results) {
+        products = result.results;
       }
 
-      return products;
+      // Transform backend products to frontend format if needed
+      return products.map(product => {
+        // If product is already in frontend format, return as is
+        if ('navn' in product && 'vvsnr' in product) {
+          return product;
+        }
+        // Otherwise transform from backend format
+        return transformBackendProduct(product as BackendProduct);
+      });
 
     } catch (error) {
-      // Progressive enhancement: retry without authentication if 401
-      if (accessToken && error instanceof ApiError && error.status === 401) {
-        this.log('Authenticated request failed, trying public access...');
-        try {
-          return await this.searchProducts(query); // Retry without token
-        } catch (publicError) {
-          this.log('Public access also failed:', publicError);
-          throw publicError;
-        }
-      }
-
-      // Re-throw the original error
+      this.log('Search failed:', error);
       throw error;
     }
   }
