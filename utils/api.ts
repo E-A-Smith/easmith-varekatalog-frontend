@@ -5,22 +5,25 @@
 
 import { Product, ProductSearchQuery } from '@/types/product';
 
-// Backend field mapping (Phase 2)
+// Current API response format
 interface BackendProduct {
-  VVSnr: string;           // → id/nobbNumber
-  varenavn: string;        // → navn
-  leverandørNavn?: string; // → produsent
-  lagerstatus?: string;    // → lagerstatus
-  kanAnbrekke?: string;    // → anbrekk ('1' = 'Ja', '' = 'Nei')
-  enhet?: string;          // → prisenhet
-  lh?: string;             // → lh (LH/Løvenskjold number)
-  pakningAntall?: number;  // → pakningAntall (package quantity)
-  lagerantall?: number;    // → lagerantall (requires 'varekatalog/inventory' scope)
-  grunnpris?: number;      // → grunnpris (requires 'varekatalog/prices' scope)
-  nettopris?: number;      // → nettopris (requires 'varekatalog/prices' scope)
-  EAN?: string;
-  varebeskrivelse?: string;
-  størrelse?: string;
+  id: string;
+  navn: string;            // Product name
+  vvsnr: string;           // VVS number
+  lagerstatus?: string;    // Stock status (raw from backend - we'll recalculate this)
+  anbrekk: string;         // Partial quantity availability
+  lh: string;              // LH/Løvenskjold number
+  nobbNumber: string;      // NOBB number
+  pakningAntall: number;   // Package quantity
+  prisenhet: string;       // Price unit
+  lagerantall?: number | null;    // Stock quantity (null when unauthorized)
+  grunnpris?: number | null;      // Base price (null when unauthorized)
+  nettopris?: number | null;      // Net price (null when unauthorized)
+  produsent?: string;      // Supplier/manufacturer
+  kategori?: string;       // Category
+  beskrivelse?: string;    // Description
+  ean?: string;            // EAN code
+  enhet?: string;          // Unit
 }
 
 /**
@@ -28,39 +31,48 @@ interface BackendProduct {
  */
 function transformBackendProduct(backendProduct: BackendProduct): Product {
   const product: Product = {
-    id: backendProduct.VVSnr,
-    navn: backendProduct.varenavn,
-    vvsnr: backendProduct.VVSnr,
-    lagerstatus: (backendProduct.lagerstatus as Product['lagerstatus']) || 'Utsolgt',
-    anbrekk: backendProduct.kanAnbrekke === '1' ? 'Ja' : 'Nei',
+    id: backendProduct.id,
+    navn: backendProduct.navn,
+    vvsnr: backendProduct.vvsnr,
     
-    // New Phase 2 fields with OAuth scope-dependent availability
-    lh: backendProduct.lh || backendProduct.VVSnr, // Fallback to VVSnr
-    nobbNumber: backendProduct.VVSnr, // NOBB number same as VVSnr
+    // Calculate lagerstatus from lagerantall (inventory count)
+    lagerstatus: backendProduct.lagerantall === null ? 'NA' : 
+                 backendProduct.lagerantall !== undefined && backendProduct.lagerantall > 0 ? 'På lager' : 'Utsolgt',
+    
+    // Handle anbrekk (partial quantity) - convert '1' to 'Ja', anything else to 'Nei'
+    anbrekk: backendProduct.anbrekk === '1' ? 'Ja' : 'Nei',
+    
+    // Required fields from current API format - handle null values
+    lh: backendProduct.lh || backendProduct.vvsnr || '',
+    nobbNumber: backendProduct.nobbNumber || backendProduct.vvsnr || '',
     pakningAntall: backendProduct.pakningAntall || 1,
-    prisenhet: backendProduct.enhet || 'STK',
+    prisenhet: backendProduct.prisenhet || 'STK',
     
     // Security-filtered fields (null when unauthorized, values when authorized)
-    lagerantall: backendProduct.lagerantall !== undefined ? backendProduct.lagerantall : null,
-    grunnpris: backendProduct.grunnpris !== undefined ? backendProduct.grunnpris : null,
-    nettopris: backendProduct.nettopris !== undefined ? backendProduct.nettopris : null,
+    lagerantall: backendProduct.lagerantall,
+    grunnpris: backendProduct.grunnpris,
+    nettopris: backendProduct.nettopris,
   };
 
-  // Optional fields - only add if they exist
-  if (backendProduct.leverandørNavn) {
-    product.produsent = backendProduct.leverandørNavn;
+  // Optional fields - only add if they exist in the API response
+  if (backendProduct.produsent) {
+    product.produsent = backendProduct.produsent;
   }
   
-  if (backendProduct.varebeskrivelse) {
-    product.beskrivelse = backendProduct.varebeskrivelse;
+  if (backendProduct.beskrivelse) {
+    product.beskrivelse = backendProduct.beskrivelse;
   }
   
-  if (backendProduct.EAN) {
-    product.ean = backendProduct.EAN;
+  if (backendProduct.ean) {
+    product.ean = backendProduct.ean;
   }
   
-  if (backendProduct.VVSnr) {
-    product.nobbNummer = backendProduct.VVSnr; // Legacy field
+  if (backendProduct.kategori) {
+    product.kategori = backendProduct.kategori;
+  }
+  
+  if (backendProduct.vvsnr) {
+    product.nobbNummer = backendProduct.vvsnr; // Legacy field compatibility
   }
   
   if (backendProduct.enhet) {
@@ -265,39 +277,9 @@ export class SimpleApiClient {
         products = result.results;
       }
 
-      // Transform backend products to frontend format if needed
-      return products.map(product => {
-        // If product is already in frontend format (has både navn and vvsnr), return as is
-        if ('navn' in product && 'vvsnr' in product) {
-          return product;
-        }
-        // If product has navn and id but no vvsnr, it's from the new API format
-        // Map id to vvsnr and add missing required fields
-        if ('navn' in product && 'id' in product) {
-          const apiProduct = product as any; // Type assertion for API response format
-          const mappedProduct: Product = {
-            id: apiProduct.id,
-            navn: apiProduct.navn,
-            vvsnr: apiProduct.id, // Map id to vvsnr
-            lagerstatus: (apiProduct.lagerstatus as Product['lagerstatus']) || 'Utsolgt',
-            anbrekk: (apiProduct.anbrekk as Product['anbrekk']) || 'Nei',
-            lh: apiProduct.lh || apiProduct.id,
-            nobbNumber: apiProduct.nobbNumber || apiProduct.id,
-            pakningAntall: apiProduct.pakningAntall || 1,
-            prisenhet: apiProduct.prisenhet || 'STK',
-            lagerantall: apiProduct.lagerantall !== undefined ? apiProduct.lagerantall : null,
-            grunnpris: apiProduct.grunnpris !== undefined ? apiProduct.grunnpris : null,
-            nettopris: apiProduct.nettopris !== undefined ? apiProduct.nettopris : null,
-            // Add optional fields if they exist
-            ...(apiProduct.produsent && { produsent: apiProduct.produsent }),
-            ...(apiProduct.kategori && { kategori: apiProduct.kategori }),
-            ...(apiProduct.beskrivelse && { beskrivelse: apiProduct.beskrivelse }),
-          };
-          return mappedProduct;
-        }
-        // Otherwise transform from old backend format
-        return transformBackendProduct(product as BackendProduct);
-      });
+      // Always transform products using the unified transformation function
+      // This handles both authenticated and non-authenticated users consistently
+      return products.map(product => transformBackendProduct(product as BackendProduct));
 
     } catch (error) {
       this.log('Search failed:', error);

@@ -77,10 +77,11 @@ export interface Product {
   nettopris: number | null;
 }
 
-// Stock status enum - simplified to binary states (updated per design)
+// Stock status enum - includes unknown state for unauthorized users
 export type LagerStatus = 
   | 'På lager'      // In stock (● Green circle)
-  | 'Utsolgt';      // Out of stock (× Red cross)
+  | 'Utsolgt'       // Out of stock (× Red cross)
+  | 'NA';           // Not available / Unknown (when lagerantall is null)
 
 // Partial quantity status (Anbrekk)
 export type AnbrekkStatus = 'Ja' | 'Nei';

@@ -127,7 +127,8 @@ export default function Dashboard() {
   // Apply filters to data
   const applyFilters = (data: Product[], filterState: FilterState) => {
     // First, filter out any invalid/malformed products using type guard
-    let filteredData = data.filter(product => isProduct(product));
+    // Temporarily disabled to debug the issue
+    let filteredData = [...data]; // data.filter(product => isProduct(product));
     
     // Filter by supplier
     if (filterState.supplier !== 'Alle leverandører') {
