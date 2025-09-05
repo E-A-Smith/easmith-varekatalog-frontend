@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased] - 2025-01-03
 
 ### Added
+- **Dynamic Filter Values Feature** - Filters now populate dynamically based on search results and catalog data
+  - Filter options (suppliers/categories) update in real-time based on current dataset
+  - Improved UX: Only show suppliers/categories that exist in current results
+  - Norwegian locale sorting support for filter options (æ, ø, å)
+  - Performance optimized with memoization using `useMemo`
+  - Enhanced error handling: Display only "Alle leverandører"/"Alle kategorier" when no valid options available (replaces static fallbacks)
+  - New utility functions: `getUniqueSuppliers()`, `getUniqueCategories()`, `validateFilterValue()`
+  - Comprehensive unit tests with >90% coverage including edge cases
+
 - **Comprehensive User Stories Documentation** (`docs/project/user-stories.md`)
   - 5 detailed user personas with authentication contexts
   - 12 search-focused user stories with acceptance criteria
@@ -15,6 +24,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Updated project documentation structure with dedicated user story specifications
+- **BREAKING**: QuickFilters component now requires dynamic options via props (no static fallbacks)
+- Simplified `applyFilters` function to use consistent Norwegian default values ("Alle leverandører"/"Alle kategorier")
 
 ---
 
