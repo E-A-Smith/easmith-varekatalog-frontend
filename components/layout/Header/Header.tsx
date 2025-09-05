@@ -24,7 +24,7 @@ export const Header: FC<HeaderProps> = ({
           
           {/* Logo Section - Simple structure like byggern.no */}
           <div className="flex-shrink-0">
-            <Logo height={56} />
+            <Logo height={40} />
           </div>
 
           {/* Search Section - Left aligned, fixed position */}
