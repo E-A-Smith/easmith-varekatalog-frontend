@@ -267,11 +267,35 @@ export class SimpleApiClient {
 
       // Transform backend products to frontend format if needed
       return products.map(product => {
-        // If product is already in frontend format, return as is
+        // If product is already in frontend format (has både navn and vvsnr), return as is
         if ('navn' in product && 'vvsnr' in product) {
           return product;
         }
-        // Otherwise transform from backend format
+        // If product has navn and id but no vvsnr, it's from the new API format
+        // Map id to vvsnr and add missing required fields
+        if ('navn' in product && 'id' in product) {
+          const apiProduct = product as any; // Type assertion for API response format
+          const mappedProduct: Product = {
+            id: apiProduct.id,
+            navn: apiProduct.navn,
+            vvsnr: apiProduct.id, // Map id to vvsnr
+            lagerstatus: (apiProduct.lagerstatus as Product['lagerstatus']) || 'Utsolgt',
+            anbrekk: (apiProduct.anbrekk as Product['anbrekk']) || 'Nei',
+            lh: apiProduct.lh || apiProduct.id,
+            nobbNumber: apiProduct.nobbNumber || apiProduct.id,
+            pakningAntall: apiProduct.pakningAntall || 1,
+            prisenhet: apiProduct.prisenhet || 'STK',
+            lagerantall: apiProduct.lagerantall !== undefined ? apiProduct.lagerantall : null,
+            grunnpris: apiProduct.grunnpris !== undefined ? apiProduct.grunnpris : null,
+            nettopris: apiProduct.nettopris !== undefined ? apiProduct.nettopris : null,
+            // Add optional fields if they exist
+            ...(apiProduct.produsent && { produsent: apiProduct.produsent }),
+            ...(apiProduct.kategori && { kategori: apiProduct.kategori }),
+            ...(apiProduct.beskrivelse && { beskrivelse: apiProduct.beskrivelse }),
+          };
+          return mappedProduct;
+        }
+        // Otherwise transform from old backend format
         return transformBackendProduct(product as BackendProduct);
       });
 
