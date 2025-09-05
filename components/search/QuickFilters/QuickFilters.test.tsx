@@ -209,7 +209,7 @@ describe('QuickFilters', () => {
         <QuickFilters 
           onFiltersChange={mockOnFiltersChange}
           supplierOptions={undefined}
-          categoryOptions={null as any}
+          categoryOptions={null as string[] | null}
         />
       );
       

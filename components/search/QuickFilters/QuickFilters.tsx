@@ -8,7 +8,7 @@
 
 'use client';
 
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
 import { validateFilterValue } from '@/utils/filter-helpers';
@@ -43,9 +43,15 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
     }
   };
 
-  // Use dynamic options or fallback to default options
-  const currentSupplierOptions = supplierOptions || ['Alle leverandører'];
-  const currentCategoryOptions = categoryOptions || ['Alle kategorier'];
+  // Use dynamic options or fallback to default options (memoized to prevent useEffect re-runs)
+  const currentSupplierOptions = useMemo(() => 
+    supplierOptions || ['Alle leverandører'], 
+    [supplierOptions]
+  );
+  const currentCategoryOptions = useMemo(() => 
+    categoryOptions || ['Alle kategorier'], 
+    [categoryOptions]
+  );
   
   // Validate current filter values against available options
   useEffect(() => {
@@ -66,7 +72,7 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
         onFiltersChange?.(resetFilters);
       }
     }
-  }, [currentSupplierOptions, currentCategoryOptions, filters.supplier, filters.category, controlledFilters, onFiltersReset, onFiltersChange]);
+  }, [currentSupplierOptions, currentCategoryOptions, filters, controlledFilters, onFiltersReset, onFiltersChange]);
 
 
 

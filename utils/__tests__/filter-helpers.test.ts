@@ -54,12 +54,12 @@ describe('getUniqueSuppliers', () => {
   });
 
   it('should handle null input by returning ["Alle leverandører"]', () => {
-    const result = getUniqueSuppliers(null as any);
+    const result = getUniqueSuppliers(null as Product[]);
     expect(result).toEqual(['Alle leverandører']);
   });
 
   it('should handle undefined input by returning ["Alle leverandører"]', () => {
-    const result = getUniqueSuppliers(undefined as any);
+    const result = getUniqueSuppliers(undefined as Product[]);
     expect(result).toEqual(['Alle leverandører']);
   });
 
@@ -120,7 +120,7 @@ describe('getUniqueSuppliers', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     
     // Test with invalid data that will cause an error
-    const invalidData = 'not-an-array' as any;
+    const invalidData = 'not-an-array' as unknown as Product[];
     const result = getUniqueSuppliers(invalidData);
     expect(result).toEqual(['Alle leverandører']);
     
@@ -140,12 +140,12 @@ describe('getUniqueCategories', () => {
   });
 
   it('should handle null input by returning ["Alle kategorier"]', () => {
-    const result = getUniqueCategories(null as any);
+    const result = getUniqueCategories(null as Product[]);
     expect(result).toEqual(['Alle kategorier']);
   });
 
   it('should handle undefined input by returning ["Alle kategorier"]', () => {
-    const result = getUniqueCategories(undefined as any);
+    const result = getUniqueCategories(undefined as Product[]);
     expect(result).toEqual(['Alle kategorier']);
   });
 
@@ -195,7 +195,7 @@ describe('getUniqueCategories', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     
     // Test with invalid data that will cause an error
-    const invalidData = 'not-an-array' as any;
+    const invalidData = 'not-an-array' as unknown as Product[];
     const result = getUniqueCategories(invalidData);
     expect(result).toEqual(['Alle kategorier']);
     
@@ -222,12 +222,12 @@ describe('validateFilterValue', () => {
   });
 
   it('should return "Alle" when availableOptions is null', () => {
-    const result = validateFilterValue('SomeValue', null as any);
+    const result = validateFilterValue('SomeValue', null as string[]);
     expect(result).toBe('Alle');
   });
 
   it('should return "Alle" when availableOptions is undefined', () => {
-    const result = validateFilterValue('SomeValue', undefined as any);
+    const result = validateFilterValue('SomeValue', undefined as string[]);
     expect(result).toBe('Alle');
   });
 

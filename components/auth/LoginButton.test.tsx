@@ -12,7 +12,8 @@ const mockUser = {
 
 // Mock the useAuth hook
 jest.mock('@/hooks/useAuth');
-const mockUseAuth = jest.mocked(require('@/hooks/useAuth').useAuth);
+import { useAuth } from '@/hooks/useAuth';
+const mockUseAuth = jest.mocked(useAuth);
 
 describe('LoginButton', () => {
   beforeEach(() => {
