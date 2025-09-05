@@ -249,23 +249,29 @@ export class SimpleApiClient {
         : { method: 'POST' as const, body: searchBody };
 
       const result = await this.request<{
+        products?: Product[];  // API already returns transformed products
         results?: BackendProduct[];
         success?: boolean;
         total?: number;
         responseTime?: string;
       } | BackendProduct[]>('/search', options);
 
-      // Handle different response formats and transform backend data
-      let backendProducts: BackendProduct[];
+      // Handle different response formats
+      let products: Product[];
       
       if (Array.isArray(result)) {
-        backendProducts = result;
+        // Legacy format - transform backend products
+        products = result.map(transformBackendProduct);
+      } else if (result.products) {
+        // New API format - products already transformed
+        products = result.products;
       } else {
-        backendProducts = result.results || [];
+        // Fallback - transform backend products from results
+        const backendProducts = result.results || [];
+        products = backendProducts.map(transformBackendProduct);
       }
 
-      // Transform backend products to frontend format
-      return backendProducts.map(transformBackendProduct);
+      return products;
 
     } catch (error) {
       // Progressive enhancement: retry without authentication if 401
