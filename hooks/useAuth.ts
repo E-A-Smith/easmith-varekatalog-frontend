@@ -65,7 +65,22 @@ const authConfig = {
 };
 
 // JWT token parsing and scope extraction (Phase 2)
-const parseJwtPayload = (token: string): any => {
+interface JwtPayload {
+  sub?: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  'cognito:username'?: string;
+  identities?: Array<{
+    userId: string;
+    providerName: string;
+    providerType: string;
+  }>;
+  scope?: string;
+  [key: string]: unknown;
+}
+
+const parseJwtPayload = (token: string): JwtPayload => {
   try {
     const parts = token.split('.');
     if (parts.length !== 3 || !parts[1]) {
@@ -173,11 +188,11 @@ export const useAuth = (): AuthContext => {
             const permissions = calculatePermissions(scopes);
             
             const userInfo: CognitoUserInfo = {
-              username: userPayload['cognito:username'] || userPayload.sub,
-              email: userPayload.email,
-              given_name: userPayload.given_name,
-              family_name: userPayload.family_name,
-              identities: userPayload.identities,
+              username: userPayload['cognito:username'] || userPayload.sub || 'unknown',
+              ...(userPayload.email && { email: userPayload.email }),
+              ...(userPayload.given_name && { given_name: userPayload.given_name }),
+              ...(userPayload.family_name && { family_name: userPayload.family_name }),
+              ...(userPayload.identities && { identities: userPayload.identities }),
             };
             
             setAuthState({
@@ -191,9 +206,11 @@ export const useAuth = (): AuthContext => {
             });
             return;
           } else {
-            // Token expired, try to refresh
-            await refreshSession();
-            return;
+            // Token expired, clear tokens (avoid circular dependency)
+            sessionStorage.removeItem('cognito_access_token');
+            sessionStorage.removeItem('cognito_id_token');
+            sessionStorage.removeItem('cognito_refresh_token');
+            sessionStorage.removeItem('cognito_token_expiry');
           }
         }
       } catch (error) {
@@ -335,11 +352,11 @@ export const useAuth = (): AuthContext => {
       const permissions = calculatePermissions(scopes);
       
       const userInfo: CognitoUserInfo = {
-        username: userPayload['cognito:username'] || userPayload.sub,
-        email: userPayload.email,
-        given_name: userPayload.given_name,
-        family_name: userPayload.family_name,
-        identities: userPayload.identities,
+        username: userPayload['cognito:username'] || userPayload.sub || 'unknown',
+        ...(userPayload.email && { email: userPayload.email }),
+        ...(userPayload.given_name && { given_name: userPayload.given_name }),
+        ...(userPayload.family_name && { family_name: userPayload.family_name }),
+        ...(userPayload.identities && { identities: userPayload.identities }),
       };
       
       setAuthState({
