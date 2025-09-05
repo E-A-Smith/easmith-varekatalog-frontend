@@ -49,12 +49,12 @@ function AuthCallbackContent() {
         // Clean up stored state
         sessionStorage.removeItem('oauth_state');
 
-        // Exchange authorization code for access token
-        const tokenResponse = await exchangeCodeForTokens(code);
+        // Exchange authorization code for Cognito tokens
+        const tokenResponse = await exchangeCodeForCognitoTokens(code);
         
         if (tokenResponse.access_token) {
-          // Store tokens securely (implement proper token storage)
-          await storeTokensSecurely(tokenResponse);
+          // Store Cognito tokens securely
+          await storeCognitoTokensSecurely(tokenResponse);
           
           setStatus('success');
           
@@ -63,7 +63,7 @@ function AuthCallbackContent() {
             router.push('/');
           }, 2000);
         } else {
-          throw new Error('Ingen tilgangstoken mottatt');
+          throw new Error('Ingen tilgangstoken mottatt fra Cognito');
         }
 
       } catch (err) {
@@ -76,18 +76,25 @@ function AuthCallbackContent() {
     handleCallback();
   }, [searchParams, router]);
 
-  // Exchange authorization code for tokens
-  async function exchangeCodeForTokens(code: string) {
+  // Exchange authorization code for Cognito tokens
+  async function exchangeCodeForCognitoTokens(code: string) {
+    const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+    if (!codeVerifier) {
+      throw new Error('PKCE code verifier ikke funnet');
+    }
+
+    const cognitoDomain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || 'varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com';
+    
     const tokenParams = new URLSearchParams({
       grant_type: 'authorization_code',
-      client_id: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '',
+      client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || '',
       code: code,
-      redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '/auth/callback',
-      scope: process.env.NEXT_PUBLIC_OAUTH_SCOPES || 'openid profile email varekatalog:search',
+      redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback',
+      code_verifier: codeVerifier, // PKCE verification
     });
 
     const response = await fetch(
-      `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}/oauth2/v2.0/token`,
+      `https://${cognitoDomain}/oauth2/token`,
       {
         method: 'POST',
         headers: {
@@ -99,30 +106,34 @@ function AuthCallbackContent() {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`Token exchange failed: ${errorData.error_description || errorData.error}`);
+      throw new Error(`Cognito token exchange failed: ${errorData.error_description || errorData.error}`);
     }
+
+    // Clean up PKCE verifier
+    sessionStorage.removeItem('pkce_code_verifier');
 
     return response.json();
   }
 
-  // Store tokens securely (implement proper storage strategy)
-  async function storeTokensSecurely(tokens: {
+  // Store Cognito tokens securely
+  async function storeCognitoTokensSecurely(tokens: {
     access_token: string;
     refresh_token: string;
     id_token: string;
     expires_in: number;
     scope?: string;
+    token_type?: string;
   }) {
-    // For now, store in sessionStorage (implement proper security later)
-    // In production, should use HTTP-only cookies or secure storage
-    sessionStorage.setItem('access_token', tokens.access_token);
-    sessionStorage.setItem('refresh_token', tokens.refresh_token);
-    sessionStorage.setItem('id_token', tokens.id_token);
-    sessionStorage.setItem('token_expiry', (Date.now() + tokens.expires_in * 1000).toString());
+    // Store in sessionStorage with Cognito-specific keys
+    sessionStorage.setItem('cognito_access_token', tokens.access_token);
+    sessionStorage.setItem('cognito_refresh_token', tokens.refresh_token);
+    sessionStorage.setItem('cognito_id_token', tokens.id_token);
+    sessionStorage.setItem('cognito_token_expiry', (Date.now() + tokens.expires_in * 1000).toString());
     
-    // Also store user scopes for frontend data filtering
-    const scopes = tokens.scope?.split(' ') || [];
-    sessionStorage.setItem('user_scopes', JSON.stringify(scopes));
+    // Store scopes for permission management
+    if (tokens.scope) {
+      sessionStorage.setItem('cognito_user_scopes', JSON.stringify(tokens.scope.split(' ')));
+    }
   }
 
   if (status === 'processing') {

@@ -29,25 +29,23 @@ export function AuthDebugPanel({ className }: AuthDebugPanelProps) {
   };
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 ${className}`}>
+    <div className={`fixed bottom-16 right-4 z-50 ${className}`}>
       {!isExpanded ? (
         <button
           onClick={togglePanel}
-          className="bg-byggern-primary text-white px-4 py-2 rounded-lg shadow-lg hover:bg-byggern-primary/90 transition-colors"
+          className="bg-byggern-primary text-white px-3 py-1 rounded text-sm hover:bg-byggern-primary/90"
         >
-          🔑 Auth Debug
+          Debug Auth
         </button>
       ) : (
-        <div className="bg-white border border-neutral-200 rounded-lg shadow-xl p-4 w-80 max-h-96 overflow-y-auto">
+        <div className="bg-white border-2 border-neutral-200 rounded-lg shadow-lg p-4 max-w-lg max-h-96 overflow-auto z-50">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-semibold text-neutral-800">
-              Authentication Debug Panel
-            </h3>
+            <h3 className="font-semibold text-lg">Auth Debug Panel</h3>
             <button
               onClick={togglePanel}
-              className="text-neutral-500 hover:text-neutral-700 text-lg leading-none"
+              className="text-neutral-500 hover:text-neutral-700"
             >
-              ×
+              ✕
             </button>
           </div>
 
