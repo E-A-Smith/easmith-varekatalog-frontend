@@ -44,17 +44,22 @@ tree -I 'node_modules|.next|.git' -L 3  # Repository overview
 ```
 app/                    # Next.js App Router (Norwegian locale)
 ├── api/               # API routes (/health, /search)
+├── auth/              # Authentication routes
+│   └── callback/      # OAuth callback handler (PKCE + JWT token exchange)
 ├── layout.tsx         # Root layout with fonts (Inter + JetBrains Mono)
 └── page.tsx          # Main search interface
 
 components/            # Atomic design pattern
 ├── ui/               # Base design system components
 ├── layout/           # Layout components (Header, SubHeader, AppLayout)
-└── search/           # Search-specific components
+├── search/           # Search-specific components
+└── auth/             # Authentication components
+    └── LoginButton.tsx  # OAuth login/logout UI with Norwegian localization
 
 hooks/                # Custom React hooks
 ├── useProductSearch.ts  # Main search logic with API fallback
-└── useApiStatus.ts     # API health monitoring
+├── useApiStatus.ts     # API health monitoring
+└── useAuth.ts          # OAuth 2.0 + PKCE authentication hook
 
 types/                # TypeScript definitions
 ├── product.ts        # Complete product data model (Norwegian)
@@ -74,7 +79,15 @@ utils/                # Utilities
 - Mock data fallback in `useProductSearch` hook when API unavailable
 - Environment variables: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_API_ENDPOINT`, `NEXT_PUBLIC_REGION`
 - Development proxy in `next.config.ts` (disabled in production)
-- AWS Cognito authentication configured
+- **AWS Cognito OAuth 2.0 authentication fully implemented and tested**
+
+**Enterprise Authentication Architecture** (✅ PRODUCTION READY):
+- **OAuth 2.0 + PKCE**: Secure authorization code flow with SHA-256 code challenge
+- **AWS Cognito Hosted UI**: Single authentication entry point (`varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com`)
+- **Azure AD Integration**: Enterprise SSO via Cognito identity provider delegation
+- **JWT Bearer Tokens**: API Gateway Cognito Authorizer compatible tokens
+- **Scope-Based Permissions**: `varekatalog/prices` and `varekatalog/inventory` resource server scopes
+- **Cross-Environment**: Works in local development, AWS Amplify, and production deployments
 
 ## 🔧 Critical Configuration Requirements
 
@@ -617,9 +630,10 @@ npm test -- --coverage     # Coverage report
 ## 🔒 Security & Performance
 
 **Security Headers**: Configured in `next.config.ts`
-- CSP with specific domains allowed
-- X-Frame-Options: DENY
-- HSTS enabled
+- **CSP with OAuth endpoint support**: `connect-src` includes `https://*.amazoncognito.com` for Cognito token endpoints
+- **X-Frame-Options**: DENY (prevents clickjacking)
+- **HSTS enabled**: Enforces HTTPS connections
+- **Content Security Policy**: Prevents XSS attacks while allowing authenticated API calls
 
 **Performance Optimizations**:
 - Tree-shaking for `lucide-react` and AWS SDK
