@@ -3,7 +3,7 @@
  * Provides simplified API access with progressive enhancement support
  */
 
-import { Product, ProductSearchQuery } from '@/types/product';
+import { Product, ProductSearchQuery, isProductCategory, type ProductCategory } from '@/types/product';
 
 // Current API response format
 interface BackendProduct {
@@ -39,8 +39,10 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     lagerstatus: backendProduct.lagerantall === null ? 'NA' : 
                  backendProduct.lagerantall !== undefined && backendProduct.lagerantall > 0 ? 'På lager' : 'Utsolgt',
     
-    // Handle anbrekk (partial quantity) - convert '1' to 'Ja', anything else to 'Nei'
-    anbrekk: backendProduct.anbrekk === '1' ? 'Ja' : 'Nei',
+    // Handle anbrekk (partial quantity) - backend already returns 'Ja'/'Nei'
+    anbrekk: (backendProduct.anbrekk === 'Ja' || backendProduct.anbrekk === 'Nei') 
+      ? backendProduct.anbrekk 
+      : 'Nei',
     
     // Required fields from current API format - handle null values
     lh: backendProduct.lh || backendProduct.vvsnr || '',
@@ -67,8 +69,10 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     product.ean = backendProduct.ean;
   }
   
-  if (backendProduct.kategori) {
-    (product as any).kategori = backendProduct.kategori;
+  if (backendProduct.kategori && isProductCategory(backendProduct.kategori)) {
+    // Type-safe assignment for optional kategori field
+    const productWithKategori = product as Product & { kategori?: ProductCategory };
+    productWithKategori.kategori = backendProduct.kategori;
   }
   
   if (backendProduct.vvsnr) {
@@ -237,7 +241,7 @@ export class SimpleApiClient {
    */
   async searchProducts(
     query: ProductSearchQuery, 
-    _accessToken?: string // TODO: Implement authentication
+    accessToken?: string // TODO: Implement authentication
   ): Promise<Product[]> {
     // Convert legacy query format to new API format
     const searchBody = {
