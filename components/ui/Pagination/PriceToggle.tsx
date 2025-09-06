@@ -20,13 +20,10 @@ export const PriceToggle: FC<PriceToggleProps> = ({
   className = '' 
 }) => {
   return (
-    <div className={clsx('flex items-center gap-2', className)}>
-      <span className="text-sm text-neutral-600">
-        {isVisible ? 'Vis priser' : 'Skjul priser'}
-      </span>
+    <div className={clsx('flex items-center', className)}>
       <button
         onClick={() => onChange(!isVisible)}
-        className="relative w-12 h-6 transition-colors focus:outline-none focus:ring-2 focus:ring-byggern-primary focus:ring-offset-2"
+        className="relative w-16 h-12 transition-colors focus:outline-none focus:ring-2 focus:ring-byggern-primary focus:ring-offset-2"
         aria-label={isVisible ? 'Skjul priser' : 'Vis priser'}
         role="switch"
         aria-checked={isVisible}
@@ -34,8 +31,8 @@ export const PriceToggle: FC<PriceToggleProps> = ({
         <Image
           src={isVisible ? '/toggle-on.svg' : '/toggle-off.svg'}
           alt=""
-          width={48}
-          height={24}
+          width={64}
+          height={48}
           className="w-full h-full"
         />
       </button>

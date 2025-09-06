@@ -45,8 +45,8 @@ export default function Dashboard() {
       label: '', 
       align: 'center' as const,
       render: (value: unknown) => {
-        // Status column: show empty space when status is null, status indicators when present
-        if (value === null) {
+        // Status column: show empty space when status is null or "NA"
+        if (value === null || value === "NA") {
           return <span className="w-6 h-6 inline-block"></span>; // Empty space maintaining layout
         }
         return (
