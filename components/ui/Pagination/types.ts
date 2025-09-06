@@ -22,6 +22,12 @@ export interface PaginationProps {
   itemLabel?: string;
   previousLabel?: string;
   nextLabel?: string;
+  
+  // Price masking feature (optional)
+  isAuthenticated?: boolean;
+  showPriceToggle?: boolean;
+  isPriceVisible?: boolean;
+  onPriceToggleChange?: (visible: boolean) => void;
 }
 
 export interface PaginationButtonProps {

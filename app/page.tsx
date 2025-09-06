@@ -21,6 +21,7 @@ const catalogProducts: Product[] = [];
 
 export default function Dashboard() {
   const { authState } = useAuth();
+  const { isAuthenticated } = authState;
   const { searchState, searchProducts } = useProductSearch(authState.accessToken || undefined);
   const [filters, setFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
@@ -32,6 +33,9 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Price visibility state (only relevant when authenticated)
+  const [showPrices, setShowPrices] = useState(true);
+
 
   // Define table columns for complete 10-column layout (Phase 2)
   // Real authentication-based data masking using OAuth scopes
@@ -41,8 +45,8 @@ export default function Dashboard() {
       label: '', 
       align: 'center' as const,
       render: (value: unknown) => {
-        // Status column: show empty space when status is null, status indicators when present
-        if (value === null) {
+        // Status column: show empty space when status is null or "NA"
+        if (value === null || value === "NA") {
           return <span className="w-6 h-6 inline-block"></span>; // Empty space maintaining layout
         }
         return (
@@ -107,19 +111,33 @@ export default function Dashboard() {
       key: 'grunnpris', 
       label: 'Grunnpris', 
       align: 'right' as const,
-      render: (value: unknown) => 
-        value !== null
-          ? <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>
-          : <span className="text-neutral-400">****</span>
+      render: (value: unknown) => {
+        // Mask prices when toggle is OFF and user is authenticated
+        if (isAuthenticated && !showPrices) {
+          return <span className="text-neutral-400">****</span>;
+        }
+        // Original logic for null masking
+        if (value === null) {
+          return <span className="text-neutral-400">****</span>;
+        }
+        return <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>;
+      }
     },
     { 
       key: 'nettopris', 
       label: 'Nettopris', 
       align: 'right' as const,
-      render: (value: unknown) => 
-        value !== null
-          ? <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>
-          : <span className="text-neutral-400">****</span>
+      render: (value: unknown) => {
+        // Mask prices when toggle is OFF and user is authenticated
+        if (isAuthenticated && !showPrices) {
+          return <span className="text-neutral-400">****</span>;
+        }
+        // Original logic for null masking
+        if (value === null) {
+          return <span className="text-neutral-400">****</span>;
+        }
+        return <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>;
+      }
     }
   ];
 
@@ -306,6 +324,11 @@ export default function Dashboard() {
               previousLabel="Forrige"
               nextLabel="Neste"
               className="border-t"
+              // New props for price masking
+              isAuthenticated={isAuthenticated}
+              showPriceToggle={true}
+              isPriceVisible={showPrices}
+              onPriceToggleChange={setShowPrices}
             />
           )}
         </div>
