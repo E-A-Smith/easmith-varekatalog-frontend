@@ -14,6 +14,7 @@
 import { FC, useMemo } from 'react';
 import { clsx } from 'clsx';
 import { PaginationProps, PaginationButtonProps, PaginationNavigationProps } from './types';
+import { PriceToggle } from './PriceToggle';
 
 /**
  * Individual pagination button component
@@ -93,7 +94,12 @@ export const Pagination: FC<PaginationProps> = ({
   className = '',
   itemLabel = 'products',
   previousLabel = 'Prev',
-  nextLabel = 'Next'
+  nextLabel = 'Next',
+  // Price masking feature props
+  isAuthenticated,
+  showPriceToggle,
+  isPriceVisible,
+  onPriceToggleChange
 }) => {
   // Generate page numbers to display
   const pageNumbers = useMemo(() => {
@@ -150,7 +156,7 @@ export const Pagination: FC<PaginationProps> = ({
       'bg-white border-t border-neutral-200',
       className
     )}>
-      {/* Combined item count, pagination controls, and export */}
+      {/* Combined item count, pagination controls */}
       <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full">
         <div className="flex items-center gap-2 text-sm text-neutral-600 whitespace-nowrap">
           <span>Showing </span>
@@ -206,8 +212,16 @@ export const Pagination: FC<PaginationProps> = ({
             />
           </div>
         )}
-
       </div>
+      
+      {/* Price Toggle - Only show when authenticated */}
+      {isAuthenticated && showPriceToggle && onPriceToggleChange && (
+        <PriceToggle
+          isVisible={isPriceVisible ?? true}
+          onChange={onPriceToggleChange}
+          className="ml-auto"
+        />
+      )}
     </div>
   );
 };
