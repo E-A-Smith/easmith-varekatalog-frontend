@@ -24,7 +24,7 @@ export interface Product {
   produsent?: string;
   
   /** Product category */
-  kategori?: ProductCategory;
+  kategori?: string;
   
   /** Product description */
   beskrivelse?: string;

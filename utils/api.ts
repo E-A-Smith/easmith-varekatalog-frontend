@@ -83,6 +83,10 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
     product.enhet = backendProduct.enhet;
   }
   
+  if (backendProduct.kategori) {
+    product.kategori = backendProduct.kategori;
+  }
+  
   // Legacy price structure for compatibility (if nettopris is available)
   if (backendProduct.nettopris !== undefined && backendProduct.nettopris !== null) {
     product.pris = {
