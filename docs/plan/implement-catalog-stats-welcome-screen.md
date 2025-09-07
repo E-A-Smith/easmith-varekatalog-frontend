@@ -89,12 +89,15 @@ colors: {
 
 ### Welcome Screen Layout
 ```
-┌───────────────────────────────────────────────────────┐
-│                                                       │
-│ Velkommen til varekatalogen for Løvenskiold Logistikk │
-│ Levert av Byggern                                     │
-│                                                       │
-└───────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│ Velkommen til varekatalogen for Løvenskiold Logistikk       │
+│ Levert av Byggern                                           │
+│                                                             │
+│ "Søk etter produkter for å se resultater"                   │
+│ "Bruk søkefeltet ovenfor for å finne produkter i katalogen" │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 
 ┌────────────┬────────────┬────────────┐
 │    [📦]    │    [🏷️]    │    [🏭]    │
@@ -109,7 +112,6 @@ Note: [📦], [🏷️], [🏭] represent custom SVG icons (see implementation)
 │                                                      │
 │ • Lagernivå: 2 timer siden (kl. 14:30)             │
 │ • Priser: I går kl. 22:00                          │
-│ • Nye produkter: 47 lagt til denne uken            │
 └─────────────────────────────────────────────────────┘
 
 
@@ -121,6 +123,9 @@ Note: [📦], [🏷️], [🏭] represent custom SVG icons (see implementation)
 - **Desktop** (> 1024px): 3 columns for stat cards
 
 ## 📁 Implementation Plan
+### Step 0: Prompt backend team to implement API endpoint
+
+Do not start on Step 7 (Update Main Page) before the backend team has implemented the API endpoint. We will not use mock data.
 
 ### Step 1: Create SVG Icon Components
 **File**: `components/ui/icons/CatalogIcons.tsx`
@@ -387,48 +392,50 @@ export interface StatCardProps {
 }
 ```
 
-### Step 2: Create API Endpoint
+### Step 2: Create API Proxy Endpoint
 **File**: `app/api/catalog-stats/route.ts`
+
+⚠️ **DEPENDENCY**: This step requires the backend `/stats` endpoint to be implemented first. See Backend Requirements section.
+
 ```typescript
 import { NextResponse } from 'next/server';
 import type { CatalogStats } from '@/types/catalog-stats';
 
-// Mock data for initial implementation
-const mockStats: CatalogStats = {
-  totalProducts: 45678,
-  totalCategories: 127,
-  totalSuppliers: 43,
-  lastStockUpdate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  lastPriceUpdate: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(),
-  recentAdditions: 47,
-  popularProducts: [
-    { name: "Terrassebord Royal", searches: 234 },
-    { name: "Skrue rustfri 4x40", searches: 189 },
-    { name: "Isolasjon GLAVA 150mm", searches: 156 }
-  ],
-  funFact: getFunFact() // Random selection
-};
-
-function getFunFact(): string {
-  const facts = [
-    "Katalogen inneholder produkter fra 43 norske leverandører!",
-    "Over 2 000 produkter kan leveres som anbrekk for fleksible bestillinger.",
-    "Den mest søkte kategorien denne måneden er 'Terrassemateriell'.",
-    "92% av produktene har komplett prisinformasjon.",
-    "Gjennomsnittlig leveringstid for lagervarer er kun 2 arbeidsdager."
-  ];
-  return facts[Math.floor(Math.random() * facts.length)];
-}
-
 export async function GET() {
   try {
-    // TODO: Replace with actual backend call when available
-    // const stats = await fetchFromBackend('/stats');
+    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
     
-    return NextResponse.json(mockStats);
+    if (!externalApiUrl) {
+      throw new Error('NEXT_PUBLIC_EXTERNAL_API_URL environment variable not configured');
+    }
+    
+    const response = await fetch(`${externalApiUrl}/stats`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      signal: AbortSignal.timeout(10000) // 10 second timeout
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend API failed with status ${response.status}`);
+    }
+    
+    const stats: CatalogStats = await response.json();
+    
+    return NextResponse.json(stats);
   } catch (error) {
     console.error('Failed to fetch catalog stats:', error);
-    return NextResponse.json(mockStats); // Fallback to mock
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Statistics temporarily unavailable',
+      message: 'Backend service is not available. Please try again later.',
+    }, { 
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 ```
@@ -527,6 +534,7 @@ import { FC } from 'react';
 import { StatCard } from '../StatCard/StatCard';
 import { useCatalogStats } from '@/hooks/useCatalogStats';
 import { formatDistanceToNow } from '@/utils/date-helpers';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   ProductsIcon, 
   CategoriesIcon, 
@@ -537,6 +545,23 @@ import {
 
 export const CatalogStats: FC = () => {
   const { stats, isLoading, isError } = useCatalogStats();
+  const { authState } = useAuth();
+  const { isAuthenticated, user } = authState;
+
+  // Generate personalized greeting
+  const getGreeting = (): string => {
+    if (isAuthenticated && user) {
+      const hour = new Date().getHours();
+      const timeGreeting = 
+        hour < 10 ? 'God morgen' :
+        hour < 17 ? 'God dag' :
+        'God kveld';
+      
+      const name = user.given_name || user.username || '';
+      return `${timeGreeting}, ${name}!`;
+    }
+    return 'Velkommen til Varekatalogen';
+  };
 
   if (isError) {
     return (
@@ -551,7 +576,7 @@ export const CatalogStats: FC = () => {
       {/* Welcome Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-neutral-900 mb-2">
-          Velkommen til Varekatalogen
+          {getGreeting()}
         </h2>
         <p className="text-lg text-neutral-600">
           Din komplette byggevareløsning med over 45 000 produkter
@@ -762,18 +787,22 @@ curl http://localhost:3000/api/catalog-stats
 ## ✅ Success Criteria
 
 1. **Visual**: Stats cards display with proper icons, numbers, and labels
-2. **Data**: All statistics show (can be mock data initially)
+2. **Data**: All statistics show real data from backend API
 3. **Timestamps**: Last update times display in Norwegian relative format
-4. **Fun Facts**: Random fact appears and changes on refresh
-5. **Responsive**: Layout works on mobile, tablet, and desktop
-6. **Performance**: Stats load without blocking initial render
-7. **Accessibility**: Screen readers can navigate statistics
-8. **Error Handling**: Graceful fallback if API fails
+4. **Responsive**: Layout works on mobile, tablet, and desktop
+5. **Performance**: Stats load without blocking initial render
+6. **Accessibility**: Screen readers can navigate statistics
+7. **Error Handling**: Graceful fallback if backend API fails
 
 ## 🔧 Configuration Notes
 
 ### Environment Variables
-No new environment variables required. The component will use mock data initially and can be connected to a real backend API later.
+Required environment variable for backend API connection:
+```bash
+NEXT_PUBLIC_EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+```
+
+This must be configured before the frontend can connect to the backend statistics endpoint.
 
 ### Dependencies
 ```json
@@ -804,15 +833,15 @@ After initial implementation, consider:
 2. **Number Formatting**: Use Norwegian locale (space as thousand separator)
 3. **Time Format**: Use 24-hour clock (kl. 14:30, not 2:30 PM)
 4. **Brand Colors**: Use Byggern colors from Tailwind config
-5. **Mock Data**: Initial implementation uses mock data - this is expected
-6. **Backend Integration**: See backend requirements section below
+5. **Backend Dependency**: Frontend implementation requires backend `/stats` endpoint to be completed first
+6. **Real Data Only**: No mock data allowed - must connect to actual backend API
 
 ---
 
 ## 🔌 BACKEND REQUIREMENTS
 
 ### Overview
-The frontend implementation initially uses mock data, but requires a backend API endpoint to provide real catalog statistics. This section describes what the backend team needs to implement.
+The frontend implementation requires a backend API endpoint to provide real catalog statistics. The frontend cannot be completed without this backend endpoint. This section describes what the backend team needs to implement.
 
 ### Backend Repository
 **Location**: `/home/rydesp/dev/easmith-varekatalog-backend/`
@@ -1184,38 +1213,50 @@ curl -X GET https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev/stats
 - Alert if error rate > 1%
 - Alert if cache is not working (all requests are cache misses)
 
-### Migration from Mock to Real Data
+### Integration Steps Between Teams
 
-Once the backend endpoint is ready:
+**Prerequisites**: Backend team must complete the `/stats` endpoint implementation first.
 
-1. **Update Frontend API Client** (`app/api/catalog-stats/route.ts`):
-```typescript
-// Replace mock data with:
-const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
-const response = await fetch(`${externalApiUrl}/stats`);
-const stats = await response.json();
-```
+**Backend Team Completion Checklist**:
+1. ✅ Lambda function deployed and accessible
+2. ✅ API Gateway route configured (`GET /stats`)
+3. ✅ All required statistics are returned in correct format
+4. ✅ CORS headers configured for frontend access
+5. ✅ Endpoint tested and returning valid data
 
-2. **Update Environment Variables**:
+**Frontend Team Integration Steps** (After backend complete):
+1. **Configure Environment Variables**:
 ```bash
+# Add to AWS Amplify Console or .env.local
 NEXT_PUBLIC_EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
-3. **Remove Mock Data**: Delete the mockStats object from the frontend code
+2. **Test Backend Connection**:
+```bash
+# Verify backend is working
+curl https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev/stats
+```
+
+3. **Deploy Frontend**: Frontend API proxy will automatically connect to backend
 
 ### Timeline & Dependencies
 
-**Backend Tasks** (Estimated 2-3 days):
+**Phase 1: Backend Implementation** (Estimated 2-3 days - MUST BE COMPLETED FIRST):
 1. Create Lambda function structure (Day 1)
 2. Implement data collection queries (Day 1-2)
 3. Add caching layer (Day 2)
-4. Deploy and test (Day 2-3)
+4. Deploy and test endpoint (Day 2-3)
+5. Verify CORS and accessibility (Day 3)
 
-**Frontend Integration** (1 hour after backend ready):
-1. Update API endpoint URL
-2. Remove mock data
-3. Test integration
-4. Deploy frontend
+**Phase 2: Frontend Implementation** (Estimated 2-3 days - STARTS AFTER BACKEND COMPLETE):
+1. Create SVG icons and components (Day 1)
+2. Implement CatalogStats components (Day 1-2)
+3. Create API proxy endpoint (Day 2)
+4. Add error handling and loading states (Day 2)
+5. Test integration with backend (Day 3)
+6. Deploy and verify (Day 3)
+
+**Total Timeline**: 4-6 days (sequential, not parallel)
 
 ### Success Criteria for Backend
 
@@ -1229,6 +1270,55 @@ NEXT_PUBLIC_EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.
 
 ---
 
-*This document now provides complete instructions for both frontend and backend implementation of the catalog statistics feature. Both teams can work independently and integrate when ready.*
+## 👤 PERSONALIZATION FEATURE
+
+### Simple Personal Greeting
+
+The implementation includes a minimal personalization feature that makes the welcome screen warmer for authenticated users while keeping the exact same UI structure.
+
+### How It Works
+
+When a user is **not logged in**:
+```
+Velkommen til Varekatalogen
+Din komplette byggevareløsning med over 45 000 produkter
+```
+
+When a user **is logged in**, the greeting changes based on time of day:
+
+**Morning (before 10:00):**
+```
+God morgen, Ola!
+Din komplette byggevareløsning med over 45 000 produkter
+```
+
+**Day (10:00-17:00):**
+```
+God dag, Ola!
+Din komplette byggevareløsning med over 45 000 produkter
+```
+
+**Evening (after 17:00):**
+```
+God kveld, Ola!
+Din komplette byggevareløsning med over 45 000 produkter
+```
+
+### Implementation Details
+
+- Uses existing `useAuth()` hook to access user information
+- Prioritizes `user.given_name` from Cognito token
+- Falls back to `user.username` if no first name available
+- Time-based greeting using Norwegian conventions
+- Zero impact on UI layout - same design for all users
+- Graceful fallback to generic welcome if not authenticated
+
+This simple touch adds warmth without complexity, making users feel recognized when they log in.
+
+---
+
+*This document provides complete instructions for both frontend and backend implementation of the catalog statistics feature. The backend team must complete their implementation first, then the frontend team can integrate and deploy.*
+
+*Implementation Order: Backend → Frontend → Integration*
 
 *Last Updated: 2025-01-07*
