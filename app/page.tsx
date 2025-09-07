@@ -95,10 +95,16 @@ export default function Dashboard() {
       key: 'lagerantall', 
       label: 'Lagerantall', 
       align: 'right' as const,
-      render: (value: unknown) => 
-        value !== null
+      render: (value: unknown) => {
+        // Unauthenticated users: always show masking
+        if (!isAuthenticated) {
+          return <span className="text-neutral-400">****</span>;
+        }
+        // Authenticated users: show value or dash for missing data
+        return value !== null
           ? <span className="text-neutral-700">{value as number}</span>
-          : <span className="text-neutral-400">****</span>
+          : <span className="text-neutral-400">-</span>;
+      }
     },
     { 
       key: 'prisenhet', 
@@ -113,15 +119,19 @@ export default function Dashboard() {
       label: 'Grunnpris', 
       align: 'right' as const,
       render: (value: unknown) => {
-        // Mask prices when toggle is OFF and user is authenticated
-        if (isAuthenticated && !showPrices) {
+        // Unauthenticated users: always show masking
+        if (!isAuthenticated) {
           return <span className="text-neutral-400">****</span>;
         }
-        // Use formatNorwegianPrice to convert øre to kroner with proper formatting
-        const formattedPrice = formatNorwegianPrice(value as number | null);
-        if (formattedPrice === "****") {
+        // Authenticated users with price toggle OFF: mask prices
+        if (!showPrices) {
           return <span className="text-neutral-400">****</span>;
         }
+        // Authenticated users with price toggle ON: show value or dash
+        if (value === null) {
+          return <span className="text-neutral-400">-</span>;
+        }
+        const formattedPrice = formatNorwegianPrice(value as number);
         return <span className="text-neutral-700">{formattedPrice}</span>;
       }
     },
@@ -130,15 +140,19 @@ export default function Dashboard() {
       label: 'Nettopris', 
       align: 'right' as const,
       render: (value: unknown) => {
-        // Mask prices when toggle is OFF and user is authenticated
-        if (isAuthenticated && !showPrices) {
+        // Unauthenticated users: always show masking
+        if (!isAuthenticated) {
           return <span className="text-neutral-400">****</span>;
         }
-        // Use formatNorwegianPrice to convert øre to kroner with proper formatting
-        const formattedPrice = formatNorwegianPrice(value as number | null);
-        if (formattedPrice === "****") {
+        // Authenticated users with price toggle OFF: mask prices
+        if (!showPrices) {
           return <span className="text-neutral-400">****</span>;
         }
+        // Authenticated users with price toggle ON: show value or dash
+        if (value === null) {
+          return <span className="text-neutral-400">-</span>;
+        }
+        const formattedPrice = formatNorwegianPrice(value as number);
         return <span className="text-neutral-700">{formattedPrice}</span>;
       }
     }
