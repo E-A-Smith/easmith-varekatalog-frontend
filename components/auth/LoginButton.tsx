@@ -10,6 +10,7 @@
 import { FC } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
+import { Lock, Unlock } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface LoginButtonProps {
@@ -41,7 +42,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
     return (
       <div className={clsx('flex items-center gap-2', className)}>
         <div className="flex items-center gap-2">
-          <span className="text-green-500" title="Innlogget">🔓</span>
+          <Unlock className="w-4 h-4 text-green-500" aria-label="Innlogget" />
           {!compact && (
             <span className="text-xs text-neutral-700 font-medium">
               {user.given_name || user.username}
@@ -74,7 +75,7 @@ export const LoginButton: FC<LoginButtonProps> = ({
         onClick={signIn}
         className="h-6 px-2 text-xs border-byggern-blue/20 text-byggern-blue hover:bg-byggern-blue/5"
       >
-        🔒
+        <Lock className="w-3 h-3" />
       </Button>
     </div>
   );

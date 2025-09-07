@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui';
+import { Loader, Check, X, AlertTriangle } from 'lucide-react';
 
 // API status checking interface
 interface ApiStatus {
@@ -75,8 +76,8 @@ export default function ApiStatusPage() {
   };
 
   const getStatusIcon = () => {
-    if (isChecking) return '⏳';
-    return apiStatus.isConnected ? '✅' : '❌';
+    if (isChecking) return <Loader className="w-4 h-4 animate-spin" />;
+    return apiStatus.isConnected ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />;
   };
 
   const getStatusText = () => {
@@ -223,23 +224,33 @@ export default function ApiStatusPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
               <span className="text-sm font-medium text-neutral-700">Produktsøk</span>
-              <span className="text-semantic-success">✅ Aktiv</span>
+              <span className="text-semantic-success flex items-center gap-1">
+                <Check className="w-4 h-4" /> Aktiv
+              </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
               <span className="text-sm font-medium text-neutral-700">NOBB-integrasjon</span>
-              <span className="text-semantic-success">✅ Aktiv</span>
+              <span className="text-semantic-success flex items-center gap-1">
+                <Check className="w-4 h-4" /> Aktiv
+              </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
               <span className="text-sm font-medium text-neutral-700">Norsk tekststøtte</span>
-              <span className="text-semantic-success">✅ Aktiv</span>
+              <span className="text-semantic-success flex items-center gap-1">
+                <Check className="w-4 h-4" /> Aktiv
+              </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
               <span className="text-sm font-medium text-neutral-700">Direktesøk</span>
-              <span className="text-semantic-success">✅ Aktiv</span>
+              <span className="text-semantic-success flex items-center gap-1">
+                <Check className="w-4 h-4" /> Aktiv
+              </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
               <span className="text-sm font-medium text-neutral-700">Real-time API</span>
-              <span className="text-semantic-warning">⚠️ Under utvikling</span>
+              <span className="text-semantic-warning flex items-center gap-1">
+                <AlertTriangle className="w-4 h-4" /> Under utvikling
+              </span>
             </div>
           </div>
         </div>

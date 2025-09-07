@@ -32,7 +32,7 @@ export const Header: FC<HeaderProps> = ({
             <div className="flex-1 max-w-2xl">
               <SearchBar 
                 onSearch={onSearch}
-                placeholder="🔍 Søk etter produkter eller kategorier..."
+                placeholder="Søk etter produkter eller kategorier..."
                 enableInstantSearch={true}
                 size="sm"
               />

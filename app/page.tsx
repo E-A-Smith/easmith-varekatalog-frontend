@@ -15,6 +15,7 @@ import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 import type { Product, LagerStatus } from '@/types/product';
 // Import filter helper utilities
 import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
+import { formatNorwegianPrice } from '@/utils/formatters';
 
 // No default products - start with empty search results
 const catalogProducts: Product[] = [];
@@ -116,11 +117,12 @@ export default function Dashboard() {
         if (isAuthenticated && !showPrices) {
           return <span className="text-neutral-400">****</span>;
         }
-        // Original logic for null masking
-        if (value === null) {
+        // Use formatNorwegianPrice to convert øre to kroner with proper formatting
+        const formattedPrice = formatNorwegianPrice(value as number | null);
+        if (formattedPrice === "****") {
           return <span className="text-neutral-400">****</span>;
         }
-        return <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>;
+        return <span className="text-neutral-700">{formattedPrice}</span>;
       }
     },
     { 
@@ -132,11 +134,12 @@ export default function Dashboard() {
         if (isAuthenticated && !showPrices) {
           return <span className="text-neutral-400">****</span>;
         }
-        // Original logic for null masking
-        if (value === null) {
+        // Use formatNorwegianPrice to convert øre to kroner with proper formatting
+        const formattedPrice = formatNorwegianPrice(value as number | null);
+        if (formattedPrice === "****") {
           return <span className="text-neutral-400">****</span>;
         }
-        return <span className="text-neutral-700">kr {(value as number).toFixed(2)}</span>;
+        return <span className="text-neutral-700">{formattedPrice}</span>;
       }
     }
   ];

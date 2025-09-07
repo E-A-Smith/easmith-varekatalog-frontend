@@ -15,6 +15,7 @@
 
 import { FC, useMemo } from 'react';
 import { clsx } from 'clsx';
+import { Zap, RotateCcw } from 'lucide-react';
 import { 
   EnhancedStatusBarProps, 
   StatusIndicatorProps, 
@@ -84,7 +85,7 @@ const MetricDisplay: FC<MetricDisplayProps> = ({
   return (
     <div className={clsx('flex items-center gap-2', className)}>
       <span className="text-neutral-500" aria-hidden="true">
-        {icon}
+        {typeof icon === 'string' ? icon : <span className="w-4 h-4 flex items-center justify-center">{icon}</span>}
       </span>
       <span className="text-sm">
         <span className="text-neutral-600">{label}: </span>
@@ -182,14 +183,14 @@ export const EnhancedStatusBar: FC<EnhancedStatusBarProps> = ({
           <>
             {/* Last sync time */}
             <MetricDisplay
-              icon="🔄"
+              icon={<RotateCcw className="w-4 h-4" />}
               label={lastSyncLabel}
               value={formattedLastSync}
             />
 
             {/* Response time */}
             <MetricDisplay
-              icon="⚡"
+              icon={<Zap className="w-4 h-4" />}
               label={responseLabel}
               value={formattedResponseTime}
               status={responseTimeStatus}
