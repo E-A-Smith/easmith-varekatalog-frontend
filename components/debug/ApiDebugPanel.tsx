@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/utils/api';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ApiDebugInfo {
   baseUrl: string;
@@ -20,8 +21,10 @@ interface ApiDebugInfo {
 }
 
 export const ApiDebugPanel = () => {
+  const { authState, getAccessToken } = useAuth();
+  
   const [debugInfo, setDebugInfo] = useState<ApiDebugInfo>({
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || '/api',
+    baseUrl: process.env.NEXT_PUBLIC_EXTERNAL_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || '/api',
     healthCheck: { status: 'loading' },
     searchTest: { status: 'idle' }
   });
@@ -68,18 +71,26 @@ export const ApiDebugPanel = () => {
     }));
 
     try {
+      // Get fresh access token
+      const accessToken = await getAccessToken();
+      
       const result = await apiClient.searchProducts({
         søketekst: testQuery.trim() || 'test',
         side: 1,
         sideStørrelse: 5,
         sortering: 'relevans'
-      });
+      }, accessToken || undefined);
       
       setDebugInfo(prev => ({
         ...prev,
         searchTest: {
           status: 'success',
-          data: result,
+          data: {
+            ...result,
+            authStatus: accessToken ? 'authenticated' : 'anonymous',
+            tokenPresent: !!accessToken,
+            userScopes: authState.scopes || []
+          },
           timestamp: new Date().toISOString()
         }
       }));
@@ -210,6 +221,10 @@ export const ApiDebugPanel = () => {
       <div className="text-xs text-neutral-500">
         <div>Build Mode: {process.env.NODE_ENV} | Debug Mode: {process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true' ? 'Development' : 'Production'}</div>
         <div className="mt-1">API Endpoint: {debugInfo.baseUrl}</div>
+        <div className="mt-1">Auth Status: {authState.isAuthenticated ? `Logged in (${authState.scopes.length} scopes)` : 'Anonymous'}</div>
+        {authState.isAuthenticated && (
+          <div className="mt-1">User Scopes: {authState.scopes.join(', ') || 'None'}</div>
+        )}
       </div>
     </div>
   );

@@ -118,9 +118,13 @@ export class SimpleApiClient {
   private timeout: number;
 
   constructor() {
-    // Get API base URL from environment
-    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+    // Prefer direct backend API when available for better performance
+    this.baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL || 
+                   process.env.NEXT_PUBLIC_API_BASE_URL || 
+                   '/api';
     this.timeout = 10000; // 10 second timeout
+    
+    this.log(`API Client initialized with baseUrl: ${this.baseUrl}`);
   }
 
   /**
@@ -259,16 +263,25 @@ export class SimpleApiClient {
     };
 
     try {
-      this.log('Searching with Next.js API route:', searchBody);
+      // Check if using direct API or Next.js proxy
+      const isDirectAPI = this.baseUrl.includes('execute-api.amazonaws.com');
+      
+      this.log('Searching with:', isDirectAPI ? 'Direct Backend API' : 'Next.js API route');
+      this.log('Request payload:', searchBody);
+      this.log('Auth token:', accessToken ? 'present' : 'none');
 
-      // Call our Next.js API route (no authentication needed - handled by route)
+      // Call API (direct or via Next.js proxy)
       const result = await this.request<{
         products?: Product[];
         results?: Product[]; // Could be in results field too
         success?: boolean;
         total?: number;
         responseTime?: string;
-      }>('/search', { method: 'POST' as const, body: searchBody });
+      }>('/search', { 
+        method: 'POST' as const, 
+        body: searchBody,
+        ...(accessToken && { token: accessToken }) // Only include token if present
+      });
 
       this.log('Search response:', result);
 

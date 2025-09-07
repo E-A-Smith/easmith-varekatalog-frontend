@@ -21,14 +21,25 @@ export async function GET(request: NextRequest) {
     if (externalApiUrl) {
       try {
         console.log(`[Search API] Calling backend: ${externalApiUrl}/search`);
+        
+        // Extract Authorization header and forward it to backend
+        const authHeader = request.headers.get('Authorization');
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+        
+        // Forward Cognito access token if present
+        if (authHeader) {
+          headers['Authorization'] = authHeader;
+          console.log(`[Search API] Forwarding auth token to backend (token length: ${authHeader.length})`);
+        } else {
+          console.log(`[Search API] No auth token found - using public access`);
+        }
+        
         const externalResponse = await fetch(`${externalApiUrl}/search`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-            // Note: For now using public access without OAuth token
-            // TODO: Add OAuth token from session when authentication is implemented
-          },
+          headers,
           body: JSON.stringify({
             query: query,
             pagination: {
@@ -117,14 +128,25 @@ export async function POST(request: NextRequest) {
     if (externalApiUrl) {
       try {
         console.log(`[Search API] POST calling backend: ${externalApiUrl}/search`);
+        
+        // Extract Authorization header and forward it to backend
+        const authHeader = request.headers.get('Authorization');
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+        
+        // Forward Cognito access token if present
+        if (authHeader) {
+          headers['Authorization'] = authHeader;
+          console.log(`[Search API] Forwarding auth token to backend (token length: ${authHeader.length})`);
+        } else {
+          console.log(`[Search API] No auth token found - using public access`);
+        }
+        
         const externalResponse = await fetch(`${externalApiUrl}/search`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-            // Note: For now using public access without OAuth token
-            // TODO: Add OAuth token from session when authentication is implemented
-          },
+          headers,
           body: JSON.stringify({
             query: query,
             filters: filters,
