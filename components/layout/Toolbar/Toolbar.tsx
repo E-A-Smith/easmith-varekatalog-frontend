@@ -47,7 +47,7 @@ export const Toolbar: FC<ToolbarProps> = ({
             <div className="flex-1 max-w-2xl mx-8">
               <SearchBar 
                 onSearch={onSearch}
-                placeholder="🔍 Søk etter produkter eller kategorier..."
+                placeholder="Søk etter produkter eller kategorier..."
                 enableInstantSearch={true}
                 size="sm"
               />

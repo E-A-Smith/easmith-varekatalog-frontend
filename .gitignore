@@ -65,3 +65,9 @@ pids/
 
 # Yarn Integrity file
 .yarn-integrity
+
+# Playwright
+.playwright/
+.playwright-mcp/
+test-results/
+playwright-report/

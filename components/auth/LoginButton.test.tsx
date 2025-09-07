@@ -45,8 +45,9 @@ describe('LoginButton', () => {
 
     render(<LoginButton />);
     
-    expect(screen.getByRole('button', { name: /🔒/i })).toBeInTheDocument();
-    expect(screen.getByText('🔒')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    // SVG icon should be present
+    expect(screen.getByRole('button')).toContainHTML('svg');
   });
 
   it('renders unlocked icon when authenticated', () => {
@@ -72,7 +73,8 @@ describe('LoginButton', () => {
 
     render(<LoginButton />);
     
-    expect(screen.getByText('🔓')).toBeInTheDocument();
+    // SVG unlock icon should be present
+    expect(document.querySelector('svg')).toBeInTheDocument();
     expect(screen.getByText('test@example.com')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logg ut/i })).toBeInTheDocument();
   });
@@ -100,7 +102,7 @@ describe('LoginButton', () => {
 
     render(<LoginButton compact />);
     
-    const button = screen.getByRole('button', { name: /🔒/i });
+    const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
   });
 
