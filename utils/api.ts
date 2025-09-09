@@ -122,10 +122,9 @@ export class SimpleApiClient {
   private timeout: number;
 
   constructor() {
-    // Prefer direct backend API when available for better performance
-    this.baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL || 
-                   process.env.NEXT_PUBLIC_API_BASE_URL || 
-                   '/api';
+    // Always use Next.js API routes for client-side requests to avoid CORS issues
+    // The server-side API routes will proxy to the external backend
+    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
     this.timeout = 10000; // 10 second timeout
     
     this.log(`API Client initialized with baseUrl: ${this.baseUrl}`);
@@ -298,9 +297,20 @@ export class SimpleApiClient {
         products = result.results;
       }
 
-      // Always transform products using the unified transformation function
-      // This handles both authenticated and non-authenticated users consistently
-      return products.map(product => transformBackendProduct(product as BackendProduct));
+      // Check if products need transformation (BackendProduct vs Product format)
+      // BackendProduct doesn't have lagerstatus field, Product does
+      const needsTransformation = products.length > 0 && 
+        products[0] && 
+        typeof products[0] === 'object' &&
+        !('lagerstatus' in products[0]);
+
+      if (needsTransformation) {
+        // Transform backend format to frontend format
+        return products.map(product => transformBackendProduct(product as BackendProduct));
+      } else {
+        // Products are already in correct format - return as is
+        return products;
+      }
 
     } catch (error) {
       this.log('Search failed:', error);

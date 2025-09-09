@@ -37,34 +37,28 @@ export async function GET(request: NextRequest) {
           console.log(`[Search API] No auth token found - using public access`);
         }
         
-        const externalResponse = await fetch(`${externalApiUrl}/search`, {
-          method: 'POST',
+        const externalResponse = await fetch(`${externalApiUrl}/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`, {
+          method: 'GET',
           headers,
-          body: JSON.stringify({
-            query: query,
-            pagination: {
-              offset: offset,
-              limit: limit
-            }
-          }),
           signal: AbortSignal.timeout(10000) // 10 second timeout
         });
         
         if (externalResponse.ok) {
           const externalData = await externalResponse.json();
-          console.log(`[Search API] Backend returned ${externalData.products?.length || 0} products`);
+          console.log(`[Search API] Backend returned ${externalData.results?.length || 0} products`);
           
           // Transform backend response to match frontend expected format
           return NextResponse.json({
             success: true,
             query,
-            total: externalData.total || externalData.products?.length || 0,
-            returned: externalData.products?.length || 0,
+            total: externalData.count || externalData.results?.length || 0,
+            returned: externalData.results?.length || 0,
             limit,
             offset,
             responseTime: `${Date.now() - startTime}ms`,
             timestamp: new Date().toISOString(),
-            results: externalData.products || [],
+            results: externalData.results || [],
+            facets: externalData.facets || {},
             meta: {
               source: 'backend-api',
               norwegianTextSupported: true,
@@ -144,27 +138,38 @@ export async function POST(request: NextRequest) {
           console.log(`[Search API] No auth token found - using public access`);
         }
         
-        const externalResponse = await fetch(`${externalApiUrl}/search`, {
-          method: 'POST',
+        const externalResponse = await fetch(`${externalApiUrl}/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`, {
+          method: 'GET',
           headers,
-          body: JSON.stringify({
-            query: query,
-            filters: filters,
-            sort: sort,
-            pagination: {
-              offset: offset,
-              limit: limit
-            }
-          }),
           signal: AbortSignal.timeout(10000) // 10 second timeout
         });
         
         if (externalResponse.ok) {
           const externalData = await externalResponse.json();
-          console.log(`[Search API] Backend returned ${externalData.products?.length || 0} products`);
+          console.log(`[Search API] Backend returned ${externalData.results?.length || 0} products`);
           
-          // Return backend response directly (already in correct format)
-          return NextResponse.json(externalData);
+          // Transform backend response to match frontend expected format
+          return NextResponse.json({
+            success: true,
+            query,
+            total: externalData.count || externalData.results?.length || 0,
+            returned: externalData.results?.length || 0,
+            limit,
+            offset,
+            timestamp: new Date().toISOString(),
+            results: externalData.results || [],
+            facets: externalData.facets || {},
+            meta: {
+              source: 'backend-api',
+              norwegianTextSupported: true,
+              searchFields: ['navn', 'produsent', 'vvsnr', 'kategori', 'beskrivelse'],
+              features: {
+                fuzzySearch: true,
+                exactMatch: true,
+                pagination: true,
+              }
+            }
+          });
         } else {
           console.warn(`[Search API] Backend API failed with status ${externalResponse.status}`);
           const errorText = await externalResponse.text();
