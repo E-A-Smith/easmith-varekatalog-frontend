@@ -32,8 +32,8 @@ describe('Supplier Mapping Utilities', () => {
     });
 
     it('should handle null/undefined inputs', () => {
-      expect(getSupplierName(null as any)).toBe('Unknown Supplier');
-      expect(getSupplierName(undefined as any)).toBe('Unknown Supplier');
+      expect(getSupplierName(null as unknown as string)).toBe('Unknown Supplier');
+      expect(getSupplierName(undefined as unknown as string)).toBe('Unknown Supplier');
     });
   });
 
@@ -58,8 +58,8 @@ describe('Supplier Mapping Utilities', () => {
     it('should handle edge cases', () => {
       expect(getSupplierCode('')).toBeNull();
       expect(getSupplierCode('   ')).toBeNull();
-      expect(getSupplierCode(null as any)).toBeNull();
-      expect(getSupplierCode(undefined as any)).toBeNull();
+      expect(getSupplierCode(null as unknown as string)).toBeNull();
+      expect(getSupplierCode(undefined as unknown as string)).toBeNull();
     });
   });
 
@@ -137,8 +137,8 @@ describe('Supplier Mapping Utilities', () => {
 
     it('should handle edge cases', () => {
       expect(getDisplayName('')).toBe('Unknown Supplier');
-      expect(getDisplayName(null as any)).toBe('Unknown Supplier');
-      expect(getDisplayName(undefined as any)).toBe('Unknown Supplier');
+      expect(getDisplayName(null as unknown as string)).toBe('Unknown Supplier');
+      expect(getDisplayName(undefined as unknown as string)).toBe('Unknown Supplier');
     });
 
     it('should handle non-numeric strings', () => {

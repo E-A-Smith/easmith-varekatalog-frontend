@@ -12,7 +12,6 @@ import { FC, useState, useEffect, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
 import { validateFilterValue } from '@/utils/filter-helpers';
-import { getSupplierCode } from '@/utils/supplier-mapping';
 
 export const QuickFilters: FC<QuickFiltersProps> = ({
   onFiltersChange,
@@ -104,21 +103,9 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
               transition-colors duration-150
             "
           >
-            {currentSupplierOptions.map(option => {
-              // Get supplier code for tooltip (if available)
-              const supplierCode = option !== 'Alle leverandører' ? getSupplierCode(option) : null;
-              const displayText = supplierCode ? `${option} (${supplierCode})` : option;
-              
-              return (
-                <option 
-                  key={option} 
-                  value={option}
-                  title={supplierCode ? `Supplier Code: ${supplierCode}` : undefined}
-                >
-                  {displayText}
-                </option>
-              );
-            })}
+            {currentSupplierOptions.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
           </select>
           <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
         </div>

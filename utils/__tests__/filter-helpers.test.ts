@@ -304,7 +304,7 @@ describe('matchesSupplierFilter', () => {
     expect(matchesSupplierFilter(testProduct, 'Alle leverandører')).toBe(true);
     
     const productWithoutSupplier = { ...testProduct };
-    delete (productWithoutSupplier as any).produsent;
+    delete (productWithoutSupplier as Partial<Product>).produsent;
     expect(matchesSupplierFilter(productWithoutSupplier as Product, 'Alle leverandører')).toBe(true);
   });
 
