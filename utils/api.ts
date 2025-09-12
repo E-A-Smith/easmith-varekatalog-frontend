@@ -4,6 +4,7 @@
  */
 
 import { Product, ProductSearchQuery, isProductCategory, type ProductCategory } from '@/types/product';
+import { getSupplierName, hasSupplierMapping } from '@/utils/supplier-mapping';
 
 // Current API response format
 interface BackendProduct {
@@ -58,7 +59,19 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
 
   // Optional fields - only add if they exist in the API response
   if (backendProduct.produsent) {
-    product.produsent = backendProduct.produsent;
+    // Check if produsent is a 5-digit code that needs mapping
+    if (/^\d{5}$/.test(backendProduct.produsent.trim()) && hasSupplierMapping(backendProduct.produsent)) {
+      // Store original code and map to display name
+      product.produsentKode = backendProduct.produsent;
+      product.produsent = getSupplierName(backendProduct.produsent);
+    } else {
+      // Already a name or unmapped code, use as-is
+      product.produsent = backendProduct.produsent;
+      // If it looks like a code but isn't mapped, store it as the code
+      if (/^\d{5}$/.test(backendProduct.produsent.trim())) {
+        product.produsentKode = backendProduct.produsent;
+      }
+    }
   }
   
   if (backendProduct.beskrivelse) {

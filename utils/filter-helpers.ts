@@ -7,6 +7,7 @@
  */
 
 import { Product } from '@/types/product';
+import { getSupplierCode } from '@/utils/supplier-mapping';
 
 /**
  * Extracts unique supplier names from a product array with Norwegian locale sorting
@@ -174,4 +175,47 @@ export function isValidProductArray(products: unknown): products is Product[] {
            'id' in item && 
            'navn' in item
          );
+}
+
+/**
+ * Check if a product matches the selected supplier filter
+ * Supports filtering by both supplier name and supplier code
+ * 
+ * @param product - Product to check
+ * @param selectedSupplier - Selected supplier name from filter dropdown
+ * @returns True if the product matches the supplier filter
+ * 
+ * @example
+ * ```typescript
+ * const product = { produsent: 'Teknikk AS', produsentKode: '10000' };
+ * const matches1 = matchesSupplierFilter(product, 'Teknikk AS');
+ * // Returns: true
+ * 
+ * const matches2 = matchesSupplierFilter(product, 'Alle leverandører');
+ * // Returns: true (matches all)
+ * ```
+ */
+export function matchesSupplierFilter(product: Product, selectedSupplier: string): boolean {
+  // "All suppliers" option always matches
+  if (selectedSupplier === 'Alle leverandører') {
+    return true;
+  }
+
+  // Direct name match (primary case)
+  if (product.produsent?.toLowerCase() === selectedSupplier.toLowerCase()) {
+    return true;
+  }
+
+  // Check if selected supplier is a code and product has matching code
+  if (product.produsentKode && /^\d{5}$/.test(selectedSupplier)) {
+    return product.produsentKode === selectedSupplier;
+  }
+
+  // Check if we can reverse-lookup the selected name to a code and match
+  const supplierCode = getSupplierCode(selectedSupplier);
+  if (supplierCode && product.produsentKode === supplierCode) {
+    return true;
+  }
+
+  return false;
 }

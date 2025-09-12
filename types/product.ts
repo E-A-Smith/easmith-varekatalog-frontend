@@ -20,8 +20,11 @@ export interface Product {
   /** Partial quantity availability (Anbrekk) */
   anbrekk: AnbrekkStatus;
   
-  /** Product manufacturer/supplier */
+  /** Product manufacturer/supplier (display name) */
   produsent?: string;
+
+  /** Original 5-digit supplier code from Løvenskiold system */
+  produsentKode?: string;
   
   /** Product category */
   kategori?: string;

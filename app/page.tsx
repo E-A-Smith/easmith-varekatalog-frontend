@@ -14,7 +14,7 @@ import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
 // Import filter helper utilities
-import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
+import { getUniqueSuppliers, getUniqueCategories, validateFilterValue, matchesSupplierFilter } from '@/utils/filter-helpers';
 import { formatNorwegianPrice } from '@/utils/formatters';
 
 // No default products - start with empty search results
@@ -164,12 +164,10 @@ export default function Dashboard() {
     // Temporarily disabled to debug the issue
     let filteredData = [...data]; // data.filter(product => isProduct(product));
     
-    // Filter by supplier
-    if (filterState.supplier !== 'Alle leverandører') {
-      filteredData = filteredData.filter(product => 
-        product.produsent?.toLowerCase() === filterState.supplier.toLowerCase()
-      );
-    }
+    // Filter by supplier using enhanced matching function
+    filteredData = filteredData.filter(product => 
+      matchesSupplierFilter(product, filterState.supplier)
+    );
     
     // Filter by category
     if (filterState.category !== 'Alle kategorier') {
