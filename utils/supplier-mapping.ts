@@ -188,8 +188,8 @@ export function getDisplayName(supplierIdentifier: string): string {
 
   const trimmed = supplierIdentifier.trim();
   
-  // Check if it's a numeric code (5 digits)
-  if (/^\d{5}$/.test(trimmed)) {
+  // Check if it's a numeric code (any number of digits)
+  if (/^\d+$/.test(trimmed)) {
     return getSupplierName(trimmed);
   }
   
@@ -239,8 +239,8 @@ export function validateMappingData(): {
 
   // Validate each supplier entry
   Object.entries(supplierMap).forEach(([code, supplier]) => {
-    // Check code format
-    if (!/^\d{5}$/.test(code)) {
+    // Check code format (should be numeric)
+    if (!/^\d+$/.test(code)) {
       errors.push(`Invalid supplier code format: ${code}`);
     }
 

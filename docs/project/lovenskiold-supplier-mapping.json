@@ -1,545 +1,921 @@
 {
-	"metadata": {
-		"source": "byggern_prisfile - 2025-08-12.txt column 39",
-		"extraction_date": "2025-09-08",
-		"mapping_updated": "2025-09-08",
-		"total_suppliers": 133,
-		"match_rate": "100%",
-		"web_catalog_source": "https://varekatalog.lovenskiold.no/",
-		"description": "Mapping between Løvenskiold internal 5-digit supplier codes and company names"
-	},
-	"suppliers": {
-		"10000": {
-			"name": "Teknikk AS",
-			"web_catalog_id": "100006"
-		},
-		"10005": {
-			"name": "Luna Norge AS (Tidl.B&B Solut",
-			"web_catalog_id": "100056"
-		},
-		"10007": {
-			"name": "THERMEX SCANDINAVIA AS",
-			"web_catalog_id": "100077"
-		},
-		"10014": {
-			"name": "Scanflex A/S",
-			"web_catalog_id": "100146"
-		},
-		"10031": {
-			"name": "Ergofast AS",
-			"web_catalog_id": "100315"
-		},
-		"10056": {
-			"name": "BYGG 1 PRODUKTER AS",
-			"web_catalog_id": "100569"
-		},
-		"10062": {
-			"name": "ADAX AS",
-			"web_catalog_id": "100624"
-		},
-		"10112": {
-			"name": "MAKITA NORWAY",
-			"web_catalog_id": "101129"
-		},
-		"10123": {
-			"name": "GRANBERG AS",
-			"web_catalog_id": "101236"
-		},
-		"10156": {
-			"name": "Flügger AS",
-			"web_catalog_id": "101561"
-		},
-		"10163": {
-			"name": "Inhouse Group AS",
-			"web_catalog_id": "101639"
-		},
-		"10168": {
-			"name": "Vilomix AS (tidl.Normin AS)",
-			"web_catalog_id": "101682"
-		},
-		"10169": {
-			"name": "Boxon AS",
-			"web_catalog_id": "101695"
-		},
-		"10236": {
-			"name": "Espegard",
-			"web_catalog_id": "102366"
-		},
-		"10237": {
-			"name": "Norfolier GreenTec AS",
-			"web_catalog_id": "102370"
-		},
-		"10256": {
-			"name": "Essve Norge AS",
-			"web_catalog_id": "102566"
-		},
-		"10263": {
-			"name": "Noragent AS",
-			"web_catalog_id": "102639"
-		},
-		"10264": {
-			"name": "Nilfisk-Alto div.av Nilfisk-A",
-			"web_catalog_id": "102645"
-		},
-		"10271": {
-			"name": "Jemtland AS",
-			"web_catalog_id": "102719"
-		},
-		"10295": {
-			"name": "Marksløjd AS",
-			"web_catalog_id": "102956"
-		},
-		"10299": {
-			"name": "BEWI INSULATION NORGE AS",
-			"web_catalog_id": "102994"
-		},
-		"10307": {
-			"name": "Aduro AS",
-			"web_catalog_id": "103073"
-		},
-		"10313": {
-			"name": "Fiskars Norway AS",
-			"web_catalog_id": "103131"
-		},
-		"10330": {
-			"name": "Sørbø Industribeslag AS",
-			"web_catalog_id": "103308"
-		},
-		"10361": {
-			"name": "Byggform A/S",
-			"web_catalog_id": "103611"
-		},
-		"10396": {
-			"name": "AB Golvabia NUF",
-			"web_catalog_id": "103960"
-		},
-		"10413": {
-			"name": "Litex AS",
-			"web_catalog_id": "104138"
-		},
-		"10450": {
-			"name": "Fibo Trespo AS",
-			"web_catalog_id": "104500"
-		},
-		"10466": {
-			"name": "Nordpeis AS",
-			"web_catalog_id": "104665"
-		},
-		"10511": {
-			"name": "Charlie Storm Messel AS",
-			"web_catalog_id": "105110"
-		},
-		"10550": {
-			"name": "GPBM Nordic AS",
-			"web_catalog_id": "105504"
-		},
-		"10553": {
-			"name": "Wilhelmsen Chemicals AS",
-			"web_catalog_id": "105530"
-		},
-		"10561": {
-			"name": "Beha Elektro AS",
-			"web_catalog_id": "105617"
-		},
-		"10566": {
-			"name": "Palmako Norge AS",
-			"web_catalog_id": "105668"
-		},
-		"10573": {
-			"name": "Sioo Wood Protection Norge AS",
-			"web_catalog_id": "105734"
-		},
-		"10582": {
-			"name": "Smartpanel AS",
-			"web_catalog_id": "105828"
-		},
-		"10610": {
-			"name": "Höganes Borgestad AS",
-			"web_catalog_id": "106101"
-		},
-		"10616": {
-			"name": "Steinhardt AS",
-			"web_catalog_id": "106167"
-		},
-		"10645": {
-			"name": "Forestia AS (Plater) Br.-foss",
-			"web_catalog_id": "106451"
-		},
-		"10650": {
-			"name": "Dansani AS",
-			"web_catalog_id": "106507"
-		},
-		"10814": {
-			"name": "Byggma AS",
-			"web_catalog_id": "108143"
-		},
-		"10901": {
-			"name": "Combiwood Barkevik AS",
-			"web_catalog_id": "109012"
-		},
-		"10905": {
-			"name": "Moelven Wood AS",
-			"web_catalog_id": "109051"
-		},
-		"10952": {
-			"name": "Habo Norge AS",
-			"web_catalog_id": "109524"
-		},
-		"10959": {
-			"name": "Industritre AS",
-			"web_catalog_id": "109596"
-		},
-		"11002": {
-			"name": "Mill International AS -tidl.",
-			"web_catalog_id": "110027"
-		},
-		"11039": {
-			"name": "Simpson Strong-Tie Norge AS (",
-			"web_catalog_id": "110394"
-		},
-		"11134": {
-			"name": "Grønn Industri AS",
-			"web_catalog_id": "111348"
-		},
-		"11373": {
-			"name": "Alloc AS",
-			"web_catalog_id": "113732"
-		},
-		"11403": {
-			"name": "Løvenskiold-Handel AS",
-			"web_catalog_id": "114037"
-		},
-		"11465": {
-			"name": "JELD-WEN NORGE AS (gml Vest W",
-			"web_catalog_id": "114655"
-		},
-		"11513": {
-			"name": "Grantoppen AS",
-			"web_catalog_id": "115130"
-		},
-		"11519": {
-			"name": "Kahrs Norge A/S",
-			"web_catalog_id": "115190"
-		},
-		"11529": {
-			"name": "Orthex Norway AS",
-			"web_catalog_id": "115297"
-		},
-		"11536": {
-			"name": "Metabo Norge AS",
-			"web_catalog_id": "115363"
-		},
-		"11614": {
-			"name": "SNA EUROPE (NORWAY) AS",
-			"web_catalog_id": "116143"
-		},
-		"11621": {
-			"name": "Schou Norge AS (NOK)",
-			"web_catalog_id": "116212"
-		},
-		"11624": {
-			"name": "Tolmer AS",
-			"web_catalog_id": "116242"
-		},
-		"11637": {
-			"name": "Hanske- Companiet AS",
-			"web_catalog_id": "116372"
-		},
-		"11647": {
-			"name": "Hunton Fiber AS",
-			"web_catalog_id": "116475"
-		},
-		"11660": {
-			"name": "Norsk Wavin A/S",
-			"web_catalog_id": "116608"
-		},
-		"11727": {
-			"name": "Weber-Stephen Nordic",
-			"web_catalog_id": "117276"
-		},
-		"11776": {
-			"name": "Husqvarna Norge AS",
-			"web_catalog_id": "117768"
-		},
-		"13588": {
-			"name": "Benders Norge AS",
-			"web_catalog_id": "135887"
-		},
-		"15476": {
-			"name": "STANLEY BLACK & DECKER NORWAY",
-			"web_catalog_id": "154768"
-		},
-		"15934": {
-			"name": "Robert Bosch AS",
-			"web_catalog_id": "159344"
-		},
-		"20065": {
-			"name": "EASY ACCESS AS",
-			"web_catalog_id": "200654"
-		},
-		"20083": {
-			"name": "FRITZØE ENGROS AS",
-			"web_catalog_id": "200839"
-		},
-		"20098": {
-			"name": "New Store Europe Norge AS",
-			"web_catalog_id": "200983"
-		},
-		"20106": {
-			"name": "NATRE VINDUER AS",
-			"web_catalog_id": "201063"
-		},
-		"20193": {
-			"name": "HVAL SJOKOLADEFABRIKK ASA",
-			"web_catalog_id": "201932"
-		},
-		"22873": {
-			"name": "Rockwool AS",
-			"web_catalog_id": "228737"
-		},
-		"25241": {
-			"name": "BMI Norge AS",
-			"web_catalog_id": "252417"
-		},
-		"30030": {
-			"name": "Nordic Tools AS",
-			"web_catalog_id": "300300"
-		},
-		"33003": {
-			"name": "Profag AS",
-			"web_catalog_id": "330033"
-		},
-		"34993": {
-			"name": "Isola AS",
-			"web_catalog_id": "349933"
-		},
-		"36433": {
-			"name": "ITW CONSTRUCTION PRODUCTS AS",
-			"web_catalog_id": "364339"
-		},
-		"40050": {
-			"name": "Storeys AS",
-			"web_catalog_id": "400500"
-		},
-		"40414": {
-			"name": "Alvdal Skurlag AS",
-			"web_catalog_id": "404142"
-		},
-		"41162": {
-			"name": "3D Innovation Nordic AS",
-			"web_catalog_id": "411622"
-		},
-		"41215": {
-			"name": "Beha Target AS",
-			"web_catalog_id": "412150"
-		},
-		"42475": {
-			"name": "Hikoki Power Tools Norway AS",
-			"web_catalog_id": "424757"
-		},
-		"42521": {
-			"name": "Flexit AS",
-			"web_catalog_id": "425214"
-		},
-		"44083": {
-			"name": "Paroc AB",
-			"web_catalog_id": "440832"
-		},
-		"44095": {
-			"name": "Krifon AS",
-			"web_catalog_id": "440957"
-		},
-		"44176": {
-			"name": "Fischer Norge AS",
-			"web_catalog_id": "441761"
-		},
-		"44940": {
-			"name": "Gjøco-Harmoni AS",
-			"web_catalog_id": "449400"
-		},
-		"44946": {
-			"name": "Gjøco AS",
-			"web_catalog_id": "449468"
-		},
-		"45008": {
-			"name": "PROTRE AS",
-			"web_catalog_id": "450085"
-		},
-		"45010": {
-			"name": "DANA LIM NORGE AS",
-			"web_catalog_id": "450106"
-		},
-		"45021": {
-			"name": "Primaverde B.V - NUF",
-			"web_catalog_id": "450212"
-		},
-		"45026": {
-			"name": "FINSTAD ENGROS AS",
-			"web_catalog_id": "450261"
-		},
-		"45027": {
-			"name": "Boråstapeter Norge",
-			"web_catalog_id": "450270"
-		},
-		"45035": {
-			"name": "Teltkongen AS",
-			"web_catalog_id": "450359"
-		},
-		"45036": {
-			"name": "Tufte Wear AS",
-			"web_catalog_id": "450363"
-		},
-		"45043": {
-			"name": "Nobia Norway AS / Norema Home",
-			"web_catalog_id": "450433"
-		},
-		"45057": {
-			"name": "Bjelin Sweden AB",
-			"web_catalog_id": "450571"
-		},
-		"45061": {
-			"name": "KYOCERA SENCO Norway AS",
-			"web_catalog_id": "450612"
-		},
-		"45063": {
-			"name": "WEDI GMBH",
-			"web_catalog_id": "450633"
-		},
-		"45081": {
-			"name": "Bestun AS",
-			"web_catalog_id": "450819"
-		},
-		"45082": {
-			"name": "Char-Broil Europe GmbH Branc",
-			"web_catalog_id": "450829"
-		},
-		"45084": {
-			"name": "Maxi Import AS",
-			"web_catalog_id": "450847"
-		},
-		"45085": {
-			"name": "Hedgehog AS",
-			"web_catalog_id": "450858"
-		},
-		"45092": {
-			"name": "KLIMABRANDS A/S",
-			"web_catalog_id": "450923"
-		},
-		"45094": {
-			"name": "OONI GMBH",
-			"web_catalog_id": "450942"
-		},
-		"45097": {
-			"name": "KRONUS SIA",
-			"web_catalog_id": "450976"
-		},
-		"45099": {
-			"name": "GPBM Nordic AB",
-			"web_catalog_id": "450994"
-		},
-		"45100": {
-			"name": "Millarco International A/S",
-			"web_catalog_id": "451001"
-		},
-		"45101": {
-			"name": "Ecovacs Europe GMBH",
-			"web_catalog_id": "451018"
-		},
-		"45104": {
-			"name": "PROVIDA VARME AS",
-			"web_catalog_id": "451043"
-		},
-		"45107": {
-			"name": "OBI Group Sourcing GmbH",
-			"web_catalog_id": "451074"
-		},
-		"45109": {
-			"name": "Add-On AS (O-Grill)",
-			"web_catalog_id": "451093"
-		},
-		"45112": {
-			"name": "Beha Target AS (USD)",
-			"web_catalog_id": "451123"
-		},
-		"45113": {
-			"name": "Mill International AS",
-			"web_catalog_id": "451139"
-		},
-		"45119": {
-			"name": "Metabo Sverige AB",
-			"web_catalog_id": "451199"
-		},
-		"46569": {
-			"name": "Ernex AS",
-			"web_catalog_id": "465690"
-		},
-		"48236": {
-			"name": "Norgips Norge AS",
-			"web_catalog_id": "482366"
-		},
-		"49457": {
-			"name": "SAINT-GOBAIN BYGGEVARER AS",
-			"web_catalog_id": "494577"
-		},
-		"50110": {
-			"name": "MYHRE MILJØPRODUKTER AS",
-			"web_catalog_id": "501104"
-		},
-		"51063": {
-			"name": "WJ Business Partner AS",
-			"web_catalog_id": "510631"
-		},
-		"51087": {
-			"name": "Mintec Paper AS",
-			"web_catalog_id": "510872"
-		},
-		"51096": {
-			"name": "VIKING ARM AS",
-			"web_catalog_id": "510960"
-		},
-		"54014": {
-			"name": "Tarkett AB - NUF utl- uten MV",
-			"web_catalog_id": "540143"
-		},
-		"60825": {
-			"name": "Skeisvoll & Co AS",
-			"web_catalog_id": "608254"
-		},
-		"62533": {
-			"name": "ToolMatic Norge AS",
-			"web_catalog_id": "625332"
-		},
-		"69461": {
-			"name": "Assa Abloy Opening Solutions",
-			"web_catalog_id": "694614"
-		},
-		"73721": {
-			"name": "Brødrene Øyo AS",
-			"web_catalog_id": "737216"
-		},
-		"75006": {
-			"name": "Hillerstorps Trä AB",
-			"web_catalog_id": "750064"
-		},
-		"75151": {
-			"name": "OMC Barbecues (Ltd UK Filial)",
-			"web_catalog_id": "751515"
-		},
-		"75919": {
-			"name": "Keter Poland Sp.Z o.o.",
-			"web_catalog_id": "759192"
-		},
-		"75957": {
-			"name": "Emil Lux Gmbh & Co KG Tysklan",
-			"web_catalog_id": "759572"
-		},
-		"76125": {
-			"name": "Jowema AB",
-			"web_catalog_id": "761254"
-		},
-		"78433": {
-			"name": "Poly Produkter AB",
-			"web_catalog_id": "784338"
-		}
-	}
+  "metadata": {
+    "source": "Complete supplier list from Løvenskiold web catalog dropdown",
+    "extraction_date": "2025-09-12",
+    "mapping_updated": "2025-09-12",
+    "total_suppliers": 227,
+    "match_rate": "100%",
+    "web_catalog_source": "https://varekatalog.lovenskiold.no/",
+    "description": "Complete mapping between Løvenskiold web catalog IDs and company names"
+  },
+  "suppliers": {
+    "146": {
+      "name": "Ahlsell Norge AS",
+      "web_catalog_id": "146"
+    },
+    "165": {
+      "name": "Alanor A/S",
+      "web_catalog_id": "165"
+    },
+    "166": {
+      "name": "Sika Norge AS",
+      "web_catalog_id": "166"
+    },
+    "175": {
+      "name": "HEY DI AS",
+      "web_catalog_id": "175"
+    },
+    "207": {
+      "name": "Karcher A/S",
+      "web_catalog_id": "207"
+    },
+    "210": {
+      "name": "Krefting & Co. A/S",
+      "web_catalog_id": "210"
+    },
+    "212": {
+      "name": "Auto Care International AS",
+      "web_catalog_id": "212"
+    },
+    "216": {
+      "name": "Bayer AS",
+      "web_catalog_id": "216"
+    },
+    "219": {
+      "name": "Osram AS",
+      "web_catalog_id": "219"
+    },
+    "5010": {
+      "name": "Scanox A.S",
+      "web_catalog_id": "5010"
+    },
+    "5017": {
+      "name": "Tarkett AS",
+      "web_catalog_id": "5017"
+    },
+    "5031": {
+      "name": "IBG AS",
+      "web_catalog_id": "5031"
+    },
+    "5035": {
+      "name": "Jotun AS",
+      "web_catalog_id": "5035"
+    },
+    "5041": {
+      "name": "Orkla House Care Norge AS",
+      "web_catalog_id": "5041"
+    },
+    "5043": {
+      "name": "3M Norge A/S",
+      "web_catalog_id": "5043"
+    },
+    "5082": {
+      "name": "Bostik AS",
+      "web_catalog_id": "5082"
+    },
+    "6058": {
+      "name": "NAMAS Vekst AS",
+      "web_catalog_id": "6058"
+    },
+    "6090": {
+      "name": "Hultafors Group Norge AS",
+      "web_catalog_id": "6090"
+    },
+    "6098": {
+      "name": "MARS Norge AS",
+      "web_catalog_id": "6098"
+    },
+    "6116": {
+      "name": "GERFLOR SCANDINAVIA AS",
+      "web_catalog_id": "6116"
+    },
+    "6163": {
+      "name": "Nelson Garden AS",
+      "web_catalog_id": "6163"
+    },
+    "6421": {
+      "name": "Steni AS",
+      "web_catalog_id": "6421"
+    },
+    "6998": {
+      "name": "Norcolour AS",
+      "web_catalog_id": "6998"
+    },
+    "10026": {
+      "name": "Møklegaard Print Shop AS",
+      "web_catalog_id": "10026"
+    },
+    "10135": {
+      "name": "Helly Hansen AS",
+      "web_catalog_id": "10135"
+    },
+    "100006": {
+      "name": "Teknikk AS",
+      "web_catalog_id": "100006"
+    },
+    "100056": {
+      "name": "Luna Norge AS (Tidl.B&B Solut",
+      "web_catalog_id": "100056"
+    },
+    "100077": {
+      "name": "THERMEX SCANDINAVIA AS",
+      "web_catalog_id": "100077"
+    },
+    "100088": {
+      "name": "O.B. Wiik AS",
+      "web_catalog_id": "100088"
+    },
+    "100146": {
+      "name": "Scanflex A/S",
+      "web_catalog_id": "100146"
+    },
+    "100315": {
+      "name": "Ergofast AS",
+      "web_catalog_id": "100315"
+    },
+    "100569": {
+      "name": "BYGG 1 PRODUKTER AS",
+      "web_catalog_id": "100569"
+    },
+    "100624": {
+      "name": "ADAX AS",
+      "web_catalog_id": "100624"
+    },
+    "101129": {
+      "name": "MAKITA NORWAY",
+      "web_catalog_id": "101129"
+    },
+    "101141": {
+      "name": "KEDDELL & BOMMEN AS",
+      "web_catalog_id": "101141"
+    },
+    "101236": {
+      "name": "GRANBERG AS",
+      "web_catalog_id": "101236"
+    },
+    "101561": {
+      "name": "Flügger AS",
+      "web_catalog_id": "101561"
+    },
+    "101639": {
+      "name": "Inhouse Group AS",
+      "web_catalog_id": "101639"
+    },
+    "101682": {
+      "name": "Vilomix AS (tidl.Normin AS)",
+      "web_catalog_id": "101682"
+    },
+    "101695": {
+      "name": "Boxon AS",
+      "web_catalog_id": "101695"
+    },
+    "101938": {
+      "name": "LS Offset AS",
+      "web_catalog_id": "101938"
+    },
+    "102366": {
+      "name": "Espegard",
+      "web_catalog_id": "102366"
+    },
+    "102370": {
+      "name": "Norfolier GreenTec AS",
+      "web_catalog_id": "102370"
+    },
+    "102521": {
+      "name": "Fjeldheim & Partners AS",
+      "web_catalog_id": "102521"
+    },
+    "102552": {
+      "name": "Brødr. Øyehaug AS",
+      "web_catalog_id": "102552"
+    },
+    "102566": {
+      "name": "Essve Norge AS",
+      "web_catalog_id": "102566"
+    },
+    "102585": {
+      "name": "Isekk AS",
+      "web_catalog_id": "102585"
+    },
+    "102639": {
+      "name": "Noragent AS",
+      "web_catalog_id": "102639"
+    },
+    "102645": {
+      "name": "Nilfisk-Alto div.av Nilfisk-A",
+      "web_catalog_id": "102645"
+    },
+    "102670": {
+      "name": "SCANPOLE AS",
+      "web_catalog_id": "102670"
+    },
+    "102719": {
+      "name": "Jemtland AS",
+      "web_catalog_id": "102719"
+    },
+    "102956": {
+      "name": "Markslöjd AS",
+      "web_catalog_id": "102956"
+    },
+    "102959": {
+      "name": "Osmo Nordic AS",
+      "web_catalog_id": "102959"
+    },
+    "102994": {
+      "name": "BEWI INSULATION NORGE AS",
+      "web_catalog_id": "102994"
+    },
+    "103007": {
+      "name": "Sandermoen AS",
+      "web_catalog_id": "103007"
+    },
+    "103073": {
+      "name": "Aduro AS",
+      "web_catalog_id": "103073"
+    },
+    "103131": {
+      "name": "Fiskars Norway AS",
+      "web_catalog_id": "103131"
+    },
+    "103300": {
+      "name": "Aaltvedt Betong AS",
+      "web_catalog_id": "103300"
+    },
+    "103308": {
+      "name": "Sørb ø Industribeslag AS",
+      "web_catalog_id": "103308"
+    },
+    "103611": {
+      "name": "Byggform A/S",
+      "web_catalog_id": "103611"
+    },
+    "103659": {
+      "name": "Harmonie Norge AS",
+      "web_catalog_id": "103659"
+    },
+    "103939": {
+      "name": "Woca Norge AS",
+      "web_catalog_id": "103939"
+    },
+    "103960": {
+      "name": "AB Golvabia NUF",
+      "web_catalog_id": "103960"
+    },
+    "104040": {
+      "name": "Sika Norge AS / Casco Schönox",
+      "web_catalog_id": "104040"
+    },
+    "104138": {
+      "name": "Litex AS",
+      "web_catalog_id": "104138"
+    },
+    "104416": {
+      "name": "Plastmo AS",
+      "web_catalog_id": "104416"
+    },
+    "104500": {
+      "name": "Fibo Trespo AS",
+      "web_catalog_id": "104500"
+    },
+    "104570": {
+      "name": "Jabo Norge AS",
+      "web_catalog_id": "104570"
+    },
+    "104665": {
+      "name": "Nordpeis AS",
+      "web_catalog_id": "104665"
+    },
+    "104833": {
+      "name": "Nobia Norway AS/Eurokit",
+      "web_catalog_id": "104833"
+    },
+    "105110": {
+      "name": "Charlie Storm Messel AS",
+      "web_catalog_id": "105110"
+    },
+    "105455": {
+      "name": "Rapp Bomek AS",
+      "web_catalog_id": "105455"
+    },
+    "105504": {
+      "name": "GPBM Nordic AS",
+      "web_catalog_id": "105504"
+    },
+    "105530": {
+      "name": "Wilhelmsen Chemicals AS",
+      "web_catalog_id": "105530"
+    },
+    "105617": {
+      "name": "Beha Elektro AS",
+      "web_catalog_id": "105617"
+    },
+    "105668": {
+      "name": "Palmako Norge AS",
+      "web_catalog_id": "105668"
+    },
+    "105691": {
+      "name": "Surface Solutions AS",
+      "web_catalog_id": "105691"
+    },
+    "105729": {
+      "name": "Uldal AS",
+      "web_catalog_id": "105729"
+    },
+    "105734": {
+      "name": "Sioo Wood Protection Norge AS",
+      "web_catalog_id": "105734"
+    },
+    "105828": {
+      "name": "Smartpanel AS",
+      "web_catalog_id": "105828"
+    },
+    "106101": {
+      "name": "Höganes Borgestad AS",
+      "web_catalog_id": "106101"
+    },
+    "106108": {
+      "name": "Stiga AS (GGP Norge)",
+      "web_catalog_id": "106108"
+    },
+    "106167": {
+      "name": "Steinhardt AS",
+      "web_catalog_id": "106167"
+    },
+    "106393": {
+      "name": "S WOOD AS",
+      "web_catalog_id": "106393"
+    },
+    "106451": {
+      "name": "Forestia AS (Plater) Br.-foss",
+      "web_catalog_id": "106451"
+    },
+    "106507": {
+      "name": "Dansani AS",
+      "web_catalog_id": "106507"
+    },
+    "106508": {
+      "name": "Grove-Knutsen & Co. AS",
+      "web_catalog_id": "106508"
+    },
+    "108143": {
+      "name": "Byggma AS",
+      "web_catalog_id": "108143"
+    },
+    "108345": {
+      "name": "Byggma-Harmonigulv AS",
+      "web_catalog_id": "108345"
+    },
+    "109012": {
+      "name": "Combiwood Barkevik AS",
+      "web_catalog_id": "109012"
+    },
+    "109051": {
+      "name": "Moelven Wood AS",
+      "web_catalog_id": "109051"
+    },
+    "109524": {
+      "name": "Habo Norge AS",
+      "web_catalog_id": "109524"
+    },
+    "109596": {
+      "name": "Industritre AS",
+      "web_catalog_id": "109596"
+    },
+    "109982": {
+      "name": "Talgø Møretre AS",
+      "web_catalog_id": "109982"
+    },
+    "110027": {
+      "name": "Mill International AS -tidl.",
+      "web_catalog_id": "110027"
+    },
+    "110394": {
+      "name": "Simpson Strong-Tie Norge AS (",
+      "web_catalog_id": "110394"
+    },
+    "111348": {
+      "name": "Grønn Industri AS",
+      "web_catalog_id": "111348"
+    },
+    "111449": {
+      "name": "O.Olsen Snekkerfabrikk AS",
+      "web_catalog_id": "111449"
+    },
+    "112001": {
+      "name": "ELEKTRONISKE TJENESTER AS",
+      "web_catalog_id": "112001"
+    },
+    "112311": {
+      "name": "Nittedal Torvindustri A/S",
+      "web_catalog_id": "112311"
+    },
+    "112463": {
+      "name": "Ide Decor Norge AS",
+      "web_catalog_id": "112463"
+    },
+    "113147": {
+      "name": "RKC A/S",
+      "web_catalog_id": "113147"
+    },
+    "113732": {
+      "name": "Alloc AS",
+      "web_catalog_id": "113732"
+    },
+    "114037": {
+      "name": "Løvenskiold-Handel AS",
+      "web_catalog_id": "114037"
+    },
+    "114138": {
+      "name": "Norvia AS",
+      "web_catalog_id": "114138"
+    },
+    "114655": {
+      "name": "JELD-WEN NORGE AS (gml Vest W",
+      "web_catalog_id": "114655"
+    },
+    "115130": {
+      "name": "Grantoppen AS",
+      "web_catalog_id": "115130"
+    },
+    "115190": {
+      "name": "Kahrs Norge A/S",
+      "web_catalog_id": "115190"
+    },
+    "115192": {
+      "name": "Relekta AS",
+      "web_catalog_id": "115192"
+    },
+    "115280": {
+      "name": "Hako Ground & Garden AS",
+      "web_catalog_id": "115280"
+    },
+    "115297": {
+      "name": "Orthex Norway AS",
+      "web_catalog_id": "115297"
+    },
+    "115363": {
+      "name": "Metabo Norge AS",
+      "web_catalog_id": "115363"
+    },
+    "116143": {
+      "name": "SNA EUROPE (NORWAY) AS",
+      "web_catalog_id": "116143"
+    },
+    "116212": {
+      "name": "Schou Norge AS (NOK)",
+      "web_catalog_id": "116212"
+    },
+    "116242": {
+      "name": "Tolmer AS",
+      "web_catalog_id": "116242"
+    },
+    "116372": {
+      "name": "Hanske- Companiet AS",
+      "web_catalog_id": "116372"
+    },
+    "116475": {
+      "name": "Hunton Fiber AS",
+      "web_catalog_id": "116475"
+    },
+    "116608": {
+      "name": "Norsk Wavin A/S",
+      "web_catalog_id": "116608"
+    },
+    "117276": {
+      "name": "Weber-Stephen Nordic",
+      "web_catalog_id": "117276"
+    },
+    "117768": {
+      "name": "Husqvarna Norge AS",
+      "web_catalog_id": "117768"
+    },
+    "135887": {
+      "name": "Benders Norge AS",
+      "web_catalog_id": "135887"
+    },
+    "154768": {
+      "name": "STANLEY BLACK & DECKER NORWAY",
+      "web_catalog_id": "154768"
+    },
+    "159344": {
+      "name": "Robert Bosch AS",
+      "web_catalog_id": "159344"
+    },
+    "171800": {
+      "name": "POLYSEAM AS",
+      "web_catalog_id": "171800"
+    },
+    "200591": {
+      "name": "AS Wilfa",
+      "web_catalog_id": "200591"
+    },
+    "200654": {
+      "name": "EASY ACCESS AS",
+      "web_catalog_id": "200654"
+    },
+    "200839": {
+      "name": "FRITZØE ENGROS AS",
+      "web_catalog_id": "200839"
+    },
+    "200983": {
+      "name": "New Store Europe Norge AS",
+      "web_catalog_id": "200983"
+    },
+    "201046": {
+      "name": "Festival As",
+      "web_catalog_id": "201046"
+    },
+    "201063": {
+      "name": "NATRE VINDUER AS",
+      "web_catalog_id": "201063"
+    },
+    "201932": {
+      "name": "HVAL SJOKOLADEFABRIKK ASA",
+      "web_catalog_id": "201932"
+    },
+    "221150": {
+      "name": "Södra Wood AS - Harmoni",
+      "web_catalog_id": "221150"
+    },
+    "228737": {
+      "name": "Rockwool AS",
+      "web_catalog_id": "228737"
+    },
+    "252417": {
+      "name": "BMI Norge AS",
+      "web_catalog_id": "252417"
+    },
+    "274410": {
+      "name": "Glava A/S",
+      "web_catalog_id": "274410"
+    },
+    "300300": {
+      "name": "Nordic Tools AS",
+      "web_catalog_id": "300300"
+    },
+    "304751": {
+      "name": "Hamre AS",
+      "web_catalog_id": "304751"
+    },
+    "330033": {
+      "name": "Profag AS",
+      "web_catalog_id": "330033"
+    },
+    "349933": {
+      "name": "Isola AS",
+      "web_catalog_id": "349933"
+    },
+    "364339": {
+      "name": "ITW CONSTRUCTION PRODUCTS AS",
+      "web_catalog_id": "364339"
+    },
+    "371262": {
+      "name": "Solør Skaft AS (Aktiv Eiendom",
+      "web_catalog_id": "371262"
+    },
+    "400500": {
+      "name": "Storeys AS",
+      "web_catalog_id": "400500"
+    },
+    "404142": {
+      "name": "Alvdal Skurlag AS",
+      "web_catalog_id": "404142"
+    },
+    "411622": {
+      "name": "3D Innovation Nordic AS",
+      "web_catalog_id": "411622"
+    },
+    "412150": {
+      "name": "Beha Target AS",
+      "web_catalog_id": "412150"
+    },
+    "424757": {
+      "name": "Hikoki Power Tools Norway AS",
+      "web_catalog_id": "424757"
+    },
+    "425214": {
+      "name": "Flexit AS",
+      "web_catalog_id": "425214"
+    },
+    "440832": {
+      "name": "Paroc AB",
+      "web_catalog_id": "440832"
+    },
+    "440936": {
+      "name": "Smartpanel AS",
+      "web_catalog_id": "440936"
+    },
+    "440957": {
+      "name": "Krifon AS",
+      "web_catalog_id": "440957"
+    },
+    "441761": {
+      "name": "Fischer Norge AS",
+      "web_catalog_id": "441761"
+    },
+    "441927": {
+      "name": "Maske Emballasjefabrikk AS",
+      "web_catalog_id": "441927"
+    },
+    "442021": {
+      "name": "Brødrene Dahl",
+      "web_catalog_id": "442021"
+    },
+    "449400": {
+      "name": "Gjøco-Harmoni AS",
+      "web_catalog_id": "449400"
+    },
+    "449468": {
+      "name": "Gjøco AS",
+      "web_catalog_id": "449468"
+    },
+    "450058": {
+      "name": "AMIGA AB",
+      "web_catalog_id": "450058"
+    },
+    "450085": {
+      "name": "PROTRE AS",
+      "web_catalog_id": "450085"
+    },
+    "450106": {
+      "name": "DANA LIM NORGE AS",
+      "web_catalog_id": "450106"
+    },
+    "450212": {
+      "name": "Primaverde B.V - NUF",
+      "web_catalog_id": "450212"
+    },
+    "450261": {
+      "name": "FINSTAD ENGROS AS",
+      "web_catalog_id": "450261"
+    },
+    "450268": {
+      "name": "PIACERE IMPORT AS",
+      "web_catalog_id": "450268"
+    },
+    "450270": {
+      "name": "Boråstapeter Norge",
+      "web_catalog_id": "450270"
+    },
+    "450359": {
+      "name": "Teltkongen AS",
+      "web_catalog_id": "450359"
+    },
+    "450363": {
+      "name": "Tufte Wear AS",
+      "web_catalog_id": "450363"
+    },
+    "450433": {
+      "name": "Nobia Norway AS / Norema Home",
+      "web_catalog_id": "450433"
+    },
+    "450571": {
+      "name": "Bjelin Sweden AB",
+      "web_catalog_id": "450571"
+    },
+    "450612": {
+      "name": "KYOCERA SENCO Norway AS",
+      "web_catalog_id": "450612"
+    },
+    "450633": {
+      "name": "WEDI GMBH",
+      "web_catalog_id": "450633"
+    },
+    "450674": {
+      "name": "ULTRA GROUP LTD",
+      "web_catalog_id": "450674"
+    },
+    "450819": {
+      "name": "Bestun AS",
+      "web_catalog_id": "450819"
+    },
+    "450820": {
+      "name": "Rob Arnesen AS",
+      "web_catalog_id": "450820"
+    },
+    "450822": {
+      "name": "U9Q-floors AS",
+      "web_catalog_id": "450822"
+    },
+    "450829": {
+      "name": "Char-Broil Europe GmbH Branc",
+      "web_catalog_id": "450829"
+    },
+    "450847": {
+      "name": "Maxi Import AS",
+      "web_catalog_id": "450847"
+    },
+    "450858": {
+      "name": "Hedgehog AS",
+      "web_catalog_id": "450858"
+    },
+    "450869": {
+      "name": "Emil Lux Gmbh & Co KG Polen",
+      "web_catalog_id": "450869"
+    },
+    "450920": {
+      "name": "MTD Products Nordic AB",
+      "web_catalog_id": "450920"
+    },
+    "450923": {
+      "name": "KLIMABRANDS A/S",
+      "web_catalog_id": "450923"
+    },
+    "450942": {
+      "name": "OONI GMBH",
+      "web_catalog_id": "450942"
+    },
+    "450976": {
+      "name": "KRONUS SIA",
+      "web_catalog_id": "450976"
+    },
+    "450994": {
+      "name": "GPBM Nordic AB",
+      "web_catalog_id": "450994"
+    },
+    "451001": {
+      "name": "Millarco International A/S",
+      "web_catalog_id": "451001"
+    },
+    "451018": {
+      "name": "Ecovacs Europe GMBH",
+      "web_catalog_id": "451018"
+    },
+    "451043": {
+      "name": "PROVIDA VARME AS",
+      "web_catalog_id": "451043"
+    },
+    "451074": {
+      "name": "OBI Group Sourcing GmbH",
+      "web_catalog_id": "451074"
+    },
+    "451093": {
+      "name": "Add-On AS (O-Grill)",
+      "web_catalog_id": "451093"
+    },
+    "451122": {
+      "name": "Meridian International Co. Lt",
+      "web_catalog_id": "451122"
+    },
+    "451123": {
+      "name": "Beha Target AS (USD)",
+      "web_catalog_id": "451123"
+    },
+    "451133": {
+      "name": "Quicktool AS",
+      "web_catalog_id": "451133"
+    },
+    "451139": {
+      "name": "Mill International AS",
+      "web_catalog_id": "451139"
+    },
+    "451179": {
+      "name": "3X WORKWEAR AS",
+      "web_catalog_id": "451179"
+    },
+    "451199": {
+      "name": "Metabo Sverige AB",
+      "web_catalog_id": "451199"
+    },
+    "458236": {
+      "name": "Nibu AS",
+      "web_catalog_id": "458236"
+    },
+    "465690": {
+      "name": "Ernex AS",
+      "web_catalog_id": "465690"
+    },
+    "482366": {
+      "name": "Norgips  Norge AS",
+      "web_catalog_id": "482366"
+    },
+    "494577": {
+      "name": "SAINT-GOBAIN BYGGEVARER AS",
+      "web_catalog_id": "494577"
+    },
+    "500572": {
+      "name": "Grohe AS NUF",
+      "web_catalog_id": "500572"
+    },
+    "501104": {
+      "name": "MYHRE MILJØPRODUKTER AS",
+      "web_catalog_id": "501104"
+    },
+    "501502": {
+      "name": "Fahrex AS (Tidl. Noah Garden",
+      "web_catalog_id": "501502"
+    },
+    "501545": {
+      "name": "BEWI Building & Industry AS",
+      "web_catalog_id": "501545"
+    },
+    "510631": {
+      "name": "WJ Business Partner AS",
+      "web_catalog_id": "510631"
+    },
+    "510872": {
+      "name": "Mintec Paper AS",
+      "web_catalog_id": "510872"
+    },
+    "510960": {
+      "name": "VIKING ARM AS",
+      "web_catalog_id": "510960"
+    },
+    "540143": {
+      "name": "Tarkett AB - NUF utl- uten MV",
+      "web_catalog_id": "540143"
+    },
+    "574201": {
+      "name": "TUNDØREN AS",
+      "web_catalog_id": "574201"
+    },
+    "608254": {
+      "name": "Skeisvoll & Co AS",
+      "web_catalog_id": "608254"
+    },
+    "625332": {
+      "name": "ToolMatic Norge AS",
+      "web_catalog_id": "625332"
+    },
+    "694614": {
+      "name": "Assa Abloy Opening Solutions",
+      "web_catalog_id": "694614"
+    },
+    "712817": {
+      "name": "Hyttetorget AS (Vera Miljø)",
+      "web_catalog_id": "712817"
+    },
+    "737216": {
+      "name": "Brødrene Øyo AS",
+      "web_catalog_id": "737216"
+    },
+    "750064": {
+      "name": "Hillerstorps Trä AB",
+      "web_catalog_id": "750064"
+    },
+    "750075": {
+      "name": "Hillerstorps Trä AB NOK",
+      "web_catalog_id": "750075"
+    },
+    "750208": {
+      "name": "Gust. Alberts GmbH & Co KG",
+      "web_catalog_id": "750208"
+    },
+    "751515": {
+      "name": "OMC Barbecues (Ltd UK Filial)",
+      "web_catalog_id": "751515"
+    },
+    "753131": {
+      "name": "Listo Asia Limited",
+      "web_catalog_id": "753131"
+    },
+    "753912": {
+      "name": "SIMPSON Strong-Tie A/S",
+      "web_catalog_id": "753912"
+    },
+    "754144": {
+      "name": "Schou Norge AS  ( Euro )",
+      "web_catalog_id": "754144"
+    },
+    "759192": {
+      "name": "Keter Poland Sp.Z o.o.",
+      "web_catalog_id": "759192"
+    },
+    "759572": {
+      "name": "Emil Lux Gmbh & Co KG Tysklan",
+      "web_catalog_id": "759572"
+    },
+    "759574": {
+      "name": "OBI Group Sourcing Hong Kong",
+      "web_catalog_id": "759574"
+    },
+    "761254": {
+      "name": "Jowema AB",
+      "web_catalog_id": "761254"
+    },
+    "771140": {
+      "name": "Keter Plastic LTD",
+      "web_catalog_id": "771140"
+    },
+    "771236": {
+      "name": "Hørby Bruk AB",
+      "web_catalog_id": "771236"
+    },
+    "775886": {
+      "name": "Renz AS (Tidl.Me-Fa AS)",
+      "web_catalog_id": "775886"
+    },
+    "784338": {
+      "name": "Poly Produkter AB",
+      "web_catalog_id": "784338"
+    },
+    "787015": {
+      "name": "Rørets Industri AB",
+      "web_catalog_id": "787015"
+    },
+    "4501014": {
+      "name": "KNUDSEN KILEN A/S",
+      "web_catalog_id": "4501014"
+    }
+  }
 }

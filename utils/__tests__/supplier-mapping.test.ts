@@ -16,9 +16,9 @@ import {
 describe('Supplier Mapping Utilities', () => {
   describe('getSupplierName', () => {
     it('should return correct supplier name for valid codes', () => {
-      expect(getSupplierName('10000')).toBe('Teknikk AS');
-      expect(getSupplierName('10005')).toBe('Luna Norge AS (Tidl.B&B Solut');
-      expect(getSupplierName('10007')).toBe('THERMEX SCANDINAVIA AS');
+      expect(getSupplierName('100006')).toBe('Teknikk AS');
+      expect(getSupplierName('100056')).toBe('Luna Norge AS (Tidl.B&B Solut');
+      expect(getSupplierName('100077')).toBe('THERMEX SCANDINAVIA AS');
     });
 
     it('should handle invalid codes gracefully', () => {
@@ -39,15 +39,15 @@ describe('Supplier Mapping Utilities', () => {
 
   describe('getSupplierCode', () => {
     it('should return correct codes for valid supplier names', () => {
-      expect(getSupplierCode('Teknikk AS')).toBe('10000');
-      expect(getSupplierCode('Luna Norge AS (Tidl.B&B Solut')).toBe('10005');
-      expect(getSupplierCode('THERMEX SCANDINAVIA AS')).toBe('10007');
+      expect(getSupplierCode('Teknikk AS')).toBe('100006');
+      expect(getSupplierCode('Luna Norge AS (Tidl.B&B Solut')).toBe('100056');
+      expect(getSupplierCode('THERMEX SCANDINAVIA AS')).toBe('100077');
     });
 
     it('should be case insensitive', () => {
-      expect(getSupplierCode('teknikk as')).toBe('10000');
-      expect(getSupplierCode('TEKNIKK AS')).toBe('10000');
-      expect(getSupplierCode('Teknikk AS')).toBe('10000');
+      expect(getSupplierCode('teknikk as')).toBe('100006');
+      expect(getSupplierCode('TEKNIKK AS')).toBe('100006');
+      expect(getSupplierCode('Teknikk AS')).toBe('100006');
     });
 
     it('should return null for unknown suppliers', () => {
@@ -65,9 +65,9 @@ describe('Supplier Mapping Utilities', () => {
 
   describe('hasSupplierMapping', () => {
     it('should return true for valid supplier codes', () => {
-      expect(hasSupplierMapping('10000')).toBe(true);
-      expect(hasSupplierMapping('10005')).toBe(true);
-      expect(hasSupplierMapping('10007')).toBe(true);
+      expect(hasSupplierMapping('100006')).toBe(true);
+      expect(hasSupplierMapping('100056')).toBe(true);
+      expect(hasSupplierMapping('100077')).toBe(true);
     });
 
     it('should return false for invalid codes', () => {
@@ -77,7 +77,7 @@ describe('Supplier Mapping Utilities', () => {
     });
 
     it('should handle whitespace', () => {
-      expect(hasSupplierMapping(' 10000 ')).toBe(true);
+      expect(hasSupplierMapping(' 100006 ')).toBe(true);
       expect(hasSupplierMapping('   ')).toBe(false);
     });
   });
@@ -102,7 +102,7 @@ describe('Supplier Mapping Utilities', () => {
       const codes = getAllSupplierCodes();
       expect(Array.isArray(codes)).toBe(true);
       expect(codes.length).toBeGreaterThan(0);
-      expect(codes).toContain('10000');
+      expect(codes).toContain('100006');
     });
 
     it('should return codes sorted numerically', () => {
@@ -111,18 +111,19 @@ describe('Supplier Mapping Utilities', () => {
       expect(codes).toEqual(sortedCodes);
     });
 
-    it('should contain only 5-digit codes', () => {
+    it('should contain only numeric codes', () => {
       const codes = getAllSupplierCodes();
       codes.forEach(code => {
-        expect(code).toMatch(/^\d{5}$/);
+        expect(code).toMatch(/^\d+$/);
+        expect(code.length).toBeGreaterThan(0);
       });
     });
   });
 
   describe('getDisplayName', () => {
     it('should convert codes to names', () => {
-      expect(getDisplayName('10000')).toBe('Teknikk AS');
-      expect(getDisplayName('10005')).toBe('Luna Norge AS (Tidl.B&B Solut');
+      expect(getDisplayName('100006')).toBe('Teknikk AS');
+      expect(getDisplayName('100056')).toBe('Luna Norge AS (Tidl.B&B Solut');
     });
 
     it('should return names as-is when already names', () => {
@@ -140,10 +141,9 @@ describe('Supplier Mapping Utilities', () => {
       expect(getDisplayName(undefined as any)).toBe('Unknown Supplier');
     });
 
-    it('should handle non-5-digit strings', () => {
-      expect(getDisplayName('123')).toBe('123'); // Too short
-      expect(getDisplayName('123456')).toBe('123456'); // Too long
+    it('should handle non-numeric strings', () => {
       expect(getDisplayName('ABC123')).toBe('ABC123'); // Non-numeric
+      expect(getDisplayName('Some Company Name')).toBe('Some Company Name');
     });
   });
 
@@ -177,7 +177,7 @@ describe('Supplier Mapping Utilities', () => {
 
   describe('Integration tests', () => {
     it('should have bidirectional mapping consistency', () => {
-      const testCodes = ['10000', '10005', '10007', '11403'];
+      const testCodes = ['100006', '100056', '100077', '114037'];
       
       testCodes.forEach(code => {
         const name = getSupplierName(code);
@@ -215,10 +215,10 @@ describe('Supplier Mapping Utilities', () => {
     it('should handle real supplier data from the mapping file', () => {
       // Test some known suppliers from the actual mapping
       const knownMappings = [
-        { code: '10000', name: 'Teknikk AS' },
-        { code: '11403', name: 'Løvenskiold-Handel AS' },
-        { code: '15934', name: 'Robert Bosch AS' },
-        { code: '45113', name: 'Mill International AS' }
+        { code: '100006', name: 'Teknikk AS' },
+        { code: '114037', name: 'Løvenskiold-Handel AS' },
+        { code: '159344', name: 'Robert Bosch AS' },
+        { code: '451139', name: 'Mill International AS' }
       ];
 
       knownMappings.forEach(({ code, name }) => {

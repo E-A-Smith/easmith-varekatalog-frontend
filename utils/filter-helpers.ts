@@ -206,8 +206,8 @@ export function matchesSupplierFilter(product: Product, selectedSupplier: string
     return true;
   }
 
-  // Check if selected supplier is a code and product has matching code
-  if (product.produsentKode && /^\d{5}$/.test(selectedSupplier)) {
+  // Check if selected supplier is a numeric code and product has matching code
+  if (product.produsentKode && /^\d+$/.test(selectedSupplier)) {
     return product.produsentKode === selectedSupplier;
   }
 
