@@ -5,6 +5,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// Interface for products from backend API
+interface ApiProduct {
+  id: string;
+  navn?: string;
+  lh?: string;
+  [key: string]: unknown;
+}
+
 // NO MORE MOCK DATA - All searches now use the real backend API
 
 export async function GET(request: NextRequest) {
@@ -16,7 +24,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Try to call the real backend API first
-    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
+    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
     
     if (externalApiUrl) {
       try {
@@ -46,6 +54,52 @@ export async function GET(request: NextRequest) {
         if (externalResponse.ok) {
           const externalData = await externalResponse.json();
           console.log(`[Search API] Backend returned ${externalData.results?.length || 0} products`);
+          
+          // Enhanced debug logging for LH field issues in development
+          if (process.env.NODE_ENV === 'development' && externalData.results?.length > 0) {
+            // Sample first few products for detailed analysis
+            const sampleProducts = externalData.results.slice(0, 5);
+            
+            // Count LH field statistics
+            const lhStats = {
+              total: externalData.results.length,
+              hasLH: 0,
+              emptyString: 0,
+              nullOrUndefined: 0,
+              zeroValue: 0,
+              validLH: 0
+            };
+            
+            externalData.results.forEach((product: ApiProduct) => {
+              if (product.lh) {
+                lhStats.hasLH++;
+                if (product.lh.trim() === "") {
+                  lhStats.emptyString++;
+                } else if (product.lh.trim() === "0") {
+                  lhStats.zeroValue++;
+                } else {
+                  lhStats.validLH++;
+                }
+              } else {
+                lhStats.nullOrUndefined++;
+              }
+            });
+            
+            console.log('[Search API] LH Field Analysis:', lhStats);
+            
+            // Log sample products
+            sampleProducts.forEach((product: ApiProduct, index: number) => {
+              console.log(`[Search API] Sample Product ${index + 1} LH data:`, {
+                id: product.id,
+                navn: product.navn?.substring(0, 30) + '...',
+                lh: product.lh,
+                lhType: typeof product.lh,
+                lhLength: product.lh?.length,
+                lhTrimmed: product.lh?.trim(),
+                isEmpty: !product.lh || product.lh.trim() === "" || product.lh.trim() === "0"
+              });
+            });
+          }
           
           // Transform backend response to match frontend expected format
           return NextResponse.json({
@@ -117,7 +171,7 @@ export async function POST(request: NextRequest) {
     const { query = '', filters = {}, sort = {}, limit = 50, offset = 0 } = body;
 
     // Try to call the real backend API first
-    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
+    const externalApiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
     
     if (externalApiUrl) {
       try {
@@ -147,6 +201,52 @@ export async function POST(request: NextRequest) {
         if (externalResponse.ok) {
           const externalData = await externalResponse.json();
           console.log(`[Search API] Backend returned ${externalData.results?.length || 0} products`);
+          
+          // Enhanced debug logging for LH field issues in development
+          if (process.env.NODE_ENV === 'development' && externalData.results?.length > 0) {
+            // Sample first few products for detailed analysis
+            const sampleProducts = externalData.results.slice(0, 5);
+            
+            // Count LH field statistics
+            const lhStats = {
+              total: externalData.results.length,
+              hasLH: 0,
+              emptyString: 0,
+              nullOrUndefined: 0,
+              zeroValue: 0,
+              validLH: 0
+            };
+            
+            externalData.results.forEach((product: ApiProduct) => {
+              if (product.lh) {
+                lhStats.hasLH++;
+                if (product.lh.trim() === "") {
+                  lhStats.emptyString++;
+                } else if (product.lh.trim() === "0") {
+                  lhStats.zeroValue++;
+                } else {
+                  lhStats.validLH++;
+                }
+              } else {
+                lhStats.nullOrUndefined++;
+              }
+            });
+            
+            console.log('[Search API] LH Field Analysis:', lhStats);
+            
+            // Log sample products
+            sampleProducts.forEach((product: ApiProduct, index: number) => {
+              console.log(`[Search API] Sample Product ${index + 1} LH data:`, {
+                id: product.id,
+                navn: product.navn?.substring(0, 30) + '...',
+                lh: product.lh,
+                lhType: typeof product.lh,
+                lhLength: product.lh?.length,
+                lhTrimmed: product.lh?.trim(),
+                isEmpty: !product.lh || product.lh.trim() === "" || product.lh.trim() === "0"
+              });
+            });
+          }
           
           // Transform backend response to match frontend expected format
           return NextResponse.json({

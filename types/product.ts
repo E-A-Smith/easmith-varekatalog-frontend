@@ -58,8 +58,8 @@ export interface Product {
 
   // NEW FIELDS FOR 10-COLUMN TABLE LAYOUT (Phase 1)
   
-  /** LH code (internal reference) */
-  lh: string;
+  /** LH code (internal reference) - can be null/empty when not available */
+  lh: string | null;
   
   /** NOBB reference number for external links */
   nobbNumber: string;

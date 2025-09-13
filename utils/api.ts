@@ -31,6 +31,16 @@ interface BackendProduct {
  * Transform backend product to frontend Product format (Phase 2)
  */
 function transformBackendProduct(backendProduct: BackendProduct): Product {
+  // Debug logging for LH field issues
+  if (process.env.NODE_ENV === 'development' && (!backendProduct.lh || backendProduct.lh.trim() === '')) {
+    console.warn('[API Transform] Product with empty LH field:', {
+      id: backendProduct.id,
+      navn: backendProduct.navn,
+      lh: backendProduct.lh,
+      vvsnr: backendProduct.vvsnr
+    });
+  }
+
   const product: Product = {
     id: backendProduct.id,
     navn: backendProduct.navn,
@@ -46,7 +56,9 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
       : 'Nei',
     
     // Required fields from current API format - handle null values
-    lh: backendProduct.lh || backendProduct.vvsnr || '',
+    lh: (backendProduct.lh && backendProduct.lh.trim() && backendProduct.lh.trim() !== "0") 
+      ? backendProduct.lh.trim() 
+      : null,
     nobbNumber: backendProduct.nobbNumber || backendProduct.vvsnr || '',
     pakningAntall: backendProduct.pakningAntall || 1,
     prisenhet: backendProduct.prisenhet || 'STK',
