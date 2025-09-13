@@ -12,9 +12,10 @@ Replace 5-digit supplier codes with human-readable company names in the Leverand
 
 ### Data Source
 - **File**: `docs/project/lovenskiold-supplier-mapping.json`
-- **Structure**: Maps 5-digit codes to company names and web catalog IDs
-- **Coverage**: 133 suppliers with 100% match rate
-- **Updated**: 2025-09-08
+- **Structure**: Maps numeric codes to company names and web catalog IDs
+- **Coverage**: 227 suppliers with 100% match rate (complete dataset)
+- **Code Format**: Variable length numeric codes (3-7 digits: 146, 5043, 100006, etc.)
+- **Updated**: 2025-09-12
 
 ### Technical Approach
 
@@ -66,12 +67,12 @@ Replace 5-digit supplier codes with human-readable company names in the Leverand
 
 ### Before
 ```
-Dropdown shows: "10000", "10005", "10007", ...
+Dropdown shows: "146", "5043", "100006", "100056", ...
 ```
 
 ### After  
 ```
-Dropdown shows: "Teknikk AS", "Luna Norge AS", "THERMEX SCANDINAVIA AS", ...
+Dropdown shows: "Ahlsell Norge AS", "3M Norge A/S", "Teknikk AS", "Luna Norge AS", ...
 ```
 
 ### Benefits
