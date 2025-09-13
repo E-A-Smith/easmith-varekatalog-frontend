@@ -9,13 +9,12 @@ import { QuickFilters } from '../components/search';
 import { useProductSearch } from '../hooks';
 import { useAuth } from '../hooks/useAuth';
 import { FilterState } from '../components/search/QuickFilters/types';
-import { ApiDebugPanel } from '../components/debug/ApiDebugPanel';
-import { AuthDebugPanel } from '../components/debug/AuthDebugPanel';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
 // Import filter helper utilities
-import { getUniqueSuppliers, getUniqueCategories, validateFilterValue } from '@/utils/filter-helpers';
+import { getUniqueSuppliers, getUniqueCategories, validateFilterValue, matchesSupplierFilter } from '@/utils/filter-helpers';
 import { formatNorwegianPrice } from '@/utils/formatters';
+import { displayLH, isEmptyLH } from '@/utils/display-helpers';
 
 // No default products - start with empty search results
 const catalogProducts: Product[] = [];
@@ -66,9 +65,21 @@ export default function Dashboard() {
       key: 'lh', 
       label: 'LH', 
       align: 'center' as const,
-      render: (value: unknown) => (
-        <span className="font-mono text-sm text-neutral-700">{value as string}</span>
-      )
+      render: (value: unknown) => {
+        const lhValue = value as string | null;
+        const displayValue = displayLH(lhValue);
+        const isEmpty = isEmptyLH(lhValue);
+        
+        return (
+          <span className={`font-mono text-sm ${
+            isEmpty 
+              ? "text-neutral-400 italic" 
+              : "text-neutral-700"
+          }`}>
+            {displayValue}
+          </span>
+        );
+      }
     },
     { 
       key: 'nobbNumber', 
@@ -164,12 +175,10 @@ export default function Dashboard() {
     // Temporarily disabled to debug the issue
     let filteredData = [...data]; // data.filter(product => isProduct(product));
     
-    // Filter by supplier
-    if (filterState.supplier !== 'Alle leverandører') {
-      filteredData = filteredData.filter(product => 
-        product.produsent?.toLowerCase() === filterState.supplier.toLowerCase()
-      );
-    }
+    // Filter by supplier using enhanced matching function
+    filteredData = filteredData.filter(product => 
+      matchesSupplierFilter(product, filterState.supplier)
+    );
     
     // Filter by category
     if (filterState.category !== 'Alle kategorier') {
@@ -351,13 +360,6 @@ export default function Dashboard() {
         </div>
       </div>
       
-      {/* Debug Panels - Only when devtools enabled */}
-      {process.env.NEXT_PUBLIC_ENABLE_DEVTOOLS === 'true' && (
-        <>
-          <ApiDebugPanel />
-          <AuthDebugPanel />
-        </>
-      )}
     </div>
   );
 }

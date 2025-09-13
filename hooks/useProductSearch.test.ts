@@ -66,6 +66,25 @@ describe('useProductSearch Hook', () => {
       lagerantall: 5,
       grunnpris: 28000.00,
       nettopris: 35000.00
+    },
+    // Test product with null LH field
+    {
+      id: '3',
+      navn: 'Product with missing LH',
+      vvsnr: '43000001',
+      lagerstatus: 'Utsolgt',
+      anbrekk: 'Ja',
+      produsent: 'Test Supplier',
+      kategori: 'Sikkerhet',
+      beskrivelse: 'Product for testing null LH field',
+      // LH field is null to test empty value handling
+      lh: null,
+      nobbNumber: '43000001',
+      pakningAntall: 1,
+      prisenhet: 'STK',
+      lagerantall: null,
+      grunnpris: null,
+      nettopris: null
     }
   ];
   

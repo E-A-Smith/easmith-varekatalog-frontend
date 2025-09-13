@@ -4,6 +4,7 @@
  */
 
 import { Product, ProductSearchQuery, isProductCategory, type ProductCategory } from '@/types/product';
+import { getSupplierName, hasSupplierMapping } from '@/utils/supplier-mapping';
 
 // Current API response format
 interface BackendProduct {
@@ -30,6 +31,16 @@ interface BackendProduct {
  * Transform backend product to frontend Product format (Phase 2)
  */
 function transformBackendProduct(backendProduct: BackendProduct): Product {
+  // Debug logging for LH field issues
+  if (process.env.NODE_ENV === 'development' && (!backendProduct.lh || backendProduct.lh.trim() === '')) {
+    console.warn('[API Transform] Product with empty LH field:', {
+      id: backendProduct.id,
+      navn: backendProduct.navn,
+      lh: backendProduct.lh,
+      vvsnr: backendProduct.vvsnr
+    });
+  }
+
   const product: Product = {
     id: backendProduct.id,
     navn: backendProduct.navn,
@@ -45,7 +56,9 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
       : 'Nei',
     
     // Required fields from current API format - handle null values
-    lh: backendProduct.lh || backendProduct.vvsnr || '',
+    lh: (backendProduct.lh && backendProduct.lh.trim() && backendProduct.lh.trim() !== "0") 
+      ? backendProduct.lh.trim() 
+      : null,
     nobbNumber: backendProduct.nobbNumber || backendProduct.vvsnr || '',
     pakningAntall: backendProduct.pakningAntall || 1,
     prisenhet: backendProduct.prisenhet || 'STK',
@@ -58,7 +71,19 @@ function transformBackendProduct(backendProduct: BackendProduct): Product {
 
   // Optional fields - only add if they exist in the API response
   if (backendProduct.produsent) {
-    product.produsent = backendProduct.produsent;
+    // Check if produsent is a numeric code that needs mapping
+    if (/^\d+$/.test(backendProduct.produsent.trim()) && hasSupplierMapping(backendProduct.produsent)) {
+      // Store original code and map to display name
+      product.produsentKode = backendProduct.produsent;
+      product.produsent = getSupplierName(backendProduct.produsent);
+    } else {
+      // Already a name or unmapped code, use as-is
+      product.produsent = backendProduct.produsent;
+      // If it looks like a numeric code but isn't mapped, store it as the code
+      if (/^\d+$/.test(backendProduct.produsent.trim())) {
+        product.produsentKode = backendProduct.produsent;
+      }
+    }
   }
   
   if (backendProduct.beskrivelse) {

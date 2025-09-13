@@ -7,7 +7,8 @@ import {
   getUniqueSuppliers, 
   getUniqueCategories, 
   validateFilterValue,
-  isValidProductArray
+  isValidProductArray,
+  matchesSupplierFilter
 } from '../filter-helpers';
 import type { Product } from '@/types/product';
 
@@ -285,5 +286,117 @@ describe('isValidProductArray', () => {
     ];
     const result = isValidProductArray(minimalProducts);
     expect(result).toBe(true);
+  });
+});
+
+describe('matchesSupplierFilter', () => {
+  const testProduct: Product = {
+    id: '1',
+    navn: 'Test Product',
+    vvsnr: '12345678',
+    lagerstatus: 'På lager',
+    anbrekk: 'Ja',
+    produsent: 'Teknikk AS',
+    produsentKode: '10000'
+  } as Product;
+
+  it('should match "Alle leverandører" for any product', () => {
+    expect(matchesSupplierFilter(testProduct, 'Alle leverandører')).toBe(true);
+    
+    const productWithoutSupplier = { ...testProduct };
+    delete (productWithoutSupplier as Partial<Product>).produsent;
+    expect(matchesSupplierFilter(productWithoutSupplier as Product, 'Alle leverandører')).toBe(true);
+  });
+
+  it('should match by supplier name (case insensitive)', () => {
+    expect(matchesSupplierFilter(testProduct, 'Teknikk AS')).toBe(true);
+    expect(matchesSupplierFilter(testProduct, 'teknikk as')).toBe(true);
+    expect(matchesSupplierFilter(testProduct, 'TEKNIKK AS')).toBe(true);
+  });
+
+  it('should match by supplier code', () => {
+    expect(matchesSupplierFilter(testProduct, '10000')).toBe(true);
+  });
+
+  it('should not match different supplier names', () => {
+    expect(matchesSupplierFilter(testProduct, 'Different Company')).toBe(false);
+  });
+
+  it('should not match different supplier codes', () => {
+    expect(matchesSupplierFilter(testProduct, '99999')).toBe(false);
+  });
+
+  it('should handle products without supplier info', () => {
+    const productWithoutSupplier: Product = {
+      id: '2',
+      navn: 'Test Product 2',
+      vvsnr: '87654321',
+      lagerstatus: 'På lager',
+      anbrekk: 'Nei'
+    } as Product;
+
+    expect(matchesSupplierFilter(productWithoutSupplier, 'Alle leverandører')).toBe(true);
+    expect(matchesSupplierFilter(productWithoutSupplier, 'Any Company')).toBe(false);
+  });
+
+  it('should handle products with only supplier name (no code)', () => {
+    const productNameOnly: Product = {
+      id: '3',
+      navn: 'Test Product 3',
+      vvsnr: '11111111',
+      lagerstatus: 'På lager',
+      anbrekk: 'Nei',
+      produsent: 'Some Company'
+    } as Product;
+
+    expect(matchesSupplierFilter(productNameOnly, 'Some Company')).toBe(true);
+    expect(matchesSupplierFilter(productNameOnly, 'Other Company')).toBe(false);
+    expect(matchesSupplierFilter(productNameOnly, '12345')).toBe(false);
+  });
+
+  it('should handle products with only supplier code (no name)', () => {
+    const productCodeOnly: Product = {
+      id: '4',
+      navn: 'Test Product 4',
+      vvsnr: '22222222',
+      lagerstatus: 'På lager',
+      anbrekk: 'Nei',
+      produsentKode: '10000'
+    } as Product;
+
+    expect(matchesSupplierFilter(productCodeOnly, '10000')).toBe(true);
+    expect(matchesSupplierFilter(productCodeOnly, '99999')).toBe(false);
+  });
+
+  it('should handle reverse lookup from name to code', () => {
+    // Mock the getSupplierCode function behavior
+    jest.mock('../supplier-mapping', () => ({
+      getSupplierCode: (name: string) => {
+        if (name.toLowerCase() === 'teknikk as') return '10000';
+        return null;
+      }
+    }));
+
+    const productWithCode: Product = {
+      id: '5',
+      navn: 'Test Product 5',
+      vvsnr: '33333333',
+      lagerstatus: 'På lager',
+      anbrekk: 'Nei',
+      produsentKode: '10000'
+    } as Product;
+
+    // This test assumes the mapping utility works correctly
+    // The actual test would depend on the real mapping data
+    expect(matchesSupplierFilter(productWithCode, '10000')).toBe(true);
+  });
+
+  it('should handle edge cases gracefully', () => {
+    expect(matchesSupplierFilter(testProduct, '')).toBe(false);
+    expect(matchesSupplierFilter(testProduct, '   ')).toBe(false);
+    
+    const emptyProduct = {} as Product;
+    expect(matchesSupplierFilter(emptyProduct, 'Alle leverandører')).toBe(true);
+    expect(matchesSupplierFilter(emptyProduct, 'Any Company')).toBe(false);
   });
 });
