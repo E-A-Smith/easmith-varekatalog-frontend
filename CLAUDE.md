@@ -131,8 +131,8 @@ aws amplify update-branch --app-id APP_ID --branch-name develop \
 ```bash
 NEXT_PUBLIC_API_BASE_URL=/api
 NEXT_PUBLIC_REGION=eu-west-1
-NEXT_PUBLIC_COGNITO_CLIENT_ID=vuuc11qdf11tnst6i3c7fhc6p
-NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
+NEXT_PUBLIC_COGNITO_CLIENT_ID=7cks2b6l1num5l0l7l4l43pi5j
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
 ```
 
 **AWS Amplify**: Configure variables directly in Amplify Console (branch-specific)
@@ -158,4 +158,28 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_EIDmPWkK2
 ---
 
 **Deployment**: AWS Amplify (`develop` branch → https://develop.d226fk1z311q90.amplifyapp.com/)
-**Related**: Backend at `/home/rydesp/dev/varekatalog/` (infrastructure, Lambda functions)
+**Related**: Backend at `/home/rydesp/dev/easmith-varekatalog-backend/` (infrastructure, Lambda functions)
+
+---
+
+## 🔄 Infrastructure Status (September 16, 2025)
+
+**✅ UPDATED - Backend Recreation Complete:**
+- All AWS resource IDs changed due to backend stack recreation
+- Frontend environment variables updated with new values
+- Azure AD identity provider configured in new Cognito User Pool
+- Authentication flow restored (pending Azure AD team redirect URI update)
+
+**Current Infrastructure:**
+- **API Gateway**: `ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com`
+- **Cognito Domain**: `eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com`
+- **User Pool**: `eu-west-1_M2S9MdjJj`
+- **Client**: `7cks2b6l1num5l0l7l4l43pi5j`
+- **Amplify**: `d226fk1z311q90.amplifyapp.com`
+
+**OpenSearch Infrastructure:**
+- **Domain Name**: `eas-dev-varekatalog`
+- **Domain Endpoint**: `search-eas-dev-varekatalog-3krcwwbqhnaakuc262vionkxl4.eu-west-1.es.amazonaws.com`
+- **Index Name**: `eas-varekatalog-products`
+- **Instance Type**: t3.small.elasticsearch (1 instance)
+- **Features**: Full-text search, faceted search, Norwegian product catalogs

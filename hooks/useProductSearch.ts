@@ -1,6 +1,10 @@
 /**
  * Product search hook for Varekatalog
- * Step 2.2: Enhanced with comprehensive TypeScript types system
+ *
+ * Interfaces with OpenSearch-powered backend search API:
+ * - OpenSearch Domain: eas-dev-varekatalog
+ * - Index: eas-varekatalog-products
+ * - Features: Full-text search, VVS-nummer lookup, Norwegian language support
  */
 
 'use client';
@@ -65,7 +69,8 @@ export const useProductSearch = (accessToken?: string) => {
         sortering: 'relevans'
       };
 
-      // Call real API with authentication token
+      // Call backend search API - queries OpenSearch domain eas-dev-varekatalog
+      // Index: eas-varekatalog-products
       const products = await apiClient.searchProducts(searchQuery, accessToken);
 
       setSearchState(prev => ({
@@ -92,13 +97,17 @@ export const useProductSearch = (accessToken?: string) => {
             errorMessage = 'API krever autentisering - logg inn for å søke etter produkter';
           }
         } else if (error.message.includes('Search Failed')) {
-          errorMessage = 'Backend søkefeil - OpenSearch konfigurasjonsproblem';
+          errorMessage = 'OpenSearch søkefeil - indeks eas-varekatalog-products utilgjengelig';
         } else if (error.message.includes('Network error')) {
           errorMessage = 'Nettverksfeil - kan ikke nå API';
         } else if (error.message.includes('timeout')) {
-          errorMessage = 'API timeout - prøv igjen';
+          errorMessage = 'OpenSearch timeout - prøv igjen';
         } else if (error.message.includes('illegal_argument_exception') || error.message.includes('fielddata=true')) {
-          errorMessage = 'Backend OpenSearch konfigurasjonsfeil - feltdata må aktiveres for sortering';
+          errorMessage = 'OpenSearch konfigurasjonfeil - feltdata må aktiveres for sortering på domene eas-dev-varekatalog';
+        } else if (error.message.includes('index_not_found_exception')) {
+          errorMessage = 'OpenSearch indeks eas-varekatalog-products ikke funnet';
+        } else if (error.message.includes('search_phase_execution_exception')) {
+          errorMessage = 'OpenSearch spørringsfel - ugyldig søkeparametere';
         } else {
           errorMessage = `API feil: ${error.message}`;
         }

@@ -168,6 +168,7 @@ export async function POST(request: NextRequest) {
   try {
     // const startTime = Date.now(); // TODO: Add performance timing
     const body = await request.json();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { query = '', filters = {}, sort = {}, limit = 50, offset = 0 } = body;
 
     // Try to call the real backend API first

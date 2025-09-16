@@ -5,7 +5,6 @@ import { Button } from '../../components/ui';
 import { Loader, Check, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { apiClient } from '@/utils/api';
-import type { OAuthScope } from '@/types/product';
 
 // API status checking interface
 interface ApiStatus {
@@ -27,6 +26,58 @@ interface DebugInfo {
   baseUrl: string;
   healthCheck: DebugStatus;
   searchTest: DebugStatus;
+}
+
+// Client-only component to avoid hydration mismatch
+function BrowserInfo() {
+  const [userAgent, setUserAgent] = useState('Loading...');
+
+  useEffect(() => {
+    setUserAgent(navigator.userAgent.split(' ')[0]);
+  }, []);
+
+  return (
+    <span className="text-sm text-neutral-800">
+      {userAgent}
+    </span>
+  );
+}
+
+// Client-only component for screen resolution
+function ScreenResolution() {
+  const [resolution, setResolution] = useState('Loading...');
+
+  useEffect(() => {
+    setResolution(`${window.screen.width}x${window.screen.height}`);
+  }, []);
+
+  return (
+    <span className="text-sm text-neutral-800">
+      {resolution}
+    </span>
+  );
+}
+
+// Client-only component for viewport size
+function ViewportSize() {
+  const [viewport, setViewport] = useState('Loading...');
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setViewport(`${window.innerWidth}x${window.innerHeight}`);
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
+
+  return (
+    <span className="text-sm text-neutral-800">
+      {viewport}
+    </span>
+  );
 }
 
 export default function ApiStatusPage() {
@@ -287,27 +338,15 @@ export default function ApiStatusPage() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm font-medium text-neutral-600">Browser:</span>
-                <span className="text-sm text-neutral-800">
-                  {typeof window !== 'undefined' ? navigator.userAgent.split(' ')[0] : 'SSR'}
-                </span>
+                <BrowserInfo />
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-medium text-neutral-600">Oppløsning:</span>
-                <span className="text-sm text-neutral-800">
-                  {typeof window !== 'undefined' 
-                    ? `${window.screen.width}x${window.screen.height}` 
-                    : '—'
-                  }
-                </span>
+                <ScreenResolution />
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-medium text-neutral-600">Viewport:</span>
-                <span className="text-sm text-neutral-800">
-                  {typeof window !== 'undefined' 
-                    ? `${window.innerWidth}x${window.innerHeight}` 
-                    : '—'
-                  }
-                </span>
+                <ViewportSize />
               </div>
             </div>
           </div>
