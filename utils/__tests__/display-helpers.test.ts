@@ -8,7 +8,7 @@ describe('Display Helper Utilities', () => {
   describe('displayLH', () => {
     test('should return "N/A" for null or undefined values', () => {
       expect(displayLH(null)).toBe('N/A');
-      expect(displayLH(undefined as string | null)).toBe('N/A');
+      expect(displayLH(undefined as unknown as string | null)).toBe('N/A');
     });
 
     test('should return "N/A" for empty string', () => {

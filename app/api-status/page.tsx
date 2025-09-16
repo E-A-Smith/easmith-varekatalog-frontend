@@ -33,7 +33,7 @@ function BrowserInfo() {
   const [userAgent, setUserAgent] = useState('Loading...');
 
   useEffect(() => {
-    setUserAgent(navigator.userAgent.split(' ')[0]);
+    setUserAgent(navigator.userAgent.split(' ')[0] || 'Unknown');
   }, []);
 
   return (
