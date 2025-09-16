@@ -71,3 +71,4 @@ pids/
 .playwright-mcp/
 test-results/
 playwright-report/
+.mcp.json

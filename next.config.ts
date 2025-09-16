@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     domains: [
       'api-dev.varekatalog.byggern.no',  // Legacy API domain
-      'y53p9uarcj.execute-api.eu-west-1.amazonaws.com'  // AWS API Gateway
+      'ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com'  // AWS API Gateway
     ],
   },
 
@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-dev.varekatalog.byggern.no https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com https://*.amazonaws.com https://*.amazoncognito.com; frame-ancestors 'none';"
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-dev.varekatalog.byggern.no https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com https://*.amazonaws.com https://*.amazoncognito.com; frame-ancestors 'none';"
           }
         ]
       }

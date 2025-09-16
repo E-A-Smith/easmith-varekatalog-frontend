@@ -58,12 +58,12 @@ const REQUIRED_VARS = [
   {
     name: 'NEXT_PUBLIC_COGNITO_CLIENT_ID',
     description: 'AWS Cognito User Pool Client ID',
-    example: 'vuuc11qdf11tnst6i3c7fhc6p'
+    example: '7cks2b6l1num5l0l7l4l43pi5j'
   },
   {
     name: 'NEXT_PUBLIC_COGNITO_USER_POOL_ID',
     description: 'AWS Cognito User Pool ID',
-    example: 'eu-west-1_EIDmPWkK2'
+    example: 'eu-west-1_M2S9MdjJj'
   },
   {
     name: 'NEXT_PUBLIC_OAUTH_SCOPES',

@@ -51,7 +51,7 @@ const ENVIRONMENT_SCHEMA: EnvironmentSchema[] = [
     required: true,
     environments: ['development', 'production'],
     pattern: /^[a-z0-9]{26}$/,
-    example: 'vuuc11qdf11tnst6i3c7fhc6p'
+    example: '7cks2b6l1num5l0l7l4l43pi5j'
   },
   {
     name: 'NEXT_PUBLIC_COGNITO_USER_POOL_ID',
@@ -59,7 +59,7 @@ const ENVIRONMENT_SCHEMA: EnvironmentSchema[] = [
     required: true,
     environments: ['development', 'production'],
     pattern: /^[a-z]{2}-[a-z]+-\d_[A-Za-z0-9]{9}$/,
-    example: 'eu-west-1_EIDmPWkK2'
+    example: 'eu-west-1_M2S9MdjJj'
   },
 
 
