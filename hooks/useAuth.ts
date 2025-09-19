@@ -250,9 +250,9 @@ export const useAuth = (): AuthContext => {
           scope: authConfig.scopes.join(' '),
           state: state,
           code_challenge: codeChallenge,
-          code_challenge_method: 'S256',
-          // Force Azure AD login through Cognito
-          identity_provider: 'AzureAD'
+          code_challenge_method: 'S256'
+          // TODO: Temporarily disabled to test basic Cognito auth
+          // identity_provider: 'AzureAD'
         });
 
         const authUrl = `${authConfig.authorizationUrl}?${authParams.toString()}`;
