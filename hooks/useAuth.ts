@@ -272,6 +272,11 @@ export const useAuth = (): AuthContext => {
         console.log('URL Length:', authUrl.length);
         console.groupEnd();
 
+        // TEMPORARY: Also show alert for debugging
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+          alert(`DEBUG INFO:\nDomain: ${authConfig.cognitoDomain}\nClient: ${authConfig.clientId}\nRedirect: ${authConfig.redirectUri}\nURL Length: ${authUrl.length}`);
+        }
+
         // Redirect to Cognito Hosted UI
         window.location.href = authUrl;
       }).catch(error => {
