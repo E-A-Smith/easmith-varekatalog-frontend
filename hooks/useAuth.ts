@@ -41,7 +41,7 @@ interface AuthContext {
 // Cognito OAuth configuration (correct architecture)
 const authConfig = {
   // Cognito OAuth domain (from backend configuration)
-  cognitoDomain: process.env.NEXT_PUBLIC_COGNITO_DOMAIN || 'varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com',
+  cognitoDomain: process.env.NEXT_PUBLIC_COGNITO_DOMAIN || '',
   clientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
   
   // OAuth scopes (Cognito resource server scopes)
