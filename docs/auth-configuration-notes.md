@@ -27,7 +27,7 @@
 NEXT_PUBLIC_API_BASE_URL=https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com/dev
 NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_GggkvCmcK
 NEXT_PUBLIC_COGNITO_CLIENT_ID=58hle80tfmljv7rbmf9o4tfmsf
-NEXT_PUBLIC_COGNITO_DOMAIN=varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
+NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
 ```
 
 ### Code Changes Made
@@ -46,5 +46,5 @@ NEXT_PUBLIC_COGNITO_DOMAIN=varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
 
 ### ⏳ Remaining Azure AD Team Action
 **Required Update:** Add redirect URIs to Azure AD application `31fc9aa9-223e-4bc5-a371-7b0d56a13075`:
-- `https://varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com/oauth2/idpresponse`
+- `https://eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com/oauth2/idpresponse`
 - `https://develop.d226fk1z311q90.amplifyapp.com/auth/callback`

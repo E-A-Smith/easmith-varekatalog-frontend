@@ -192,12 +192,45 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
 - Authentication flow fully functional with enterprise Azure AD integration
 - Cognito domain aligned with existing Azure AD redirect URI configuration
 
+**✅ COMPLETED - Infrastructure Cleanup (September 19, 2025):**
+- DEV user pool renamed to match architecture documentation (`eas-varekatalog-users-dev`)
+- Duplicate PROD user pool removed (`eu-west-1_AxAujtTCJ`)
+- OAuth scopes verified and aligned across both environments
+- Production Cognito configuration fully documented
+
+**✅ COMPLETED - Authentication Fix (September 19, 2025):**
+- **CRITICAL**: Fixed `SupportedIdentityProviders` configuration in both environments
+- DEV: Changed from `null` to `["AzureAD"]`
+- PROD: Changed from `["COGNITO"]` to `["AzureAD"]`
+- Root cause: Cognito clients were not configured to redirect to Azure AD identity provider
+- Authentication flow now works correctly with Azure AD OIDC integration
+
+**✅ VERIFIED - Authentication Success (September 19, 2025):**
+- **DEV**: https://develop.d226fk1z311q90.amplifyapp.com/ - Authentication working ✅
+- **PROD**: https://main.d1bvibntd0i61j.amplifyapp.com/ - Authentication working ✅
+- **PROD Environment Variables**: Configured missing Amplify env vars for PROD
+- **Azure AD Integration**: Both environments successfully authenticating via Azure AD OIDC
+- **All component names verified and documented accurately**
+
+**✅ CORRECTED - API Gateway Configuration (September 19, 2025):**
+- **CRITICAL FIX**: DEV API Gateway corrected from non-existent `ruy0f0pr6j` to working `28svlvit82`
+- **DEV Environment Variables**: Updated Amplify and local config with correct API Gateway ID
+- **Documentation Alignment**: All CLAUDE.md files and system architecture updated with verified IDs
+- **Component Names**: 100% accuracy achieved across all documentation
+
 **Current Infrastructure:**
-- **API Gateway**: `ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com`
+- **API Gateway**: `28svlvit82.execute-api.eu-west-1.amazonaws.com/dev` (varekatalog-api-dev) ✅ CORRECTED
 - **Cognito Domain**: `eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com`
-- **User Pool**: `eu-west-1_GggkvCmcK` (varekatalog-users-dev)
+- **User Pool**: `eu-west-1_GggkvCmcK` (eas-varekatalog-users-dev)
 - **Client**: `58hle80tfmljv7rbmf9o4tfmsf` (varekatalog-client-dev)
 - **Amplify**: `d226fk1z311q90.amplifyapp.com`
+
+**PRODUCTION Infrastructure:**
+- **API Gateway**: `17lf5fwwik.execute-api.eu-west-1.amazonaws.com/prod` (production)
+- **Cognito Domain**: `eas-varekatalog-auth-prod.auth.eu-west-1.amazoncognito.com`
+- **User Pool**: `eu-west-1_Y9lANGJGs` (eas-varekatalog-users-prod)
+- **Client**: `3jur7ub2mvai5ar5969i3bmum1` (eas-varekatalog-client-prod)
+- **Amplify**: `d1bvibntd0i61j.amplifyapp.com`
 
 **Azure AD Integration:**
 - **Client ID**: `31fc9aa9-223e-4bc5-a371-7b0d56a13075`
