@@ -23,11 +23,11 @@
 
 ### Environment Variables Updated
 ```bash
-# NEW VALUES (September 15, 2025)
+# LATEST VALUES (September 19, 2025) - Backend Recreation Complete
 NEXT_PUBLIC_API_BASE_URL=https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com/dev
-NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
-NEXT_PUBLIC_COGNITO_CLIENT_ID=7cks2b6l1num5l0l7l4l43pi5j
-NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_GggkvCmcK
+NEXT_PUBLIC_COGNITO_CLIENT_ID=58hle80tfmljv7rbmf9o4tfmsf
+NEXT_PUBLIC_COGNITO_DOMAIN=varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
 ```
 
 ### Code Changes Made
@@ -37,7 +37,14 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
   - September 16: Re-enabled `identity_provider: 'AzureAD'` (Identity provider configured)
 - **Current Status:** AzureAD identity provider active, pending Azure team redirect URI update
 
+### ✅ COMPLETED (September 19, 2025) - Full Azure AD Integration Restored
+**Azure AD OIDC Identity Provider Successfully Configured:**
+1. ✅ Created AzureAD OIDC identity provider in new Cognito User Pool (eu-west-1_GggkvCmcK)
+2. ✅ Updated User Pool Client to support both COGNITO and AzureAD providers
+3. ✅ Re-enabled `identity_provider: 'AzureAD'` in useAuth.ts
+4. ✅ Stored Azure AD client secret securely in AWS Systems Manager Parameter Store
+
 ### ⏳ Remaining Azure AD Team Action
 **Required Update:** Add redirect URIs to Azure AD application `31fc9aa9-223e-4bc5-a371-7b0d56a13075`:
-- `https://eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com/oauth2/idpresponse`
+- `https://varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com/oauth2/idpresponse`
 - `https://develop.d226fk1z311q90.amplifyapp.com/auth/callback`
