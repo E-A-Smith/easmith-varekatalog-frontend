@@ -8,75 +8,72 @@
 
 'use client';
 
-import { FC, useState } from 'react';
-import { ChevronDown, Zap } from 'lucide-react';
+import { FC, useState, useEffect, useMemo } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
+import { validateFilterValue } from '@/utils/filter-helpers';
 
 export const QuickFilters: FC<QuickFiltersProps> = ({
-  totalItems = 0,
   onFiltersChange,
-  className
+  className,
+  supplierOptions,
+  categoryOptions,
+  filters: controlledFilters,
+  onFiltersReset
 }) => {
-  const [filters, setFilters] = useState<FilterState>({
+  // Use controlled filters if provided, otherwise use internal state
+  const [internalFilters, setInternalFilters] = useState<FilterState>({
     supplier: 'Alle leverandører',
-    category: 'Alle kategorier', 
+    category: 'Alle kategorier',
     stock: 'Alle'
   });
+  
+  const filters = controlledFilters || internalFilters;
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-    onFiltersChange?.(newFilters);
+    
+    if (controlledFilters) {
+      // In controlled mode, just notify parent
+      onFiltersChange?.(newFilters);
+    } else {
+      // In uncontrolled mode, update internal state
+      setInternalFilters(newFilters);
+      onFiltersChange?.(newFilters);
+    }
   };
 
-  // Supplier options based on Norwegian building supplies market
-  const supplierOptions = [
-    'Alle leverandører',
-    'Biltema',
-    'Würth', 
-    'Bostik',
-    'DeWalt',
-    'Essve',
-    'Flügger',
-    'Glava',
-    'Gyproc',
-    'Rockwool',
-    'Uponor',
-    'Tarkett',
-    '3M',
-    'Roto',
-    'Mapei',
-    'Monier',
-    'Nexans'
-  ];
+  // Use dynamic options or fallback to default options (memoized to prevent useEffect re-runs)
+  const currentSupplierOptions = useMemo(() => 
+    supplierOptions || ['Alle leverandører'], 
+    [supplierOptions]
+  );
+  const currentCategoryOptions = useMemo(() => 
+    categoryOptions || ['Alle kategorier'], 
+    [categoryOptions]
+  );
+  
+  // Validate current filter values against available options
+  useEffect(() => {
+    const validatedSupplier = validateFilterValue(filters.supplier, currentSupplierOptions);
+    const validatedCategory = validateFilterValue(filters.category, currentCategoryOptions);
+    
+    if (validatedSupplier !== filters.supplier || validatedCategory !== filters.category) {
+      const resetFilters = {
+        ...filters,
+        supplier: validatedSupplier,
+        category: validatedCategory
+      };
+      
+      if (controlledFilters && onFiltersReset) {
+        onFiltersReset(resetFilters);
+      } else {
+        setInternalFilters(resetFilters);
+        onFiltersChange?.(resetFilters);
+      }
+    }
+  }, [currentSupplierOptions, currentCategoryOptions, filters, controlledFilters, onFiltersReset, onFiltersChange]);
 
-  // Category options for Norwegian building supplies
-  const categoryOptions = [
-    'Alle kategorier',
-    'Sikkerhet',
-    'Beslag', 
-    'Festing',
-    'Skruer og bolter',
-    'Byggematerialer',
-    'Isolasjon',
-    'Rør og koblingsutstyr',
-    'Elektro',
-    'Gulv',
-    'Vindus- og dørbeslag',
-    'Lim og fugemasse',
-    'Takmateriell',
-    'Ventilasjon',
-    'Verktøy',
-    'Maling og lakk'
-  ];
-
-  const stockOptions = [
-    'Alle',
-    'På lager',
-    'Få igjen', 
-    'Utsolgt',
-    'Bestillingsvare'
-  ];
 
 
   return (
@@ -87,14 +84,13 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
       px-6
       ${className || ''}
     `}>
-      {/* Left side: Lightning icon and filter dropdowns */}
+      {/* Left side: Filter dropdowns */}
       <div className="flex items-center gap-3">
-        {/* Lightning bolt icon */}
-        <Zap className="w-4 h-4 text-byggern-orange" />
-        
         {/* Supplier Filter */}
         <div className="relative">
           <select
+            id="supplier-filter"
+            name="supplier"
             value={filters.supplier}
             onChange={(e) => handleFilterChange('supplier', e.target.value)}
             className="
@@ -107,67 +103,42 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
               transition-colors duration-150
             "
           >
-            {supplierOptions.map(option => (
+            {currentSupplierOptions.map(option => (
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
           <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
         </div>
 
-        {/* Category Filter */}
-        <div className="relative">
-          <select
-            value={filters.category}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-            className="
-              appearance-none bg-transparent
-              text-sm font-medium text-neutral-700
-              pr-6 pl-1 py-1
-              border-none outline-none
-              cursor-pointer
-              hover:text-byggern-blue
-              transition-colors duration-150
-            "
-          >
-            {categoryOptions.map(option => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
-        </div>
+        {/* Category Filter - Hidden for now, will be implemented properly later */}
+        {false && (
+          <div className="relative">
+            <select
+              id="category-filter"
+              name="category"
+              value={filters.category}
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+              className="
+                appearance-none bg-transparent
+                text-sm font-medium text-neutral-700
+                pr-6 pl-1 py-1
+                border-none outline-none
+                cursor-pointer
+                hover:text-byggern-blue
+                transition-colors duration-150
+              "
+            >
+              {currentCategoryOptions.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
+          </div>
+        )}
 
-        {/* Stock Filter */}
-        <div className="relative">
-          <select
-            value={filters.stock}
-            onChange={(e) => handleFilterChange('stock', e.target.value)}
-            className="
-              appearance-none bg-transparent
-              text-sm font-medium text-neutral-700
-              pr-6 pl-1 py-1
-              border-none outline-none
-              cursor-pointer
-              hover:text-byggern-blue
-              transition-colors duration-150
-            "
-          >
-            {stockOptions.map(option => (
-              <option key={option} value={option}>
-                Lager: {option}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
-        </div>
 
       </div>
 
-      {/* Right side: Item count */}
-      <div className="flex items-center">
-        <span className="text-sm text-neutral-600 font-medium">
-          {totalItems.toLocaleString('no-NO')} produkter
-        </span>
-      </div>
     </div>
   );
 };

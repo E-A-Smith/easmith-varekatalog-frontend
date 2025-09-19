@@ -1,58 +1,52 @@
-# CLAUDE.md - Varekatalog Frontend Developer Quick Reference
+# CLAUDE.md
 
 **Easmith Varekatalog Frontend** - Next.js 15+ TypeScript application for Byggern retail chain's digital product catalog.
 
-## 📋 Repository Structure
-
-This is a **standalone frontend repository** extracted from the main varekatalog monorepo at `/home/rydesp/dev/varekatalog/`.
-
-**Original Location**: `/home/rydesp/dev/varekatalog/src/frontend/`  
-**New Location**: `/home/rydesp/dev/easmith-varekatalog-frontend/` (this repository)
-
-## 🚀 Development Essentials
-
-**Live Environment:**
-- DEV: https://develop.d23xt6r6u1pris.amplifyapp.com/
-- Branch: develop (auto-deploy enabled via AWS Amplify)
-
-**Documentation References:**
-- **🏗️ SYSTEM ARCHITECTURE**: See main repo `/docs/architecture/varekatalog-system-architecture.md`
-- **📋 BUSINESS REQUIREMENTS**: See main repo `/docs/project/product-manager-output.md` 
-- **🎨 DESIGN SYSTEM**: See main repo `/docs/design/` - UI/UX specifications, brand guidelines, component designs
-
-## ⚡ Quick Commands
+## 🚀 Essential Commands
 
 ```bash
-npm run dev         # Development server
-npm run build       # Production build
-npm run start       # Start production server
-npm run type-check  # TypeScript validation
-npm run lint        # ESLint check
-npm run test        # Run tests (Jest + React Testing Library)
-
-# Build validation script
-./scripts/validate-build.sh           # Full validation
-./scripts/validate-build.sh --help    # See all options
+./scripts/start-dev.sh           # PREFERRED: Development server (handles port conflicts)
+npm run build                    # Production build
+npm run type-check              # TypeScript validation (strict mode)
+npm run lint                    # ESLint check
+npm test                        # Run all tests
+./scripts/validate-build.sh     # Full validation pipeline
+tree -I 'node_modules|.next|.git' -L 3  # Repository overview
 ```
+
+## 🏗️ Architecture
+
+**Tech Stack**: Next.js 15 + React 19 + TypeScript 5 + Tailwind CSS v4 + SWR + Zustand
+
+**Structure**:
+- `app/` - Next.js App Router (Norwegian locale), API routes, auth callbacks
+- `components/` - Atomic design: ui/, layout/, search/, auth/
+- `hooks/` - useProductSearch, useApiStatus, useAuth (OAuth 2.0 + PKCE)
+- `types/` - TypeScript definitions (Norwegian product model)
+- `utils/` - API client with error handling
+
+**Authentication**: AWS Cognito OAuth 2.0 + PKCE, Azure AD integration, JWT Bearer tokens
 
 ## 🔧 Critical Configuration
 
-**PostCSS Config (EXACT):**
+**PostCSS (Required for Tailwind v4)**:
 ```javascript
 // postcss.config.mjs
 const config = { plugins: ["@tailwindcss/postcss"] };
 ```
 
-**TypeScript Strict (REQUIRED):**
+**TypeScript (Ultra-Strict)**:
 ```json
 {
   "strict": true,
   "exactOptionalPropertyTypes": true,
-  "noUncheckedIndexedAccess": true
+  "noUncheckedIndexedAccess": true,
+  "noImplicitReturns": true,
+  "noFallthroughCasesInSwitch": true
 }
 ```
 
-**Path Aliases:**
+**Path Aliases**:
 ```typescript
 @/*           -> ./*
 @/components  -> ./components
@@ -61,72 +55,137 @@ const config = { plugins: ["@tailwindcss/postcss"] };
 @/utils       -> ./utils
 ```
 
-## 🚨 FORBIDDEN Practices
-- ❌ `any` types (use proper TypeScript)
-- ❌ Inline styles (use Tailwind classes)
-- ❌ Components over 200 lines
-- ❌ --turbopack flag (incompatible with Tailwind v4)
-- ❌ console.log in production
+## 🚨 FORBIDDEN / ✅ MANDATORY
 
-## ✅ MANDATORY Practices
-- ✅ TypeScript strict mode
-- ✅ Export barrel files
-- ✅ Error boundaries
-- ✅ Norwegian language support
-- ✅ Semantic HTML + ARIA
+**❌ FORBIDDEN**:
+- `any` types
+- Inline styles (use Tailwind only)
+- Components over 200 lines
+- `--turbopack` flag (incompatible with Tailwind v4)
 
-## 📁 Component Structure (MANDATORY)
+**✅ MANDATORY**:
+- TypeScript strict mode
+- Component folder structure with barrel exports
+- Norwegian language support (`lang="no"`)
+- Tests for all components
+- Error boundaries and ARIA attributes
+
+## 📁 Component Structure
 
 ```
 ComponentName/
 ├── ComponentName.tsx      # Main implementation
 ├── ComponentName.test.tsx # Tests (required)
-├── types.ts              # Component types
+├── types.ts              # Component-specific types
 └── index.ts              # Export barrel
 ```
 
-## 📚 Essential File References
+## 🎨 Design System
 
-**Configuration Files:**
-- `/package.json` - Dependencies and scripts
-- `/tsconfig.json` - TypeScript configuration  
-- `/next.config.ts` - Next.js configuration
-- `/amplify.yml` - AWS deployment pipeline
-- `/jest.config.js` - Test configuration
-- `/setupTests.ts` - Jest setup
+**Tailwind CSS v4 Architecture** - Single source of truth in `tailwind.config.ts`
 
-**Key Implementation Files:**
-- `/utils/api.ts` - API utilities
-- `/components/ui/` - Design system components
-- `/types/` - TypeScript definitions
-- `/hooks/` - React hooks
+**Brand Colors**:
+```typescript
+byggern: {
+  primary: '#1E3A5F',    // Brand blue
+  orange: '#FF6B35',     // Accent orange
+  gold: '#d4af37',       // Logo gold
+  success: '#3dcc4a',    // Success green
+}
+```
 
-## 🎯 Quick Context
+**Typography**:
+```typescript
+fontFamily: {
+  sans: ['Inter', 'system-ui'],           # Primary UI
+  display: ['National2', 'Helvetica'],    # Brand headings
+  mono: ['JetBrains Mono', 'monospace'],  # Code/technical
+}
+```
 
-**Product Goal**: Lightning-fast product lookup for store staff during customer interactions (<2 sec response)
+## 🚨 Critical Troubleshooting
 
-**Current Status**: ✅ Phase 1 Complete - Standalone repository ready for independent deployment
+### Tailwind v4 Issues
 
-**Emergency Protocol**: Production fixes via hotfix branch from main + full test suite + AWS Amplify deployment
+**CSS Import**: Must use `@import "tailwindcss"` (not `@tailwind` directives)
 
-## 🔗 Related Repositories
+**PostCSS Plugin**: Use `@tailwindcss/postcss` (not `tailwindcss`)
 
-**Main Backend Repository**: `/home/rydesp/dev/varekatalog/`
-- Infrastructure (CloudFormation/AWS SAM)
-- Lambda functions
-- Documentation
-- AWS configurations
+**NODE_ENV Warning**: Set `NODE_ENV=production` for builds or unset entirely
 
-## 🚀 AWS Amplify Deployment
+### AWS Amplify Environment Variables
 
-**Build Configuration**: `amplify.yml`
-- Frontend-only deployment (no appRoot needed)
-- Automatic builds on push to `develop`
-- Built artifacts in `.next/` directory
+**CRITICAL**: Environment variables must be configured in AWS Amplify Console (per branch), not .env files
 
-**Environment Variables** (configure in Amplify Console):
-- `NEXT_PUBLIC_API_ENDPOINT` - Backend API endpoint
-- `NEXT_PUBLIC_REGION` - AWS region
+**Root Cause**: Next.js processes environment variables BEFORE amplify.yml build scripts execute
+
+**Solution**:
+```bash
+aws amplify update-branch --app-id APP_ID --branch-name develop \
+  --environment-variables NEXT_PUBLIC_API_BASE_URL=https://api.example.com
+```
+
+## 🔗 Environment Configuration
+
+**Local Development** (`.env.local`):
+```bash
+NEXT_PUBLIC_API_BASE_URL=/api
+NEXT_PUBLIC_REGION=eu-west-1
+NEXT_PUBLIC_COGNITO_CLIENT_ID=7cks2b6l1num5l0l7l4l43pi5j
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
+```
+
+**AWS Amplify**: Configure variables directly in Amplify Console (branch-specific)
+
+**Validation**: Built-in fail-fast validation via `npm run validate-env`
+
+## 🎯 Domain Knowledge
+
+**Norwegian Building Supplies Catalog**:
+- **VVS-nummer**: 8-digit product codes
+- **Anbrekk**: Partial quantity availability ("Ja"/"Nei")
+- **LagerStatus**: Stock levels ("På lager", "Få igjen", "Utsolgt")
+- **Performance Goal**: <2 second response time
+
+## 🧪 Testing & Security
+
+**Testing**: Jest + React Testing Library, every component requires `.test.tsx`
+
+**Security Headers**: CSP, HSTS, X-Frame-Options configured in `next.config.ts`
+
+**Build Validation**: `./scripts/validate-build.sh` for complete CI/CD pipeline
 
 ---
-*Standalone frontend repository. For complete system documentation, see main varekatalog repository at `/home/rydesp/dev/varekatalog/docs/`*
+
+**Deployment**: AWS Amplify (`develop` branch → https://develop.d226fk1z311q90.amplifyapp.com/)
+**Related**: Backend at `/home/rydesp/dev/easmith-varekatalog-backend/` (infrastructure, Lambda functions)
+
+## 🔗 AWS Accounts
+
+**Development Account**: 852634887748
+**Production Account**: 785105558045
+**Region**: eu-west-1
+
+---
+
+## 🔄 Infrastructure Status (September 16, 2025)
+
+**✅ UPDATED - Backend Recreation Complete:**
+- All AWS resource IDs changed due to backend stack recreation
+- Frontend environment variables updated with new values
+- Azure AD identity provider configured in new Cognito User Pool
+- Authentication flow restored (pending Azure AD team redirect URI update)
+
+**Current Infrastructure:**
+- **API Gateway**: `ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com`
+- **Cognito Domain**: `eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com`
+- **User Pool**: `eu-west-1_M2S9MdjJj`
+- **Client**: `7cks2b6l1num5l0l7l4l43pi5j`
+- **Amplify**: `d226fk1z311q90.amplifyapp.com`
+
+**OpenSearch Infrastructure:**
+- **Domain Name**: `eas-dev-varekatalog`
+- **Domain Endpoint**: `search-eas-dev-varekatalog-3krcwwbqhnaakuc262vionkxl4.eu-west-1.es.amazonaws.com`
+- **Index Name**: `eas-varekatalog-products`
+- **Instance Type**: t3.small.elasticsearch (1 instance)
+- **Features**: Full-text search, faceted search, Norwegian product catalogs

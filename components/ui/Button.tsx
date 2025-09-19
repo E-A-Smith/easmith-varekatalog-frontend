@@ -14,12 +14,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const buttonStyles = {
-  base: 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-byggern-blue focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  base: 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-byggern-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   variants: {
-    primary: 'bg-byggern-blue text-white hover:bg-byggern-blue/90 active:bg-byggern-blue/95 shadow-sm',
+    primary: 'bg-byggern-primary text-white hover:bg-byggern-primary/90 active:bg-byggern-primary/95 shadow-sm',
     secondary: 'bg-byggern-orange text-white hover:bg-byggern-orange/90 active:bg-byggern-orange/95 shadow-sm',
-    outline: 'border border-byggern-blue bg-white text-byggern-blue hover:bg-byggern-blue/5 active:bg-byggern-blue/10',
-    ghost: 'text-byggern-blue hover:bg-byggern-blue/10 active:bg-byggern-blue/15',
+    outline: 'border border-byggern-primary bg-white text-byggern-primary hover:bg-byggern-primary/5 active:bg-byggern-primary/10',
+    ghost: 'text-byggern-primary hover:bg-byggern-primary/10 active:bg-byggern-primary/15',
   },
   sizes: {
     sm: 'h-8 px-3 text-sm',

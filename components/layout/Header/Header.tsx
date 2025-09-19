@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { SearchBar } from '../../search';
+import { Logo } from '../../ui';
 import { HeaderProps } from './types';
 
 /**
@@ -19,27 +20,19 @@ export const Header: FC<HeaderProps> = ({
       data-testid={testId}
     >
       <div className="max-w-7xl mx-auto px-6 h-full">
-        <div className="flex items-center justify-between h-full">
+        <div className="flex items-center gap-8 h-full">
           
-          {/* Logo Section */}
-          <div className="flex items-center">
-            <div className="flex items-center gap-3">
-              {/* Authentic BYGGER'N Logo with brand gold */}
-              <div className="w-10 h-8 bg-byggern-gold rounded-sm flex items-center justify-center">
-                <span className="text-byggern-header font-bold text-lg leading-none">&nbsp;</span>
-              </div>
-              <h1 className="text-xl font-bold text-white">
-                BYGGER&apos;N
-              </h1>
-            </div>
+          {/* Logo Section - Simple structure like byggern.no */}
+          <div className="flex-shrink-0">
+            <Logo height={40} />
           </div>
 
-          {/* Search Section - Center */}
+          {/* Search Section - Left aligned, fixed position */}
           {showSearch && onSearch && (
-            <div className="flex-1 max-w-2xl mx-8">
+            <div className="flex-1 max-w-2xl">
               <SearchBar 
                 onSearch={onSearch}
-                placeholder="🔍 Søk etter produkter eller kategorier..."
+                placeholder="Søk etter produkter eller kategorier..."
                 enableInstantSearch={true}
                 size="sm"
               />

@@ -12,7 +12,10 @@ const nextConfig: NextConfig = {
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['api-dev.varekatalog.byggern.no'],
+    domains: [
+      'api-dev.varekatalog.byggern.no',  // Legacy API domain
+      'ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com'  // AWS API Gateway
+    ],
   },
 
   // Security headers (handled by Amplify/CloudFront)
@@ -39,7 +42,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-dev.varekatalog.byggern.no https://*.amazonaws.com; frame-ancestors 'none';"
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-dev.varekatalog.byggern.no https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com https://*.amazonaws.com https://*.amazoncognito.com; frame-ancestors 'none';"
           }
         ]
       }
@@ -56,19 +59,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', '@aws-sdk/client-cognito-identity-provider'],
   },
 
-  // PWA-like caching for offline support
+  // No API proxy needed - using local API routes directly
   async rewrites() {
-    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    if (!apiEndpoint) {
-      return [];
-    }
-    return [
-      // API proxy for development
-      {
-        source: '/api/:path*',
-        destination: `${apiEndpoint}/:path*`,
-      },
-    ];
+    return [];
   },
 };
 

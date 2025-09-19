@@ -1,17 +1,19 @@
 /**
  * Product search hook for Varekatalog
- * Step 2.2: Enhanced with comprehensive TypeScript types system
+ *
+ * Interfaces with OpenSearch-powered backend search API:
+ * - OpenSearch Domain: eas-dev-varekatalog
+ * - Index: eas-varekatalog-products
+ * - Features: Full-text search, VVS-nummer lookup, Norwegian language support
  */
 
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { apiClient } from '@/utils/api';
 import type { 
   Product, 
-  ProductSearchQuery, 
-  ProductSortOrder,
-  PriceInfo 
+  ProductSearchQuery
 } from '@/types/product';
 
 type LoadingState = 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -25,7 +27,7 @@ interface SearchState {
   loadingState: LoadingState;
 }
 
-export const useProductSearch = () => {
+export const useProductSearch = (accessToken?: string) => {
   const [searchState, setSearchState] = useState<SearchState>({
     query: '',
     results: [],
@@ -35,42 +37,7 @@ export const useProductSearch = () => {
     loadingState: 'idle',
   });
 
-  // Minimal mock data for development
-  const mockProducts = useMemo((): Product[] => [
-    {
-      id: '1',
-      navn: 'VVS Rør 15mm',
-      vvsnr: 'VVS12345',
-      lagerstatus: 'På lager',
-      anbrekk: 'Nei',
-      produsent: 'Uponor',
-      pris: { salgspris: 15000, valuta: 'NOK', inkludertMva: true },
-      kategori: 'Rør og koblingsutstyr',
-      beskrivelse: 'Kobberrør for varmt og kaldt vann'
-    },
-    {
-      id: '2', 
-      navn: 'Varmepumpe 12kW',
-      vvsnr: 'VP-12000',
-      lagerstatus: 'På lager',
-      anbrekk: 'Nei',
-      produsent: 'NIBE',
-      pris: { salgspris: 35000, valuta: 'NOK', inkludertMva: true },
-      kategori: 'Ovner og varme',
-      beskrivelse: 'Luft/vann-varmepumpe for enebolig'
-    },
-    {
-      id: '3',
-      navn: 'Ventil 15mm',
-      vvsnr: 'VALV-001', 
-      lagerstatus: 'På lager',
-      anbrekk: 'Nei',
-      produsent: 'Uponor',
-      pris: { salgspris: 129, valuta: 'NOK', inkludertMva: true },
-      kategori: 'Rør og koblingsutstyr',
-      beskrivelse: 'Avstengningsventil for vann'
-    }
-  ], []);
+  // Mock data removed - using real API only
 
   const searchProducts = useCallback(async (query: string): Promise<void> => {
     setSearchState(prev => ({
@@ -102,8 +69,9 @@ export const useProductSearch = () => {
         sortering: 'relevans'
       };
 
-      // Call real API
-      const products = await apiClient.searchProducts(searchQuery);
+      // Call backend search API - queries OpenSearch domain eas-dev-varekatalog
+      // Index: eas-varekatalog-products
+      const products = await apiClient.searchProducts(searchQuery, accessToken);
 
       setSearchState(prev => ({
         ...prev,
@@ -116,25 +84,46 @@ export const useProductSearch = () => {
     } catch (error) {
       console.error('Search API error:', error);
       
-      // Fallback to mock data if API fails
-      const searchTerm = query.toLowerCase();
-      const filteredProducts = mockProducts.filter(product =>
-        product.navn.toLowerCase().includes(searchTerm) ||
-        (product.vvsnr && product.vvsnr.includes(searchTerm)) ||
-        (product.produsent && product.produsent.toLowerCase().includes(searchTerm)) ||
-        (product.kategori && product.kategori.toLowerCase().includes(searchTerm))
-      );
-
+      // Enhanced error handling for progressive enhancement
+      let errorMessage = 'API ikke tilgjengelig';
+      if (error instanceof Error) {
+        if (error.message.includes('HTTP 401') || error.message.includes('Unauthorized')) {
+          // Check if this was a progressive enhancement attempt that failed completely
+          if (accessToken && error.message.includes('public access failed')) {
+            errorMessage = 'API krever autentisering, men både autentisert og offentlig tilgang feilet';
+          } else if (accessToken) {
+            errorMessage = 'Autentisering feilet - token utløpt eller ugyldig';
+          } else {
+            errorMessage = 'API krever autentisering - logg inn for å søke etter produkter';
+          }
+        } else if (error.message.includes('Search Failed')) {
+          errorMessage = 'OpenSearch søkefeil - indeks eas-varekatalog-products utilgjengelig';
+        } else if (error.message.includes('Network error')) {
+          errorMessage = 'Nettverksfeil - kan ikke nå API';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = 'OpenSearch timeout - prøv igjen';
+        } else if (error.message.includes('illegal_argument_exception') || error.message.includes('fielddata=true')) {
+          errorMessage = 'OpenSearch konfigurasjonfeil - feltdata må aktiveres for sortering på domene eas-dev-varekatalog';
+        } else if (error.message.includes('index_not_found_exception')) {
+          errorMessage = 'OpenSearch indeks eas-varekatalog-products ikke funnet';
+        } else if (error.message.includes('search_phase_execution_exception')) {
+          errorMessage = 'OpenSearch spørringsfel - ugyldig søkeparametere';
+        } else {
+          errorMessage = `API feil: ${error.message}`;
+        }
+      }
+      
+      // No fallback to mock data - show API error
       setSearchState(prev => ({
         ...prev,
-        results: filteredProducts,
+        results: [],
         isLoading: false,
-        loadingState: 'succeeded',
+        loadingState: 'failed',
         hasSearched: true,
-        error: 'Bruker lokal data (API ikke tilgjengelig)'
+        error: errorMessage
       }));
     }
-  }, [mockProducts]);
+  }, [accessToken]);
 
   return {
     searchState,

@@ -1,0 +1,135 @@
+/**
+ * LoginButton Component Tests
+ */
+
+import { render, screen } from '@testing-library/react';
+import { LoginButton } from './LoginButton';
+
+// Mock CognitoUser for authenticated tests
+const mockUser = {
+  username: 'test@example.com',
+  email: 'test@example.com',
+  getUsername: () => 'test@example.com'
+};
+
+// Mock the useAuth hook
+jest.mock('@/hooks/useAuth');
+import { useAuth } from '@/hooks/useAuth';
+const mockUseAuth = jest.mocked(useAuth);
+
+describe('LoginButton', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders login button when not authenticated', () => {
+    mockUseAuth.mockReturnValue({
+      authState: {
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        accessToken: null,
+        error: null,
+        scopes: [],
+        permissions: {
+          canSearch: true,
+          canViewPrices: false,
+          canViewInventory: false,
+        },
+      },
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
+    });
+
+    render(<LoginButton />);
+    
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    // SVG icon should be present
+    expect(screen.getByRole('button')).toContainHTML('svg');
+  });
+
+  it('renders unlocked icon when authenticated', () => {
+    mockUseAuth.mockReturnValue({
+      authState: {
+        isAuthenticated: true,
+        isLoading: false,
+        user: mockUser,
+        accessToken: 'mock-token',
+        error: null,
+        scopes: ['varekatalog/prices', 'varekatalog/inventory'],
+        permissions: {
+          canSearch: true,
+          canViewPrices: true,
+          canViewInventory: true,
+        },
+      },
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
+    });
+
+    render(<LoginButton />);
+    
+    // SVG unlock icon should be present
+    expect(document.querySelector('svg')).toBeInTheDocument();
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /logg ut/i })).toBeInTheDocument();
+  });
+
+  it('applies compact mode styles when compact prop is true', () => {
+    mockUseAuth.mockReturnValue({
+      authState: {
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        accessToken: null,
+        error: null,
+        scopes: [],
+        permissions: {
+          canSearch: true,
+          canViewPrices: false,
+          canViewInventory: false,
+        },
+      },
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
+    });
+
+    render(<LoginButton compact />);
+    
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+  });
+
+  it('applies custom className when provided', () => {
+    mockUseAuth.mockReturnValue({
+      authState: {
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        accessToken: null,
+        error: null,
+        scopes: [],
+        permissions: {
+          canSearch: true,
+          canViewPrices: false,
+          canViewInventory: false,
+        },
+      },
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+      refreshSession: jest.fn(),
+      getAccessToken: jest.fn(),
+    });
+
+    const customClass = 'custom-test-class';
+    const { container } = render(<LoginButton className={customClass} />);
+    
+    expect(container.firstChild).toHaveClass(customClass);
+  });
+});

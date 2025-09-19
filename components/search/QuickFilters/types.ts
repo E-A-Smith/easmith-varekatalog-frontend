@@ -15,9 +15,6 @@ export interface FilterState {
 }
 
 export interface QuickFiltersProps {
-  /** Total number of items being filtered */
-  totalItems?: number;
-  
   /** Callback when filters change */
   onFiltersChange?: (filters: FilterState) => void;
   
@@ -26,4 +23,16 @@ export interface QuickFiltersProps {
   
   /** Initial filter state */
   initialFilters?: Partial<FilterState>;
+  
+  /** Dynamic supplier options extracted from product data */
+  supplierOptions?: string[];
+  
+  /** Dynamic category options extracted from product data */
+  categoryOptions?: string[];
+  
+  /** Controlled filter state from parent component */
+  filters?: FilterState;
+  
+  /** Callback when filters need to be reset due to invalid options */
+  onFiltersReset?: (resetFilters: FilterState) => void;
 }

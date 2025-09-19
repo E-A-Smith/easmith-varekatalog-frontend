@@ -10,9 +10,10 @@ interface NOBBLinkProps {
   vvsNumber: string | number;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  displayText?: string; // Optional custom text to display instead of "NOBB"
 }
 
-export function NOBBLink({ vvsNumber, className, size = 'sm' }: NOBBLinkProps) {
+export function NOBBLink({ vvsNumber, className, size = 'sm', displayText }: NOBBLinkProps) {
   // Convert to string and validate VVS number
   const vvsStr = String(vvsNumber).trim();
   
@@ -33,9 +34,9 @@ export function NOBBLink({ vvsNumber, className, size = 'sm' }: NOBBLinkProps) {
   };
 
   const iconSizes = {
-    sm: 'w-3 h-3',
-    md: 'w-4 h-4', 
-    lg: 'w-5 h-5',
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5', 
+    lg: 'w-6 h-6',
   };
 
   return (
@@ -50,7 +51,7 @@ export function NOBBLink({ vvsNumber, className, size = 'sm' }: NOBBLinkProps) {
       )}
       title={`Åpne ${vvsStr} i NOBB (Norsk produktdatabase)`}
     >
-      <span>NOBB</span>
+      <span>{displayText || 'NOBB'}</span>
       <ExternalLinkIcon className={iconSizes[size]} aria-hidden="true" />
       <span className="sr-only">Åpner i ny fane</span>
     </a>

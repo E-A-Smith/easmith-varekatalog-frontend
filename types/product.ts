@@ -20,11 +20,14 @@ export interface Product {
   /** Partial quantity availability (Anbrekk) */
   anbrekk: AnbrekkStatus;
   
-  /** Product manufacturer/supplier */
+  /** Product manufacturer/supplier (display name) */
   produsent?: string;
+
+  /** Original 5-digit supplier code from Løvenskiold system */
+  produsentKode?: string;
   
   /** Product category */
-  kategori?: ProductCategory;
+  kategori?: string;
   
   /** Product description */
   beskrivelse?: string;
@@ -52,16 +55,36 @@ export interface Product {
   
   /** Last updated timestamp */
   sistOppdatert?: Date;
+
+  // NEW FIELDS FOR 10-COLUMN TABLE LAYOUT (Phase 1)
+  
+  /** LH code (internal reference) - can be null/empty when not available */
+  lh: string | null;
+  
+  /** NOBB reference number for external links */
+  nobbNumber: string;
+  
+  /** Package quantity (# i pakning) */
+  pakningAntall: number;
+  
+  /** Price unit (STK, POS, etc.) */
+  prisenhet: string;
+  
+  /** Stock quantity (Lagerantall) - null when unauthorized, number when authorized */
+  lagerantall: number | null;
+  
+  /** Base price (Grunnpris) - null when unauthorized, number when authorized */
+  grunnpris: number | null;
+  
+  /** Net price (Nettopris) - null when unauthorized, number when authorized */
+  nettopris: number | null;
 }
 
-// Stock status enum matching Norwegian terminology
+// Stock status enum - includes unknown state for unauthorized users
 export type LagerStatus = 
-  | 'På lager'      // In stock
-  | 'Få igjen'      // Low stock
-  | 'Utsolgt'       // Out of stock
-  | 'Bestillingsvare' // Special order
-  | 'Utgått'        // Discontinued
-  | 'Ikke tilgjengelig'; // Not available
+  | 'På lager'      // In stock (● Green circle)
+  | 'Utsolgt'       // Out of stock (× Red cross)
+  | 'NA';           // Not available / Unknown (when lagerantall is null)
 
 // Partial quantity status (Anbrekk)
 export type AnbrekkStatus = 'Ja' | 'Nei';
@@ -303,6 +326,16 @@ export type CreateProductData = Omit<Product, 'id' | 'sistOppdatert'>;
 // Helper type for updating products (partial with required id)
 export type UpdateProductData = Partial<Omit<Product, 'id'>> & { id: string };
 
+// OAuth scope types (Phase 2) - Search is public, only premium features need scopes
+export type OAuthScope = 'varekatalog/prices' | 'varekatalog/inventory';
+
+// User permissions interface (Phase 2) - Search is always public
+export interface UserPermissions {
+  canViewPrices: boolean;
+  canViewInventory: boolean;
+  canSearch: true; // Always true - search is public
+}
+
 // Helper type for product table display
 export interface ProductTableColumn {
   /** Column key matching Product property */
@@ -334,7 +367,7 @@ export const isProduct = (obj: unknown): obj is Product => {
 };
 
 export const isLagerStatus = (status: string): status is LagerStatus => {
-  return ['På lager', 'Få igjen', 'Utsolgt', 'Bestillingsvare', 'Utgått', 'Ikke tilgjengelig'].includes(status);
+  return ['På lager', 'Utsolgt'].includes(status);
 };
 
 export const isAnbrekkStatus = (status: string): status is AnbrekkStatus => {
