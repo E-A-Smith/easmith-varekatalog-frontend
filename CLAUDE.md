@@ -129,7 +129,7 @@ aws amplify update-branch --app-id APP_ID --branch-name develop \
 
 **Local Development** (`.env.development`):
 ```bash
-NEXT_PUBLIC_API_BASE_URL=https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_API_BASE_URL=https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev
 NEXT_PUBLIC_REGION=eu-west-1
 NEXT_PUBLIC_COGNITO_CLIENT_ID=58hle80tfmljv7rbmf9o4tfmsf
 NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_GggkvCmcK
@@ -172,7 +172,6 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
 - **App ARN**: `arn:aws:amplify:eu-west-1:785105558045:apps/d1bvibntd0i61j`
 - **Branch**: `main`
 - **Account**: 785105558045
-
 **Related**: Backend at `/home/rydesp/dev/easmith-varekatalog-backend/` (infrastructure, Lambda functions)
 
 ## 🔗 AWS Accounts
@@ -237,7 +236,6 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
 - **Tenant ID**: `f0be9261-9717-4dc6-9ca2-b31924476526`
 - **Identity Provider**: AzureAD (OIDC) configured in Cognito
 - **Status**: Active with proper redirect URI alignment
-
 **OpenSearch Infrastructure:**
 - **Domain Name**: `eas-dev-varekatalog`
 - **Domain Endpoint**: `search-eas-dev-varekatalog-3krcwwbqhnaakuc262vionkxl4.eu-west-1.es.amazonaws.com`
