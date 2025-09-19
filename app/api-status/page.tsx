@@ -624,7 +624,7 @@ export default function ApiStatusPage() {
                   <div className="text-sm font-medium text-yellow-800 mb-1">📋 Debug Instructions</div>
                   <div className="text-xs text-yellow-700">
                     <p className="mb-1">1. <strong>Direct Cognito Test:</strong> Should work if basic Cognito is configured correctly</p>
-                    <p className="mb-1">2. <strong>Azure AD Test:</strong> Will show unauthorized_client if Azure AD redirect URIs don't match</p>
+                    <p className="mb-1">2. <strong>Azure AD Test:</strong> Will show unauthorized_client if Azure AD redirect URIs don&apos;t match</p>
                     <p>3. Check browser Network tab for failed requests during authentication</p>
                   </div>
                 </div>
