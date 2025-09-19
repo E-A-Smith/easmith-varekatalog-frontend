@@ -504,6 +504,133 @@ export default function ApiStatusPage() {
               </div>
             </div>
 
+            {/* Cognito Auth Test Panel */}
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+              <h2 className="text-xl font-semibold text-neutral-800 mb-4">
+                🔐 Cognito Authentication Test
+              </h2>
+
+              <div className="space-y-4">
+                {/* Current Configuration */}
+                <div className="p-3 bg-neutral-50 rounded border">
+                  <div className="text-sm font-medium text-neutral-600 mb-2">Current Configuration</div>
+                  <div className="space-y-1 text-xs font-mono">
+                    <div><strong>Domain:</strong> {process.env.NEXT_PUBLIC_COGNITO_DOMAIN}</div>
+                    <div><strong>Client ID:</strong> {process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}</div>
+                    <div><strong>User Pool:</strong> {process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID}</div>
+                    <div><strong>Redirect URI:</strong> {typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'N/A'}</div>
+                  </div>
+                </div>
+
+                {/* Test Buttons */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    onClick={async () => {
+                      // Test Direct Cognito (no Azure AD)
+                      const generateCodeVerifier = () => {
+                        const array = new Uint8Array(32);
+                        crypto.getRandomValues(array);
+                        return btoa(String.fromCharCode.apply(null, Array.from(array)))
+                          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                      };
+
+                      const generateCodeChallenge = async (verifier: string) => {
+                        const encoder = new TextEncoder();
+                        const data = encoder.encode(verifier);
+                        const digest = await crypto.subtle.digest('SHA-256', data);
+                        return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(digest))))
+                          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                      };
+
+                      const codeVerifier = generateCodeVerifier();
+                      const state = generateCodeVerifier();
+                      const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+                      sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+                      sessionStorage.setItem('oauth_state', state);
+
+                      const authParams = new URLSearchParams({
+                        response_type: 'code',
+                        client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+                        redirect_uri: `${window.location.origin}/auth/callback`,
+                        scope: 'openid profile email varekatalog/search varekatalog/prices varekatalog/inventory',
+                        state: state,
+                        code_challenge: codeChallenge,
+                        code_challenge_method: 'S256'
+                        // NO identity_provider parameter
+                      });
+
+                      const authUrl = `https://${process.env.NEXT_PUBLIC_COGNITO_DOMAIN}/oauth2/authorize?${authParams.toString()}`;
+
+                      alert(`🔍 DIRECT COGNITO TEST\n\nURL: ${authUrl}\n\nLength: ${authUrl.length} chars\n\nClick OK to test...`);
+                      window.location.href = authUrl;
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded text-sm font-medium"
+                  >
+                    🔵 Test Direct Cognito
+                    <div className="text-xs opacity-90 mt-1">Built-in authentication only</div>
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      // Test Cognito + Azure AD
+                      const generateCodeVerifier = () => {
+                        const array = new Uint8Array(32);
+                        crypto.getRandomValues(array);
+                        return btoa(String.fromCharCode.apply(null, Array.from(array)))
+                          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                      };
+
+                      const generateCodeChallenge = async (verifier: string) => {
+                        const encoder = new TextEncoder();
+                        const data = encoder.encode(verifier);
+                        const digest = await crypto.subtle.digest('SHA-256', data);
+                        return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(digest))))
+                          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                      };
+
+                      const codeVerifier = generateCodeVerifier();
+                      const state = generateCodeVerifier();
+                      const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+                      sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+                      sessionStorage.setItem('oauth_state', state);
+
+                      const authParams = new URLSearchParams({
+                        response_type: 'code',
+                        client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+                        redirect_uri: `${window.location.origin}/auth/callback`,
+                        scope: 'openid profile email varekatalog/search varekatalog/prices varekatalog/inventory',
+                        state: state,
+                        code_challenge: codeChallenge,
+                        code_challenge_method: 'S256',
+                        identity_provider: 'AzureAD'
+                      });
+
+                      const authUrl = `https://${process.env.NEXT_PUBLIC_COGNITO_DOMAIN}/oauth2/authorize?${authParams.toString()}`;
+
+                      alert(`🔍 AZURE AD TEST\n\nURL: ${authUrl}\n\nLength: ${authUrl.length} chars\n\nClick OK to test...`);
+                      window.location.href = authUrl;
+                    }}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded text-sm font-medium"
+                  >
+                    🔴 Test Azure AD + Cognito
+                    <div className="text-xs opacity-90 mt-1">Enterprise SSO authentication</div>
+                  </button>
+                </div>
+
+                {/* Debug Info */}
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <div className="text-sm font-medium text-yellow-800 mb-1">📋 Debug Instructions</div>
+                  <div className="text-xs text-yellow-700">
+                    <p className="mb-1">1. <strong>Direct Cognito Test:</strong> Should work if basic Cognito is configured correctly</p>
+                    <p className="mb-1">2. <strong>Azure AD Test:</strong> Will show unauthorized_client if Azure AD redirect URIs don&apos;t match</p>
+                    <p>3. Check browser Network tab for failed requests during authentication</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Auth Debug Panel */}
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
               <h2 className="text-xl font-semibold text-neutral-800 mb-4">

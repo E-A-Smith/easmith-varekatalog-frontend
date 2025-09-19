@@ -41,7 +41,7 @@ interface AuthContext {
 // Cognito OAuth configuration (correct architecture)
 const authConfig = {
   // Cognito OAuth domain (from backend configuration)
-  cognitoDomain: process.env.NEXT_PUBLIC_COGNITO_DOMAIN || 'varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com',
+  cognitoDomain: process.env.NEXT_PUBLIC_COGNITO_DOMAIN || '',
   clientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
   
   // OAuth scopes (Cognito resource server scopes)
@@ -251,12 +251,32 @@ export const useAuth = (): AuthContext => {
           state: state,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
-          // Force Azure AD login through Cognito
+          // Force Azure AD login through Cognito (restored original working config)
           identity_provider: 'AzureAD'
         });
 
         const authUrl = `${authConfig.authorizationUrl}?${authParams.toString()}`;
-        
+
+        // DEBUG: Log complete authentication configuration
+        console.group('🔐 AUTHENTICATION DEBUG');
+        console.log('Environment:', process.env.NODE_ENV);
+        console.log('Auth Config:', {
+          cognitoDomain: authConfig.cognitoDomain,
+          clientId: authConfig.clientId,
+          redirectUri: authConfig.redirectUri,
+          scopes: authConfig.scopes,
+          authorizationUrl: authConfig.authorizationUrl
+        });
+        console.log('OAuth Parameters:', Object.fromEntries(authParams.entries()));
+        console.log('Complete Auth URL:', authUrl);
+        console.log('URL Length:', authUrl.length);
+        console.groupEnd();
+
+        // TEMPORARY: Also show alert for debugging
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+          alert(`DEBUG INFO:\nDomain: ${authConfig.cognitoDomain}\nClient: ${authConfig.clientId}\nRedirect: ${authConfig.redirectUri}\nURL Length: ${authUrl.length}`);
+        }
+
         // Redirect to Cognito Hosted UI
         window.location.href = authUrl;
       }).catch(error => {

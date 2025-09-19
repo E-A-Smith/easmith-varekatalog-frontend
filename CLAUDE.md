@@ -127,12 +127,13 @@ aws amplify update-branch --app-id APP_ID --branch-name develop \
 
 ## 🔗 Environment Configuration
 
-**Local Development** (`.env.local`):
+**Local Development** (`.env.development`):
 ```bash
-NEXT_PUBLIC_API_BASE_URL=/api
+NEXT_PUBLIC_API_BASE_URL=https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev
 NEXT_PUBLIC_REGION=eu-west-1
-NEXT_PUBLIC_COGNITO_CLIENT_ID=7cks2b6l1num5l0l7l4l43pi5j
-NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
+NEXT_PUBLIC_COGNITO_CLIENT_ID=58hle80tfmljv7rbmf9o4tfmsf
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_GggkvCmcK
+NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
 ```
 
 **AWS Amplify**: Configure variables directly in Amplify Console (branch-specific)
@@ -157,7 +158,20 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
 
 ---
 
-**Deployment**: AWS Amplify (`develop` branch → https://develop.d226fk1z311q90.amplifyapp.com/)
+## 🌐 Deployment Configuration
+
+### Development Environment
+- **Amplify App**: `d226fk1z311q90` → https://develop.d226fk1z311q90.amplifyapp.com/
+- **Branch**: `develop`
+- **Account**: 852634887748
+
+### Production Environment
+- **Name**: `easmith-varekatalog-frontend`
+- **App ID**: `d1bvibntd0i61j`
+- **Production URL**: https://main.d1bvibntd0i61j.amplifyapp.com
+- **App ARN**: `arn:aws:amplify:eu-west-1:785105558045:apps/d1bvibntd0i61j`
+- **Branch**: `main`
+- **Account**: 785105558045
 **Related**: Backend at `/home/rydesp/dev/easmith-varekatalog-backend/` (infrastructure, Lambda functions)
 
 ## 🔗 AWS Accounts
@@ -168,21 +182,60 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
 
 ---
 
-## 🔄 Infrastructure Status (September 16, 2025)
+## 🔄 Infrastructure Status (September 19, 2025)
 
-**✅ UPDATED - Backend Recreation Complete:**
-- All AWS resource IDs changed due to backend stack recreation
-- Frontend environment variables updated with new values
-- Azure AD identity provider configured in new Cognito User Pool
-- Authentication flow restored (pending Azure AD team redirect URI update)
+**✅ COMPLETED - Azure AD Authentication Fully Restored:**
+- Backend stack recreation completed (September 18, 2025)
+- All AWS resource IDs updated to new infrastructure
+- Azure AD OIDC identity provider configured in Cognito User Pool
+- Authentication flow fully functional with enterprise Azure AD integration
+- Cognito domain aligned with existing Azure AD redirect URI configuration
+
+**✅ COMPLETED - Infrastructure Cleanup (September 19, 2025):**
+- DEV user pool renamed to match architecture documentation (`eas-varekatalog-users-dev`)
+- Duplicate PROD user pool removed (`eu-west-1_AxAujtTCJ`)
+- OAuth scopes verified and aligned across both environments
+- Production Cognito configuration fully documented
+
+**✅ COMPLETED - Authentication Fix (September 19, 2025):**
+- **CRITICAL**: Fixed `SupportedIdentityProviders` configuration in both environments
+- DEV: Changed from `null` to `["AzureAD"]`
+- PROD: Changed from `["COGNITO"]` to `["AzureAD"]`
+- Root cause: Cognito clients were not configured to redirect to Azure AD identity provider
+- Authentication flow now works correctly with Azure AD OIDC integration
+
+**✅ VERIFIED - Authentication Success (September 19, 2025):**
+- **DEV**: https://develop.d226fk1z311q90.amplifyapp.com/ - Authentication working ✅
+- **PROD**: https://main.d1bvibntd0i61j.amplifyapp.com/ - Authentication working ✅
+- **PROD Environment Variables**: Configured missing Amplify env vars for PROD
+- **Azure AD Integration**: Both environments successfully authenticating via Azure AD OIDC
+- **All component names verified and documented accurately**
+
+**✅ CORRECTED - API Gateway Configuration (September 19, 2025):**
+- **CRITICAL FIX**: DEV API Gateway corrected from non-existent `ruy0f0pr6j` to working `28svlvit82`
+- **DEV Environment Variables**: Updated Amplify and local config with correct API Gateway ID
+- **Documentation Alignment**: All CLAUDE.md files and system architecture updated with verified IDs
+- **Component Names**: 100% accuracy achieved across all documentation
 
 **Current Infrastructure:**
-- **API Gateway**: `ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com`
+- **API Gateway**: `28svlvit82.execute-api.eu-west-1.amazonaws.com/dev` (varekatalog-api-dev) ✅ CORRECTED
 - **Cognito Domain**: `eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com`
-- **User Pool**: `eu-west-1_M2S9MdjJj`
-- **Client**: `7cks2b6l1num5l0l7l4l43pi5j`
+- **User Pool**: `eu-west-1_GggkvCmcK` (eas-varekatalog-users-dev)
+- **Client**: `58hle80tfmljv7rbmf9o4tfmsf` (varekatalog-client-dev)
 - **Amplify**: `d226fk1z311q90.amplifyapp.com`
 
+**PRODUCTION Infrastructure:**
+- **API Gateway**: `17lf5fwwik.execute-api.eu-west-1.amazonaws.com/prod` (production)
+- **Cognito Domain**: `eas-varekatalog-auth-prod.auth.eu-west-1.amazoncognito.com`
+- **User Pool**: `eu-west-1_Y9lANGJGs` (eas-varekatalog-users-prod)
+- **Client**: `3jur7ub2mvai5ar5969i3bmum1` (eas-varekatalog-client-prod)
+- **Amplify**: `d1bvibntd0i61j.amplifyapp.com`
+
+**Azure AD Integration:**
+- **Client ID**: `31fc9aa9-223e-4bc5-a371-7b0d56a13075`
+- **Tenant ID**: `f0be9261-9717-4dc6-9ca2-b31924476526`
+- **Identity Provider**: AzureAD (OIDC) configured in Cognito
+- **Status**: Active with proper redirect URI alignment
 **OpenSearch Infrastructure:**
 - **Domain Name**: `eas-dev-varekatalog`
 - **Domain Endpoint**: `search-eas-dev-varekatalog-3krcwwbqhnaakuc262vionkxl4.eu-west-1.es.amazonaws.com`

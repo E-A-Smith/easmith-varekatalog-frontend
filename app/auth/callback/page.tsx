@@ -17,11 +17,20 @@ function AuthCallbackContent() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // DEBUG: Log all URL parameters
+        console.group('🔐 OAUTH CALLBACK DEBUG');
+        console.log('Current URL:', window.location.href);
+        console.log('Search Params:', window.location.search);
+        console.log('All URL Parameters:', Object.fromEntries(searchParams.entries()));
+
         // Extract parameters from URL
         const code = searchParams.get('code');
         const state = searchParams.get('state');
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
+
+        console.log('Extracted Values:', { code: !!code, state: !!state, error, errorDescription });
+        console.groupEnd();
 
         // Handle OAuth errors
         if (error) {
