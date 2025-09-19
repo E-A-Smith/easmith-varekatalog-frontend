@@ -160,6 +160,12 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_M2S9MdjJj
 **Deployment**: AWS Amplify (`develop` branch → https://develop.d226fk1z311q90.amplifyapp.com/)
 **Related**: Backend at `/home/rydesp/dev/easmith-varekatalog-backend/` (infrastructure, Lambda functions)
 
+## 🔗 AWS Accounts
+
+**Development Account**: 852634887748
+**Production Account**: 785105558045
+**Region**: eu-west-1
+
 ---
 
 ## 🔄 Infrastructure Status (September 16, 2025)
