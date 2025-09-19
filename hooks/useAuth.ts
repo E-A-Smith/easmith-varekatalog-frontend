@@ -256,7 +256,22 @@ export const useAuth = (): AuthContext => {
         });
 
         const authUrl = `${authConfig.authorizationUrl}?${authParams.toString()}`;
-        
+
+        // DEBUG: Log complete authentication configuration
+        console.group('🔐 AUTHENTICATION DEBUG');
+        console.log('Environment:', process.env.NODE_ENV);
+        console.log('Auth Config:', {
+          cognitoDomain: authConfig.cognitoDomain,
+          clientId: authConfig.clientId,
+          redirectUri: authConfig.redirectUri,
+          scopes: authConfig.scopes,
+          authorizationUrl: authConfig.authorizationUrl
+        });
+        console.log('OAuth Parameters:', Object.fromEntries(authParams.entries()));
+        console.log('Complete Auth URL:', authUrl);
+        console.log('URL Length:', authUrl.length);
+        console.groupEnd();
+
         // Redirect to Cognito Hosted UI
         window.location.href = authUrl;
       }).catch(error => {
