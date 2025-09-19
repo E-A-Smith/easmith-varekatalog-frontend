@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
           console.log(`[Search API] No auth token found - using public access`);
         }
         
-        const externalResponse = await fetch(`${externalApiUrl}/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`, {
+        const externalResponse = await fetch(`${externalApiUrl}/products/search?q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`, {
           method: 'GET',
           headers,
           signal: AbortSignal.timeout(10000) // 10 second timeout
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
           console.log(`[Search API] No auth token found - using public access`);
         }
         
-        const externalResponse = await fetch(`${externalApiUrl}/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`, {
+        const externalResponse = await fetch(`${externalApiUrl}/products/search?q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`, {
           method: 'GET',
           headers,
           signal: AbortSignal.timeout(10000) // 10 second timeout
