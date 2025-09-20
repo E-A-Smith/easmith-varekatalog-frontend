@@ -37,7 +37,6 @@ export default function Dashboard() {
   const [showPrices, setShowPrices] = useState(true);
 
 
-  // Define table columns for complete 10-column layout (Phase 2)
   // Real authentication-based data masking using OAuth scopes
   const tableColumns = [
     { 
