@@ -256,7 +256,6 @@ export const useAuth = (): AuthContext => {
         });
 
         const authUrl = `${authConfig.authorizationUrl}?${authParams.toString()}`;
-
         // Redirect to Cognito Hosted UI
         window.location.href = authUrl;
       }).catch(error => {
