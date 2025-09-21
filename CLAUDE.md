@@ -14,6 +14,29 @@ npm test                        # Run all tests
 tree -I 'node_modules|.next|.git' -L 3  # Repository overview
 ```
 
+## 🛡️ Git Workflow & Branch Protection
+
+**CRITICAL**: `main` branch is protected - **NO DIRECT PUSHES ALLOWED**
+
+```bash
+# ✅ Development workflow (daily work)
+git checkout develop
+git push origin develop          # Direct pushes allowed to develop
+
+# ✅ Production deployment
+gh pr create --base main --head develop    # Only way to update main
+
+# ❌ BLOCKED: Direct push to main
+git push origin main            # ERROR: Protected branch update failed
+```
+
+**Branch Rules**:
+- `develop` → Open for direct pushes (development environment)
+- `main` → Protected, PR-only (production environment)
+- **Required**: 1 approving review + resolved conversations
+
+See [README.md](./README.md) for complete workflow guidelines and project overview.
+
 ## 🏗️ Architecture
 
 **Tech Stack**: Next.js 15 + React 19 + TypeScript 5 + Tailwind CSS v4 + SWR + Zustand
