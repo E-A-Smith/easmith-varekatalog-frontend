@@ -6,7 +6,7 @@ The Varekatalog Search API provides OpenSearch-powered product search functional
 
 ## Base Configuration
 
-- **API Gateway URL**: `https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com/dev`
+- **API Gateway URL**: `https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev`
 - **Frontend Proxy**: `/api` (via Next.js API routes to avoid CORS)
 - **OpenSearch Domain**: `eas-dev-varekatalog`
 - **OpenSearch Index**: `eas-varekatalog-products`
@@ -293,7 +293,7 @@ For testing direct backend connection, use `NEXT_PUBLIC_EXTERNAL_API_URL`:
 
 ```bash
 # .env.local
-NEXT_PUBLIC_EXTERNAL_API_URL=https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_EXTERNAL_API_URL=https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
 **Note**: The API route will use `NEXT_PUBLIC_EXTERNAL_API_URL` first, then fall back to `NEXT_PUBLIC_API_BASE_URL`. Direct backend access may have CORS restrictions in browser environments.
