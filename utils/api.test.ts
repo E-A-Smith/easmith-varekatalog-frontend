@@ -11,6 +11,7 @@ describe('API Client', () => {
       const backendProduct: BackendProduct = {
         id: '12345678',
         navn: 'Test Product',
+        vvsnr: '12345678',
         produsent: 'Test Supplier',
         lagerstatus: 'På lager',
         anbrekk: 'Ja',
@@ -37,13 +38,12 @@ describe('API Client', () => {
       const backendProduct: BackendProduct = {
         id: '12345678',
         navn: 'Test Product',
-        produsent: null,
-        lagerstatus: 'Utsolgt',
+        vvsnr: '12345678',
         anbrekk: 'Nei',
-        lh: null,
+        lh: '',
         nobbNumber: '12345678',
-        pakningAntall: null,
-        prisenhet: null,
+        pakningAntall: 1,
+        prisenhet: 'STK',
         lagerantall: null,
         grunnpris: null,
         nettopris: null
@@ -52,7 +52,7 @@ describe('API Client', () => {
       const result = transformBackendProduct(backendProduct);
 
       expect(result.produsent).toBeUndefined();
-      expect(result.lh).toBeNull();
+      expect(result.lh).toBeNull(); // Empty string should transform to null
       expect(result.lagerantall).toBeNull();
     });
   });

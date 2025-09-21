@@ -45,11 +45,11 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
 
   // Use dynamic options or fallback to default options (memoized to prevent useEffect re-runs)
   const currentSupplierOptions = useMemo(() =>
-    supplierOptions || ['-'],
+    (supplierOptions && supplierOptions.length > 0) ? supplierOptions : ['-'],
     [supplierOptions]
   );
   const currentCategoryOptions = useMemo(() =>
-    categoryOptions || ['-'],
+    (categoryOptions && categoryOptions.length > 0) ? categoryOptions : ['-'],
     [categoryOptions]
   );
   
@@ -111,30 +111,32 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
           <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
         </div>
 
-        {/* Category Filter */}
-        <div className="relative">
-          <select
-            id="category-filter"
-            name="category"
-            aria-label="Category filter"
-            value={filters.category}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-            className="
-              appearance-none bg-transparent
-              text-sm font-medium text-neutral-700
-              pr-6 pl-1 py-1
-              border-none outline-none
-              cursor-pointer
-              hover:text-byggern-blue
-              transition-colors duration-150
-            "
-          >
-            {currentCategoryOptions.map(option => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
-        </div>
+        {/* Category Filter - Hidden until implementation is complete */}
+        {false && (
+          <div className="relative">
+            <select
+              id="category-filter"
+              name="category"
+              aria-label="Category filter"
+              value={filters.category}
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+              className="
+                appearance-none bg-transparent
+                text-sm font-medium text-neutral-700
+                pr-6 pl-1 py-1
+                border-none outline-none
+                cursor-pointer
+                hover:text-byggern-blue
+                transition-colors duration-150
+              "
+            >
+              {currentCategoryOptions.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
+          </div>
+        )}
 
 
       </div>
