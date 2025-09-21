@@ -92,9 +92,9 @@ export const Pagination: FC<PaginationProps> = ({
   endItem,
   onPageChange,
   className = '',
-  itemLabel = 'products',
-  previousLabel = 'Prev',
-  nextLabel = 'Next',
+  itemLabel = 'produkter',
+  previousLabel = 'Forrige',
+  nextLabel = 'Neste',
   // Price masking feature props
   isAuthenticated,
   showPriceToggle,
@@ -159,11 +159,11 @@ export const Pagination: FC<PaginationProps> = ({
       {/* Combined item count, pagination controls */}
       <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full">
         <div className="flex items-center gap-2 text-sm text-neutral-600 whitespace-nowrap">
-          <span>Showing </span>
+          <span>Viser </span>
           <span className="font-medium text-neutral-900">
             {startItem}-{endItem}
           </span>
-          <span> of </span>
+          <span> av </span>
           <span className="font-medium text-neutral-900">
             {totalItems}
           </span>

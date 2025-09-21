@@ -18,7 +18,7 @@ System architecture validation completed following backend infrastructure recrea
 | **Azure AD Client** | `31fc9aa9-223e-4bc5-a371-7b0d56a13075` | ✅ Active |
 | **Azure AD Tenant** | `f0be9261-9717-4dc6-9ca2-b31924476526` | ✅ Active |
 | **Identity Provider** | AzureAD (OIDC) | ✅ Configured |
-| **API Gateway** | `ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com` | ✅ Active |
+| **API Gateway** | `28svlvit82.execute-api.eu-west-1.amazonaws.com` | ✅ Active |
 
 ### ❌ CORRECTED - Documentation Inconsistencies
 | Component | Outdated Value | Corrected Value | Files Updated |
@@ -51,7 +51,7 @@ System architecture validation completed following backend infrastructure recrea
 NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-1_GggkvCmcK
 NEXT_PUBLIC_COGNITO_CLIENT_ID=58hle80tfmljv7rbmf9o4tfmsf
 NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito.com
-NEXT_PUBLIC_API_BASE_URL=https://ruy0f0pr6j.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_API_BASE_URL=https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
 ### ✅ VERIFIED - AWS Amplify Configuration

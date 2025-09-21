@@ -24,7 +24,11 @@ describe('Pagination', () => {
   it('renders pagination info correctly in Norwegian', () => {
     render(<Pagination {...defaultProps} />);
     
-    expect(screen.getByText(/Viser 1-10 av 1\s?247 produkter/)).toBeInTheDocument();
+    expect(screen.getByText('Viser')).toBeInTheDocument();
+    expect(screen.getByText('1-10')).toBeInTheDocument();
+    expect(screen.getByText('av')).toBeInTheDocument();
+    expect(screen.getByText('1247')).toBeInTheDocument();
+    expect(screen.getByText('produkter')).toBeInTheDocument();
   });
 
   it('renders all page numbers when total pages <= 7', () => {
