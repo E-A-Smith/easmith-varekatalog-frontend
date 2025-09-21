@@ -1,6 +1,6 @@
 /**
  * Comprehensive tests for useProductSearch hook
- * Tests search functionality, API integration, and fallback mechanisms
+ * Tests search functionality, API integration, and error handling
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
@@ -31,15 +31,14 @@ describe('useProductSearch Hook', () => {
   const mockProducts: Product[] = [
     {
       id: '1',
-      navn: 'VVS Rör 15mm',
+      navn: 'VVS Ror 15mm',
       vvsnr: 'VVS12345',
       lagerstatus: 'På lager',
       anbrekk: 'Nei',
       produsent: 'Uponor',
       pris: { salgspris: 15000, valuta: 'NOK', inkludertMva: true },
-      kategori: 'Rør og koblingsutstyr',
-      beskrivelse: 'Kobberrør for varmt og kaldt vann',
-      // Required new fields for Phase 1
+      kategori: 'Ror og koblingsutstyr',
+      beskrivelse: 'Kobberror for varmt og kaldt vann',
       lh: 'TEST123',
       nobbNumber: '41000001',
       pakningAntall: 1,
@@ -47,51 +46,13 @@ describe('useProductSearch Hook', () => {
       lagerantall: 100,
       grunnpris: 120.00,
       nettopris: 150.00
-    },
-    {
-      id: '2',
-      navn: 'Varmepumpe 12kW',
-      vvsnr: 'VP-12000',
-      lagerstatus: 'På lager',
-      anbrekk: 'Nei',
-      produsent: 'NIBE',
-      pris: { salgspris: 35000, valuta: 'NOK', inkludertMva: true },
-      kategori: 'Ovner og varme',
-      beskrivelse: 'Luft/vann-varmepumpe for enebolig',
-      // Required new fields for Phase 1
-      lh: 'TEST456',
-      nobbNumber: '42000001',
-      pakningAntall: 1,
-      prisenhet: 'STK',
-      lagerantall: 5,
-      grunnpris: 28000.00,
-      nettopris: 35000.00
-    },
-    // Test product with null LH field
-    {
-      id: '3',
-      navn: 'Product with missing LH',
-      vvsnr: '43000001',
-      lagerstatus: 'Utsolgt',
-      anbrekk: 'Ja',
-      produsent: 'Test Supplier',
-      kategori: 'Sikkerhet',
-      beskrivelse: 'Product for testing null LH field',
-      // LH field is null to test empty value handling
-      lh: null,
-      nobbNumber: '43000001',
-      pakningAntall: 1,
-      prisenhet: 'STK',
-      lagerantall: null,
-      grunnpris: null,
-      nettopris: null
     }
   ];
-  
+
   describe('Initial State', () => {
     it('should initialize with empty state', () => {
       const { result } = renderHook(() => useProductSearch());
-      
+
       expect(result.current.searchState).toEqual({
         query: '',
         results: [],
@@ -102,77 +63,77 @@ describe('useProductSearch Hook', () => {
       });
     });
   });
-  
+
   describe('Search Functionality', () => {
     it('should handle empty search query', async () => {
       const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
         await result.current.searchProducts('');
       });
-      
+
       expect(result.current.searchState.results).toEqual([]);
       expect(result.current.searchState.hasSearched).toBe(false);
       expect(result.current.searchState.loadingState).toBe('idle');
     });
-    
+
     it('should trim whitespace from search query', async () => {
       const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
         await result.current.searchProducts('   ');
       });
-      
+
       expect(result.current.searchState.results).toEqual([]);
       expect(result.current.searchState.hasSearched).toBe(false);
     });
-    
+
     it('should set loading state during search', async () => {
       (apiClient.searchProducts as jest.Mock).mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve(mockProducts), 100))
       );
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
+
       act(() => {
         result.current.searchProducts('test');
       });
-      
+
       // Should be loading immediately after starting search
       expect(result.current.searchState.isLoading).toBe(true);
       expect(result.current.searchState.loadingState).toBe('loading');
-      
+
       await waitFor(() => {
         expect(result.current.searchState.isLoading).toBe(false);
       });
     });
-    
+
     it('should call API with correct search parameters', async () => {
       (apiClient.searchProducts as jest.Mock).mockResolvedValue(mockProducts);
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
-      await act(async () => {
-        await result.current.searchProducts('rør');
-      });
-      
-      expect(apiClient.searchProducts).toHaveBeenCalledWith({
-        søketekst: 'rør',
-        side: 1,
-        sideStørrelse: 10,
-        sortering: 'relevans'
-      });
-    });
-    
-    it('should update state with API results on success', async () => {
-      (apiClient.searchProducts as jest.Mock).mockResolvedValue(mockProducts);
-      
-      const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
         await result.current.searchProducts('test');
       });
-      
+
+      expect(apiClient.searchProducts).toHaveBeenCalledWith({
+        søketekst: 'test',
+        side: 1,
+        sideStørrelse: 10,
+        sortering: 'relevans'
+      }, undefined);
+    });
+
+    it('should update state with API results on success', async () => {
+      (apiClient.searchProducts as jest.Mock).mockResolvedValue(mockProducts);
+
+      const { result } = renderHook(() => useProductSearch());
+
+      await act(async () => {
+        await result.current.searchProducts('test');
+      });
+
       expect(result.current.searchState).toMatchObject({
         query: 'test',
         results: mockProducts,
@@ -183,219 +144,114 @@ describe('useProductSearch Hook', () => {
       });
     });
   });
-  
-  describe('Error Handling and Fallback', () => {
-    it('should fall back to mock data on API error', async () => {
+
+  describe('Error Handling', () => {
+    it('should handle API network errors', async () => {
       (apiClient.searchProducts as jest.Mock).mockRejectedValue(
         new Error('Network error')
       );
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
-      await act(async () => {
-        await result.current.searchProducts('rør');
-      });
-      
-      // Should have results from mock data
-      expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0]?.navn).toContain('Rör');
-      expect(result.current.searchState.error).toContain('Bruker lokal data');
-      expect(result.current.searchState.error).toContain('Nettverksfeil');
-    });
-    
-    it('should handle Elasticsearch error correctly', async () => {
-      (apiClient.searchProducts as jest.Mock).mockRejectedValue(
-        new Error('Search Failed: Elasticsearch cluster is not available')
-      );
-      
-      const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
         await result.current.searchProducts('test');
       });
-      
-      expect(result.current.searchState.error).toContain('Backend søkefeil');
-      expect(result.current.searchState.error).toContain('Elasticsearch konfigurasjonsproblem');
+
+      expect(result.current.searchState.results).toHaveLength(0);
+      expect(result.current.searchState.error).toContain('Nettverksfeil - kan ikke nå API');
+      expect(result.current.searchState.loadingState).toBe('failed');
     });
-    
-    it('should handle timeout error', async () => {
+
+    it('should handle OpenSearch errors correctly', async () => {
+      (apiClient.searchProducts as jest.Mock).mockRejectedValue(
+        new Error('Search Failed: index not found')
+      );
+
+      const { result } = renderHook(() => useProductSearch());
+
+      await act(async () => {
+        await result.current.searchProducts('test');
+      });
+
+      expect(result.current.searchState.error).toContain('OpenSearch søkefeil - indeks eas-varekatalog-products utilgjengelig');
+    });
+
+    it('should handle timeout errors', async () => {
       (apiClient.searchProducts as jest.Mock).mockRejectedValue(
         new Error('Request timeout')
       );
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
         await result.current.searchProducts('test');
       });
-      
-      expect(result.current.searchState.error).toContain('API timeout');
+
+      expect(result.current.searchState.error).toContain('OpenSearch timeout - prøv igjen');
     });
-    
-    it('should filter mock data based on search term', async () => {
+
+    it('should handle authentication errors', async () => {
       (apiClient.searchProducts as jest.Mock).mockRejectedValue(
-        new Error('API error')
+        new Error('HTTP 401: Unauthorized')
       );
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
-      // Search for "ventil"
-      await act(async () => {
-        await result.current.searchProducts('ventil');
-      });
-      
-      expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0]?.navn).toContain('Ventil');
-      
-      // Search for "NIBE" (produsent)
-      await act(async () => {
-        await result.current.searchProducts('NIBE');
-      });
-      
-      expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0]?.produsent).toBe('NIBE');
-      
-      // Search for VVS number
-      await act(async () => {
-        await result.current.searchProducts('VVS12345');
-      });
-      
-      expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0]?.vvsnr).toBe('VVS12345');
-    });
-    
-    it('should search by category in mock data', async () => {
-      (apiClient.searchProducts as jest.Mock).mockRejectedValue(
-        new Error('API error')
-      );
-      
-      const { result } = renderHook(() => useProductSearch());
-      
-      await act(async () => {
-        await result.current.searchProducts('ovner');
-      });
-      
-      expect(result.current.searchState.results).toHaveLength(1);
-      expect(result.current.searchState.results[0]?.kategori).toContain('Ovner');
-    });
-    
-    it('should handle unknown error types', async () => {
-      (apiClient.searchProducts as jest.Mock).mockRejectedValue(
-        'String error' // Non-Error object
-      );
-      
-      const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
         await result.current.searchProducts('test');
       });
-      
-      expect(result.current.searchState.error).toContain('Bruker lokal data');
-      expect(result.current.searchState.error).toContain('API ikke tilgjengelig');
-    });
-    
-    it('should preserve error message from API', async () => {
-      (apiClient.searchProducts as jest.Mock).mockRejectedValue(
-        new Error('Custom API error message')
-      );
-      
-      const { result } = renderHook(() => useProductSearch());
-      
-      await act(async () => {
-        await result.current.searchProducts('test');
-      });
-      
-      expect(result.current.searchState.error).toContain('Custom API error message');
+
+      expect(result.current.searchState.error).toContain('API krever autentisering');
     });
   });
-  
+
   describe('State Management', () => {
     it('should preserve query in state', async () => {
       (apiClient.searchProducts as jest.Mock).mockResolvedValue(mockProducts);
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
+
       await act(async () => {
-        await result.current.searchProducts('test query');
+        await result.current.searchProducts('ventil');
       });
-      
-      expect(result.current.searchState.query).toBe('test query');
+
+      expect(result.current.searchState.query).toBe('ventil');
     });
-    
+
     it('should mark hasSearched after search', async () => {
-      (apiClient.searchProducts as jest.Mock).mockResolvedValue([]);
-      
+      (apiClient.searchProducts as jest.Mock).mockResolvedValue(mockProducts);
+
       const { result } = renderHook(() => useProductSearch());
-      
+
       expect(result.current.searchState.hasSearched).toBe(false);
-      
+
       await act(async () => {
         await result.current.searchProducts('test');
       });
-      
+
       expect(result.current.searchState.hasSearched).toBe(true);
     });
-    
+
     it('should reset error on new search', async () => {
       (apiClient.searchProducts as jest.Mock)
         .mockRejectedValueOnce(new Error('First error'))
         .mockResolvedValueOnce(mockProducts);
-      
+
       const { result } = renderHook(() => useProductSearch());
-      
-      // First search with error
+
+      // First search fails
       await act(async () => {
-        await result.current.searchProducts('error');
+        await result.current.searchProducts('fail');
       });
-      
+
       expect(result.current.searchState.error).toBeTruthy();
-      
-      // Second search successful
+
+      // Second search succeeds and clears error
       await act(async () => {
         await result.current.searchProducts('success');
       });
-      
+
       expect(result.current.searchState.error).toBeNull();
-    });
-  });
-  
-  describe('Mock Data Integrity', () => {
-    it('should have valid mock product structure', async () => {
-      (apiClient.searchProducts as jest.Mock).mockRejectedValue(
-        new Error('Force mock data')
-      );
-      
-      const { result } = renderHook(() => useProductSearch());
-      
-      await act(async () => {
-        await result.current.searchProducts('rør');
-      });
-      
-      const product = result.current.searchState.results[0];
-      expect(product).toBeDefined();
-      
-      if (product) {
-        // Validate product structure
-        expect(product).toHaveProperty('id');
-        expect(product).toHaveProperty('navn');
-        expect(product).toHaveProperty('vvsnr');
-        expect(product).toHaveProperty('lagerstatus');
-        expect(product).toHaveProperty('anbrekk');
-        expect(product).toHaveProperty('produsent');
-        expect(product).toHaveProperty('pris');
-        expect(product).toHaveProperty('kategori');
-        expect(product).toHaveProperty('beskrivelse');
-        
-        // Validate price structure
-        expect(product.pris).toHaveProperty('salgspris');
-        expect(product.pris).toHaveProperty('valuta');
-        expect(product.pris).toHaveProperty('inkludertMva');
-        
-        // Validate Norwegian values
-        expect(['På lager', 'Få igjen', 'Utsolgt']).toContain(product.lagerstatus);
-        expect(['Ja', 'Nei']).toContain(product.anbrekk);
-        expect(product.pris?.valuta).toBe('NOK');
-      }
     });
   });
 });

@@ -7,7 +7,7 @@ import { Product, ProductSearchQuery, isProductCategory, type ProductCategory } 
 import { getSupplierName, hasSupplierMapping } from '@/utils/supplier-mapping';
 
 // Current API response format
-interface BackendProduct {
+export interface BackendProduct {
   id: string;
   navn: string;            // Product name
   vvsnr: string;           // VVS number
@@ -30,7 +30,7 @@ interface BackendProduct {
 /**
  * Transform backend product to frontend Product format (Phase 2)
  */
-function transformBackendProduct(backendProduct: BackendProduct): Product {
+export function transformBackendProduct(backendProduct: BackendProduct): Product {
   // Debug logging for LH field issues
   if (process.env.NODE_ENV === 'development' && (!backendProduct.lh || backendProduct.lh.trim() === '')) {
     console.warn('[API Transform] Product with empty LH field:', {

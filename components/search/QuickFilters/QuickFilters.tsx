@@ -23,8 +23,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
 }) => {
   // Use controlled filters if provided, otherwise use internal state
   const [internalFilters, setInternalFilters] = useState<FilterState>({
-    supplier: 'Alle leverandører',
-    category: 'Alle kategorier',
+    supplier: '-',
+    category: '-',
     stock: 'Alle'
   });
   
@@ -44,12 +44,12 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
   };
 
   // Use dynamic options or fallback to default options (memoized to prevent useEffect re-runs)
-  const currentSupplierOptions = useMemo(() => 
-    supplierOptions || ['Alle leverandører'], 
+  const currentSupplierOptions = useMemo(() =>
+    supplierOptions || ['-'],
     [supplierOptions]
   );
-  const currentCategoryOptions = useMemo(() => 
-    categoryOptions || ['Alle kategorier'], 
+  const currentCategoryOptions = useMemo(() =>
+    categoryOptions || ['-'],
     [categoryOptions]
   );
   
@@ -91,6 +91,7 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
           <select
             id="supplier-filter"
             name="supplier"
+            aria-label="Supplier filter"
             value={filters.supplier}
             onChange={(e) => handleFilterChange('supplier', e.target.value)}
             className="
@@ -110,31 +111,30 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
           <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
         </div>
 
-        {/* Category Filter - Hidden for now, will be implemented properly later */}
-        {false && (
-          <div className="relative">
-            <select
-              id="category-filter"
-              name="category"
-              value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="
-                appearance-none bg-transparent
-                text-sm font-medium text-neutral-700
-                pr-6 pl-1 py-1
-                border-none outline-none
-                cursor-pointer
-                hover:text-byggern-blue
-                transition-colors duration-150
-              "
-            >
-              {currentCategoryOptions.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
-          </div>
-        )}
+        {/* Category Filter */}
+        <div className="relative">
+          <select
+            id="category-filter"
+            name="category"
+            aria-label="Category filter"
+            value={filters.category}
+            onChange={(e) => handleFilterChange('category', e.target.value)}
+            className="
+              appearance-none bg-transparent
+              text-sm font-medium text-neutral-700
+              pr-6 pl-1 py-1
+              border-none outline-none
+              cursor-pointer
+              hover:text-byggern-blue
+              transition-colors duration-150
+            "
+          >
+            {currentCategoryOptions.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500 pointer-events-none" />
+        </div>
 
 
       </div>
