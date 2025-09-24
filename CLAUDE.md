@@ -191,7 +191,8 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
 ### Production Environment
 - **Name**: `easmith-varekatalog-frontend`
 - **App ID**: `d1bvibntd0i61j`
-- **Production URL**: https://main.d1bvibntd0i61j.amplifyapp.com
+- **Production URL**: https://varekatalog.byggern.no/ (Primary)
+- **Production URL**: https://main.d1bvibntd0i61j.amplifyapp.com/ (Fallback)
 - **App ARN**: `arn:aws:amplify:eu-west-1:785105558045:apps/d1bvibntd0i61j`
 - **Branch**: `main`
 - **Account**: 785105558045
@@ -205,7 +206,6 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
 
 ---
 
-## 🔄 Infrastructure Status (September 19, 2025)
 
 **✅ COMPLETED - Azure AD Authentication Fully Restored:**
 - Backend stack recreation completed (September 18, 2025)
@@ -252,6 +252,7 @@ NEXT_PUBLIC_COGNITO_DOMAIN=eas-varekatalog-auth-dev.auth.eu-west-1.amazoncognito
 - **Cognito Domain**: `eas-varekatalog-auth-prod.auth.eu-west-1.amazoncognito.com`
 - **User Pool**: `eu-west-1_Y9lANGJGs` (eas-varekatalog-users-prod)
 - **Client**: `3jur7ub2mvai5ar5969i3bmum1` (eas-varekatalog-client-prod)
+- **Callback URLs**: `varekatalog.byggern.no/auth/callback`, `main.d1bvibntd0i61j.amplifyapp.com/auth/callback`
 - **Amplify**: `d1bvibntd0i61j.amplifyapp.com`
 
 **Azure AD Integration:**
