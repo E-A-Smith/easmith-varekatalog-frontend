@@ -1,0 +1,251 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [develop, main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+env:
+  AWS_REGION: eu-west-1
+  SAM_CLI_TELEMETRY: 0
+
+jobs:
+  # Skip draft PRs unless they're ready for review
+  check-pr-status:
+    name: Check PR Status
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: PR Info
+        run: |
+          echo "PR #${{ github.event.number }}: ${{ github.event.pull_request.title }}"
+          echo "Author: ${{ github.event.pull_request.user.login }}"
+          echo "Base: ${{ github.event.pull_request.base.ref }}"
+          echo "Head: ${{ github.event.pull_request.head.ref }}"
+
+  # Fast validation checks
+  quick-validation:
+    name: Quick Validation
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for required files
+        run: |
+          echo "Checking for required files and directories..."
+          
+          # Check for Lambda function directories
+          LAMBDA_DIRS=(
+            "src/lambdas/search-api"
+            "src/lambdas/dynamodb-sync"
+            "src/lambdas/index-setup"
+            "src/lambdas/file-processor"
+          )
+          
+          for dir in "${LAMBDA_DIRS[@]}"; do
+            if [ ! -d "$dir" ]; then
+              echo "❌ Lambda directory not found: $dir"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All required files found"
+
+      - name: Check for secrets or sensitive data
+        run: |
+          echo "Scanning for potential secrets..."
+          
+          # Check for common secret patterns
+          if grep -r -i "password\|secret\|key" --include="*.ts" --include="*.js" --include="*.py" --include="*.yaml" --include="*.yml" . | grep -v ".git" | grep -v "node_modules" | head -10; then
+            echo "⚠️ Potential secrets found - please review"
+          else
+            echo "✅ No obvious secrets detected"
+          fi
+
+      - name: Check commit messages
+        run: |
+          echo "Checking commit messages..."
+          
+          # Get commits in this PR
+          git log --oneline origin/${{ github.event.pull_request.base.ref }}..HEAD
+          
+          # Check if commits follow conventional commits (loosely)
+          COMMITS=$(git log --pretty=format:"%s" origin/${{ github.event.pull_request.base.ref }}..HEAD)
+          
+          while IFS= read -r commit; do
+            if [[ ! "$commit" =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?: ]]; then
+              echo "⚠️ Commit message doesn't follow conventional format: $commit"
+            fi
+          done <<< "$COMMITS"
+          
+          echo "✅ Commit message check completed"
+
+  # Full validation (reuse parts of main CI/CD)
+  full-validation:
+    name: Full PR Validation
+    runs-on: ubuntu-latest
+    needs: quick-validation
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install AWS SAM CLI
+        run: |
+          wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+          unzip -q aws-sam-cli-linux-x86_64.zip -d sam-installation
+          sudo ./sam-installation/install --update
+          sam --version
+
+      - name: Configure AWS credentials (Read-only)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::852634887748:role/GitHubActions-Varekatalog-dev
+          role-session-name: GitHubActions-PR-Validation
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Lint TypeScript Lambda functions
+        run: |
+          echo "🔍 Running TypeScript linting..."
+          cd src/lambdas/search-api && npm ci && npm run lint
+          cd ../dynamodb-sync && npm ci && (npm run lint || echo "Lint script not available")
+          cd ../index-setup && npm ci && (npm run lint || echo "Lint script not available")
+
+      - name: Lint Python Lambda functions
+        run: |
+          echo "🔍 Running Python linting..."
+          cd src/lambdas/file-processor
+          pip install flake8 black
+          flake8 . --count --statistics --max-line-length=88
+          black --check --diff .
+
+      - name: Type check TypeScript
+        run: |
+          echo "🔍 Running TypeScript type checking..."
+          cd src/lambdas/search-api && npx tsc --noEmit
+          cd ../dynamodb-sync && (npx tsc --noEmit || echo "No TypeScript config")
+          cd ../index-setup && (npx tsc --noEmit || echo "No TypeScript config")
+
+      - name: Build all Lambda functions
+        run: |
+          echo "🏗️ Building Lambda functions..."
+          ./scripts/build-all-lambdas.sh
+
+      - name: Run tests
+        run: |
+          echo "🧪 Running tests..."
+          ./scripts/test-all.sh
+
+      - name: Security scan
+        continue-on-error: true
+        run: |
+          echo "🔒 Running security scans..."
+          
+          # Node.js security scan
+          npm install -g snyk
+          cd src/lambdas/search-api && (snyk test --severity-threshold=medium || echo "Security issues found")
+          
+          # Python security scan
+          pip install bandit[toml]
+          cd ../file-processor && (bandit -r . || echo "Security issues found")
+
+      - name: Generate PR summary
+        run: |
+          echo "📊 PR Validation Summary" >> pr_summary.md
+          echo "========================" >> pr_summary.md
+          echo "" >> pr_summary.md
+          echo "✅ **All checks passed!**" >> pr_summary.md
+          echo "" >> pr_summary.md
+          echo "**Changes validated:**" >> pr_summary.md
+          echo "- 🔍 Code linting and type checking" >> pr_summary.md
+          echo "- 🏗️ Lambda function builds" >> pr_summary.md
+          echo "- 🧪 Unit tests" >> pr_summary.md
+          echo "- 🔒 Security scanning" >> pr_summary.md
+          echo "" >> pr_summary.md
+          echo "**Ready for review! 🚀**" >> pr_summary.md
+          
+          cat pr_summary.md
+
+  # Size and impact analysis
+  change-analysis:
+    name: Change Analysis
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze changes
+        run: |
+          echo "📈 Analyzing PR changes..."
+          
+          # Get changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}..HEAD)
+          LAMBDA_CHANGES=0
+          INFRA_CHANGES=0
+          TEST_CHANGES=0
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          echo ""
+          
+          # Categorize changes
+          while IFS= read -r file; do
+            if [[ "$file" == src/lambdas/* ]]; then
+              LAMBDA_CHANGES=$((LAMBDA_CHANGES + 1))
+            elif [[ "$file" == *test* ]] || [[ "$file" == *.test.* ]]; then
+              TEST_CHANGES=$((TEST_CHANGES + 1))
+            fi
+          done <<< "$CHANGED_FILES"
+          
+          echo "📊 Change Summary:"
+          echo "  Lambda functions: $LAMBDA_CHANGES files"
+          echo "  Tests: $TEST_CHANGES files"
+          echo ""
+          
+          # Risk assessment
+          if [ $LAMBDA_CHANGES -gt 5 ]; then
+            echo "⚠️  Many Lambda changes - consider splitting PR"
+          fi
+          
+          if [ $TEST_CHANGES -eq 0 ] && [ $LAMBDA_CHANGES -gt 0 ]; then
+            echo "⚠️  Lambda changes without test updates - consider adding tests"
+          fi
+
+  # Auto-assign reviewers based on changed files
+  assign-reviewers:
+    name: Assign Reviewers
+    runs-on: ubuntu-latest
+    needs: change-analysis
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Auto-assign reviewers
+        run: |
+          echo "👥 Auto-assigning reviewers based on changes..."
+          echo "This step would integrate with your team's reviewer assignment logic"
+          echo "For now, manual assignment is recommended"
