@@ -1,0 +1,256 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [develop, main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+env:
+  AWS_REGION: eu-west-1
+  SAM_CLI_TELEMETRY: 0
+
+jobs:
+  # Skip draft PRs unless they're ready for review
+  check-pr-status:
+    name: Check PR Status
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: PR Info
+        run: |
+          echo "PR #${{ github.event.number }}: ${{ github.event.pull_request.title }}"
+          echo "Author: ${{ github.event.pull_request.user.login }}"
+          echo "Base: ${{ github.event.pull_request.base.ref }}"
+          echo "Head: ${{ github.event.pull_request.head.ref }}"
+
+  # Fast validation checks
+  quick-validation:
+    name: Quick Validation
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for required files
+        run: |
+          echo "Checking for required frontend files and directories..."
+
+          # Check for Next.js frontend directories
+          FRONTEND_DIRS=(
+            "app"
+            "components"
+            "hooks"
+            "types"
+            "utils"
+          )
+
+          for dir in "${FRONTEND_DIRS[@]}"; do
+            if [ ! -d "$dir" ]; then
+              echo "❌ Frontend directory not found: $dir"
+              exit 1
+            fi
+          done
+
+          # Check for essential frontend files
+          FRONTEND_FILES=(
+            "package.json"
+            "next.config.ts"
+            "tailwind.config.ts"
+            "tsconfig.json"
+          )
+
+          for file in "${FRONTEND_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Frontend file not found: $file"
+              exit 1
+            fi
+          done
+
+          echo "✅ All required frontend files found"
+
+      - name: Check for secrets or sensitive data
+        run: |
+          echo "Scanning for potential secrets..."
+          
+          # Check for common secret patterns
+          if grep -r -i "password\|secret\|key" --include="*.ts" --include="*.js" --include="*.py" --include="*.yaml" --include="*.yml" . | grep -v ".git" | grep -v "node_modules" | head -10; then
+            echo "⚠️ Potential secrets found - please review"
+          else
+            echo "✅ No obvious secrets detected"
+          fi
+
+      - name: Check commit messages
+        run: |
+          echo "Checking commit messages..."
+          
+          # Get commits in this PR
+          git log --oneline origin/${{ github.event.pull_request.base.ref }}..HEAD
+          
+          # Check if commits follow conventional commits (loosely)
+          COMMITS=$(git log --pretty=format:"%s" origin/${{ github.event.pull_request.base.ref }}..HEAD)
+          
+          while IFS= read -r commit; do
+            if [[ ! "$commit" =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?: ]]; then
+              echo "⚠️ Commit message doesn't follow conventional format: $commit"
+            fi
+          done <<< "$COMMITS"
+          
+          echo "✅ Commit message check completed"
+
+  # Full validation (reuse parts of main CI/CD)
+  full-validation:
+    name: Full PR Validation
+    runs-on: ubuntu-latest
+    needs: quick-validation
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint frontend code
+        run: |
+          echo "🔍 Running ESLint..."
+          npm run lint
+
+      - name: Type check TypeScript
+        run: |
+          echo "🔍 Running TypeScript type checking..."
+          npm run type-check
+
+      - name: Build Next.js application
+        run: |
+          echo "🏗️ Building Next.js application..."
+          npm run build
+
+      - name: Run tests
+        run: |
+          echo "🧪 Running frontend tests..."
+          npm test -- --watchAll=false
+
+      - name: Security scan
+        continue-on-error: true
+        run: |
+          echo "🔒 Running security scans..."
+
+          # Node.js dependency audit
+          npm audit --audit-level=moderate || echo "Security issues found in dependencies"
+
+          # Additional frontend security checks
+          echo "Checking for potential security issues..."
+
+          # Check for hardcoded secrets (basic patterns)
+          if grep -r -E "(password|secret|key|token)\s*[:=]\s*['\"][^'\"]*['\"]" . --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v node_modules | head -5; then
+            echo "⚠️ Potential hardcoded secrets found - please review"
+          else
+            echo "✅ No obvious hardcoded secrets detected"
+          fi
+
+      - name: Generate PR summary
+        run: |
+          echo "📊 Frontend PR Validation Summary" >> pr_summary.md
+          echo "=================================" >> pr_summary.md
+          echo "" >> pr_summary.md
+          echo "✅ **All frontend checks passed!**" >> pr_summary.md
+          echo "" >> pr_summary.md
+          echo "**Changes validated:**" >> pr_summary.md
+          echo "- 🔍 ESLint code linting" >> pr_summary.md
+          echo "- 📝 TypeScript type checking" >> pr_summary.md
+          echo "- 🏗️ Next.js application build" >> pr_summary.md
+          echo "- 🧪 Frontend unit tests" >> pr_summary.md
+          echo "- 🔒 Security scanning" >> pr_summary.md
+          echo "" >> pr_summary.md
+          echo "**Frontend ready for review! 🚀**" >> pr_summary.md
+
+          cat pr_summary.md
+
+  # Size and impact analysis
+  change-analysis:
+    name: Change Analysis
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze changes
+        run: |
+          echo "📈 Analyzing frontend PR changes..."
+
+          # Get changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}..HEAD)
+          COMPONENT_CHANGES=0
+          HOOK_CHANGES=0
+          API_CHANGES=0
+          TYPE_CHANGES=0
+          TEST_CHANGES=0
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          echo ""
+
+          # Categorize changes
+          while IFS= read -r file; do
+            if [[ "$file" == components/* ]]; then
+              COMPONENT_CHANGES=$((COMPONENT_CHANGES + 1))
+            elif [[ "$file" == hooks/* ]]; then
+              HOOK_CHANGES=$((HOOK_CHANGES + 1))
+            elif [[ "$file" == app/api/* ]]; then
+              API_CHANGES=$((API_CHANGES + 1))
+            elif [[ "$file" == types/* ]]; then
+              TYPE_CHANGES=$((TYPE_CHANGES + 1))
+            elif [[ "$file" == *test* ]] || [[ "$file" == *.test.* ]] || [[ "$file" == *.spec.* ]]; then
+              TEST_CHANGES=$((TEST_CHANGES + 1))
+            fi
+          done <<< "$CHANGED_FILES"
+
+          echo "📊 Frontend Change Summary:"
+          echo "  Components: $COMPONENT_CHANGES files"
+          echo "  Hooks: $HOOK_CHANGES files"
+          echo "  API routes: $API_CHANGES files"
+          echo "  Types: $TYPE_CHANGES files"
+          echo "  Tests: $TEST_CHANGES files"
+          echo ""
+
+          # Risk assessment
+          if [ $COMPONENT_CHANGES -gt 10 ]; then
+            echo "⚠️  Many component changes - consider splitting PR"
+          fi
+
+          if [ $TEST_CHANGES -eq 0 ] && [ $((COMPONENT_CHANGES + HOOK_CHANGES + API_CHANGES)) -gt 0 ]; then
+            echo "⚠️  Frontend changes without test updates - consider adding tests"
+          fi
+
+          if [ $API_CHANGES -gt 0 ]; then
+            echo "ℹ️  API route changes detected - ensure backend compatibility"
+          fi
+
+  # Auto-assign reviewers based on changed files
+  assign-reviewers:
+    name: Assign Reviewers
+    runs-on: ubuntu-latest
+    needs: change-analysis
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Auto-assign reviewers
+        run: |
+          echo "👥 Auto-assigning reviewers based on changes..."
+          echo "This step would integrate with your team's reviewer assignment logic"
+          echo "For now, manual assignment is recommended"

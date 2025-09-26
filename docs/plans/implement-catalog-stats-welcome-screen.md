@@ -10,28 +10,23 @@ This empty state provides no value to users and misses an opportunity to showcas
 - When stock levels were last updated
 - When prices were last updated
 - Total number of products, categories, and suppliers
-- Fun facts and statistics about the catalog
 
 ## 📋 Requirements
 
 ### User Stories
 As a **warehouse employee**, I want to:
 - See when stock levels were last updated so I know if the data is current
-- View total product count to understand catalog scope
-- Check data completeness to trust the information
-
-As a **purchasing manager**, I want to:
-- Know when prices were last updated for accurate budgeting
-- See supplier count for vendor diversity insights
-- View category breakdown for procurement planning
+- See when the prices was last adjusted so I know if the data is current
+- See total product count to understand catalog scope
+- See total supplier count to understand catalog scope
+- See total category count to understand catalog scope
 
 ### Functional Requirements
 1. Display catalog statistics in an engaging card-based layout
 2. Show last update timestamps for stock and prices
-3. Present fun facts that rotate or change
-4. Maintain responsive design (mobile, tablet, desktop)
-5. Use Norwegian language throughout
-6. Load statistics without blocking initial page render
+3. Maintain responsive design (mobile, tablet, desktop)
+4. Use Norwegian language throughout
+5. Load statistics without blocking initial page render
 
 ## 🏗️ Current Architecture
 
@@ -125,7 +120,7 @@ Note: [📦], [🏷️], [🏭] represent custom SVG icons (see implementation)
 ## 📁 Implementation Plan
 ### Step 0: Prompt backend team to implement API endpoint
 
-Do not start on Step 7 (Update Main Page) before the backend team has implemented the API endpoint. We will not use mock data.
+Do not start on Step 8 (Update Main Page) before the backend team has implemented the API endpoint. We will not use mock data.
 
 ### Step 1: Create SVG Icon Components
 **File**: `components/ui/icons/CatalogIcons.tsx`
@@ -379,7 +374,6 @@ export interface CatalogStats {
     name: string;
     searches: number;
   }>;
-  funFact: string;           // Random fun fact in Norwegian
 }
 
 export interface StatCardProps {
@@ -392,7 +386,7 @@ export interface StatCardProps {
 }
 ```
 
-### Step 2: Create API Proxy Endpoint
+### Step 3: Create API Proxy Endpoint
 **File**: `app/api/catalog-stats/route.ts`
 
 ⚠️ **DEPENDENCY**: This step requires the backend `/stats` endpoint to be implemented first. See Backend Requirements section.
@@ -440,7 +434,7 @@ export async function GET() {
 }
 ```
 
-### Step 3: Create Stats Hook
+### Step 4: Create Stats Hook
 **File**: `hooks/useCatalogStats.ts`
 ```typescript
 import useSWR from 'swr';
@@ -467,7 +461,7 @@ export function useCatalogStats() {
 }
 ```
 
-### Step 4: Create StatCard Component
+### Step 5: Create StatCard Component
 **File**: `components/catalog/StatCard/StatCard.tsx`
 ```typescript
 'use client';
@@ -525,7 +519,7 @@ export const StatCard: FC<StatCardProps> = ({
 };
 ```
 
-### Step 5: Create CatalogStats Component
+### Step 6: Create CatalogStats Component
 **File**: `components/catalog/CatalogStats/CatalogStats.tsx`
 ```typescript
 'use client';
@@ -633,17 +627,6 @@ export const CatalogStats: FC = () => {
         </div>
       </div>
 
-      {/* Fun Fact Section */}
-      <div className="bg-byggern-primary/5 rounded-lg p-6 border border-byggern-primary/20">
-        <h3 className="text-lg font-semibold text-byggern-primary mb-3 flex items-center">
-          <LightbulbIcon size={20} className="text-byggern-orange mr-2" />
-          Visste du at?
-        </h3>
-        <p className="text-neutral-700">
-          {stats?.funFact || 'Laster interessante fakta...'}
-        </p>
-      </div>
-
       {/* Search Prompt */}
       <div className="text-center mt-8">
         <p className="text-neutral-600">
@@ -655,7 +638,7 @@ export const CatalogStats: FC = () => {
 };
 ```
 
-### Step 6: Create Date Helper Utility
+### Step 7: Create Date Helper Utility
 **File**: `utils/date-helpers.ts`
 ```typescript
 export function formatDistanceToNow(dateString: string): string {
@@ -681,7 +664,7 @@ export function formatDistanceToNow(dateString: string): string {
 }
 ```
 
-### Step 7: Update Main Page
+### Step 8: Update Main Page
 **File**: `app/page.tsx`
 
 Find the section that shows the empty state message (around line where it says "Søk etter produkter for å se resultater") and replace it with:
@@ -707,7 +690,7 @@ import { CatalogStats } from '@/components/catalog/CatalogStats';
 )}
 ```
 
-### Step 8: Add Barrel Exports
+### Step 9: Add Barrel Exports
 **File**: `components/catalog/StatCard/index.ts`
 ```typescript
 export { StatCard } from './StatCard';
@@ -719,7 +702,7 @@ export type { StatCardProps } from '@/types/catalog-stats';
 export { CatalogStats } from './CatalogStats';
 ```
 
-### Step 9: Add Tests
+### Step 10: Add Tests
 **File**: `components/catalog/StatCard/StatCard.test.tsx`
 ```typescript
 import { render, screen } from '@testing-library/react';
@@ -799,7 +782,7 @@ curl http://localhost:3000/api/catalog-stats
 ### Environment Variables
 Required environment variable for backend API connection:
 ```bash
-NEXT_PUBLIC_EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_EXTERNAL_API_URL=https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
 This must be configured before the frontend can connect to the backend statistics endpoint.
@@ -870,14 +853,6 @@ interface CatalogStatsResponse {
   // Recent Activity
   recentAdditions: number;      // Products added in last 7 days
   
-  // Popular Items (optional, for fun facts)
-  popularProducts?: Array<{
-    name: string;              // Product name (varenavn)
-    searches: number;           // Search count in last 30 days
-  }>;
-  
-  // Fun Fact (optional)
-  funFact?: string;             // Random interesting fact in Norwegian
 }
 ```
 
@@ -888,19 +863,7 @@ interface CatalogStatsResponse {
   "totalCategories": 127,
   "totalSuppliers": 43,
   "lastStockUpdate": "2025-01-07T14:30:00Z",
-  "lastPriceUpdate": "2025-01-06T22:00:00Z",
-  "recentAdditions": 47,
-  "popularProducts": [
-    {
-      "name": "Terrassebord Royal",
-      "searches": 234
-    },
-    {
-      "name": "Skrue rustfri 4x40",
-      "searches": 189
-    }
-  ],
-  "funFact": "Katalogen inneholder produkter fra 43 norske leverandører!"
+  "lastPriceUpdate": "2025-01-06T22:00:00Z"
 }
 ```
 
@@ -1036,36 +999,6 @@ const recentProducts = await opensearchClient.search({
 });
 ```
 
-##### Popular Products (Optional)
-```typescript
-// If you're tracking searches in CloudWatch or DynamoDB
-const popularProducts = await dynamoClient.query({
-  TableName: 'search-analytics',
-  IndexName: 'by-count',
-  ScanIndexForward: false,
-  Limit: 3,
-  KeyConditionExpression: 'period = :period',
-  ExpressionAttributeValues: {
-    ':period': { S: 'last-30-days' }
-  }
-});
-```
-
-#### Step 3: Generate Fun Facts
-```typescript
-function generateFunFact(stats: any): string {
-  const facts = [
-    `Katalogen inneholder produkter fra ${stats.totalSuppliers} norske leverandører!`,
-    `Over ${Math.floor(stats.totalProducts * 0.05)} produkter kan leveres som anbrekk.`,
-    `${stats.recentAdditions} nye produkter ble lagt til denne uken.`,
-    `Den største kategorien inneholder over ${Math.floor(stats.totalProducts / stats.totalCategories * 1.5)} produkter.`,
-    `Katalogen har ${stats.totalCategories} forskjellige produktkategorier.`
-  ];
-  
-  return facts[Math.floor(Math.random() * facts.length)];
-}
-```
-
 #### Step 4: Add Caching Layer
 ```typescript
 import { createHash } from 'crypto';
@@ -1187,7 +1120,7 @@ describe('CatalogStats Lambda', () => {
 #### Integration Test
 ```bash
 # Test the deployed endpoint
-curl -X GET https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev/stats
+curl -X GET https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev/stats
 
 # Expected response format
 {
@@ -1228,13 +1161,13 @@ curl -X GET https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev/stats
 1. **Configure Environment Variables**:
 ```bash
 # Add to AWS Amplify Console or .env.local
-NEXT_PUBLIC_EXTERNAL_API_URL=https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev
+NEXT_PUBLIC_EXTERNAL_API_URL=https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev
 ```
 
 2. **Test Backend Connection**:
 ```bash
 # Verify backend is working
-curl https://y53p9uarcj.execute-api.eu-west-1.amazonaws.com/dev/stats
+curl https://28svlvit82.execute-api.eu-west-1.amazonaws.com/dev/stats
 ```
 
 3. **Deploy Frontend**: Frontend API proxy will automatically connect to backend
