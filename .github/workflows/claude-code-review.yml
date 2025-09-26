@@ -12,6 +12,8 @@ on:
 
 jobs:
   claude-review:
+    # Disabled: CLAUDE_CODE_OAUTH_TOKEN not available in frontend repository
+    if: false
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
