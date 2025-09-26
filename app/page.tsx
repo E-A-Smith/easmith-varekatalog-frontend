@@ -15,6 +15,7 @@ import type { Product, LagerStatus } from '@/types/product';
 import { getUniqueSuppliers, getUniqueCategories, validateFilterValue, matchesSupplierFilter } from '@/utils/filter-helpers';
 import { formatNorwegianPrice } from '@/utils/formatters';
 import { displayLH, isEmptyLH } from '@/utils/display-helpers';
+import { CatalogStats } from '@/components/catalog/CatalogStats';
 
 // No default products - start with empty search results
 const catalogProducts: Product[] = [];
@@ -325,14 +326,7 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-neutral-600">
-                  Søk etter produkter for å se resultater
-                </p>
-                <p className="text-sm text-neutral-500 mt-2">
-                  Bruk søkefeltet ovenfor for å finne produkter i katalogen
-                </p>
-              </div>
+              <CatalogStats />
             )}
           </div>
 
