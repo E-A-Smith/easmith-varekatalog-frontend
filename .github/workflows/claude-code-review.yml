@@ -12,7 +12,7 @@ on:
 
 jobs:
   claude-review:
-    # Temporarily disabled due to missing ANTHROPIC_API_KEY
+    # Disabled: CLAUDE_CODE_OAUTH_TOKEN not available in frontend repository
     if: false
     # Optional: Filter by PR author
     # if: |
