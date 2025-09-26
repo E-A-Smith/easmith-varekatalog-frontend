@@ -262,12 +262,6 @@ export default function Dashboard() {
     }
   };
 
-
-
-  const displayTitle = searchState.hasSearched && searchState.query
-    ? `Søkeresultater for "${searchState.query}" (${searchState.results.length} funnet)`
-    : 'Produktkatalog';
-
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Sub Header: Organization branding (36px) */}
@@ -295,12 +289,6 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto p-6">
         {/* Product Catalog Table */}
         <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-neutral-200">
-            <h2 className="text-lg font-semibold text-neutral-800">
-              {displayTitle}
-            </h2>
-          </div>
-          
           <div className="p-6">
             {searchState.isLoading ? (
               <div className="text-center py-12">
