@@ -36,24 +36,40 @@ jobs:
 
       - name: Check for required files
         run: |
-          echo "Checking for required files and directories..."
-          
-          # Check for Lambda function directories
-          LAMBDA_DIRS=(
-            "src/lambdas/search-api"
-            "src/lambdas/dynamodb-sync"
-            "src/lambdas/index-setup"
-            "src/lambdas/file-processor"
+          echo "Checking for required frontend files and directories..."
+
+          # Check for Next.js frontend directories
+          FRONTEND_DIRS=(
+            "app"
+            "components"
+            "hooks"
+            "types"
+            "utils"
           )
-          
-          for dir in "${LAMBDA_DIRS[@]}"; do
+
+          for dir in "${FRONTEND_DIRS[@]}"; do
             if [ ! -d "$dir" ]; then
-              echo "❌ Lambda directory not found: $dir"
+              echo "❌ Frontend directory not found: $dir"
               exit 1
             fi
           done
-          
-          echo "✅ All required files found"
+
+          # Check for essential frontend files
+          FRONTEND_FILES=(
+            "package.json"
+            "next.config.ts"
+            "tailwind.config.ts"
+            "tsconfig.json"
+          )
+
+          for file in "${FRONTEND_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Frontend file not found: $file"
+              exit 1
+            fi
+          done
+
+          echo "✅ All required frontend files found"
 
       - name: Check for secrets or sensitive data
         run: |
@@ -124,69 +140,63 @@ jobs:
           role-session-name: GitHubActions-PR-Validation
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Lint TypeScript Lambda functions
+      - name: Lint frontend code
         run: |
-          echo "🔍 Running TypeScript linting..."
-          cd src/lambdas/search-api && npm ci && npm run lint
-          cd ../dynamodb-sync && npm ci && (npm run lint || echo "Lint script not available")
-          cd ../index-setup && npm ci && (npm run lint || echo "Lint script not available")
-
-      - name: Lint Python Lambda functions
-        run: |
-          echo "🔍 Running Python linting..."
-          cd src/lambdas/file-processor
-          pip install flake8 black
-          flake8 . --count --statistics --max-line-length=88
-          black --check --diff .
+          echo "🔍 Running ESLint..."
+          npm run lint
 
       - name: Type check TypeScript
         run: |
           echo "🔍 Running TypeScript type checking..."
-          cd src/lambdas/search-api && npx tsc --noEmit
-          cd ../dynamodb-sync && (npx tsc --noEmit || echo "No TypeScript config")
-          cd ../index-setup && (npx tsc --noEmit || echo "No TypeScript config")
+          npm run type-check
 
-      - name: Build all Lambda functions
+      - name: Build Next.js application
         run: |
-          echo "🏗️ Building Lambda functions..."
-          ./scripts/build-all-lambdas.sh
+          echo "🏗️ Building Next.js application..."
+          npm run build
 
       - name: Run tests
         run: |
-          echo "🧪 Running tests..."
-          ./scripts/test-all.sh
+          echo "🧪 Running frontend tests..."
+          npm test -- --watchAll=false
 
       - name: Security scan
         continue-on-error: true
         run: |
           echo "🔒 Running security scans..."
-          
-          # Node.js security scan
-          npm install -g snyk
-          cd src/lambdas/search-api && (snyk test --severity-threshold=medium || echo "Security issues found")
-          
-          # Python security scan
-          pip install bandit[toml]
-          cd ../file-processor && (bandit -r . || echo "Security issues found")
+
+          # Node.js dependency audit
+          npm audit --audit-level=moderate || echo "Security issues found in dependencies"
+
+          # Additional frontend security checks
+          echo "Checking for potential security issues..."
+
+          # Check for hardcoded secrets (basic patterns)
+          if grep -r -E "(password|secret|key|token)\s*[:=]\s*['\"][^'\"]*['\"]" . --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v node_modules | head -5; then
+            echo "⚠️ Potential hardcoded secrets found - please review"
+          else
+            echo "✅ No obvious hardcoded secrets detected"
+          fi
 
       - name: Generate PR summary
         run: |
-          echo "📊 PR Validation Summary" >> pr_summary.md
-          echo "========================" >> pr_summary.md
+          echo "📊 Frontend PR Validation Summary" >> pr_summary.md
+          echo "=================================" >> pr_summary.md
           echo "" >> pr_summary.md
-          echo "✅ **All checks passed!**" >> pr_summary.md
+          echo "✅ **All frontend checks passed!**" >> pr_summary.md
           echo "" >> pr_summary.md
           echo "**Changes validated:**" >> pr_summary.md
-          echo "- 🔍 Code linting and type checking" >> pr_summary.md
-          echo "- 🏗️ Lambda function builds" >> pr_summary.md
-          echo "- 🧪 Unit tests" >> pr_summary.md
+          echo "- 🔍 ESLint code linting" >> pr_summary.md
+          echo "- 📝 TypeScript type checking" >> pr_summary.md
+          echo "- 🏗️ Next.js application build" >> pr_summary.md
+          echo "- 🧪 Frontend unit tests" >> pr_summary.md
           echo "- 🔒 Security scanning" >> pr_summary.md
           echo "" >> pr_summary.md
-          echo "**Ready for review! 🚀**" >> pr_summary.md
-          
+          echo "**Frontend ready for review! 🚀**" >> pr_summary.md
+
           cat pr_summary.md
 
   # Size and impact analysis
@@ -202,39 +212,54 @@ jobs:
 
       - name: Analyze changes
         run: |
-          echo "📈 Analyzing PR changes..."
-          
+          echo "📈 Analyzing frontend PR changes..."
+
           # Get changed files
           CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}..HEAD)
-          LAMBDA_CHANGES=0
-          INFRA_CHANGES=0
+          COMPONENT_CHANGES=0
+          HOOK_CHANGES=0
+          API_CHANGES=0
+          TYPE_CHANGES=0
           TEST_CHANGES=0
-          
+
           echo "Changed files:"
           echo "$CHANGED_FILES"
           echo ""
-          
+
           # Categorize changes
           while IFS= read -r file; do
-            if [[ "$file" == src/lambdas/* ]]; then
-              LAMBDA_CHANGES=$((LAMBDA_CHANGES + 1))
-            elif [[ "$file" == *test* ]] || [[ "$file" == *.test.* ]]; then
+            if [[ "$file" == components/* ]]; then
+              COMPONENT_CHANGES=$((COMPONENT_CHANGES + 1))
+            elif [[ "$file" == hooks/* ]]; then
+              HOOK_CHANGES=$((HOOK_CHANGES + 1))
+            elif [[ "$file" == app/api/* ]]; then
+              API_CHANGES=$((API_CHANGES + 1))
+            elif [[ "$file" == types/* ]]; then
+              TYPE_CHANGES=$((TYPE_CHANGES + 1))
+            elif [[ "$file" == *test* ]] || [[ "$file" == *.test.* ]] || [[ "$file" == *.spec.* ]]; then
               TEST_CHANGES=$((TEST_CHANGES + 1))
             fi
           done <<< "$CHANGED_FILES"
-          
-          echo "📊 Change Summary:"
-          echo "  Lambda functions: $LAMBDA_CHANGES files"
+
+          echo "📊 Frontend Change Summary:"
+          echo "  Components: $COMPONENT_CHANGES files"
+          echo "  Hooks: $HOOK_CHANGES files"
+          echo "  API routes: $API_CHANGES files"
+          echo "  Types: $TYPE_CHANGES files"
           echo "  Tests: $TEST_CHANGES files"
           echo ""
-          
+
           # Risk assessment
-          if [ $LAMBDA_CHANGES -gt 5 ]; then
-            echo "⚠️  Many Lambda changes - consider splitting PR"
+          if [ $COMPONENT_CHANGES -gt 10 ]; then
+            echo "⚠️  Many component changes - consider splitting PR"
           fi
-          
-          if [ $TEST_CHANGES -eq 0 ] && [ $LAMBDA_CHANGES -gt 0 ]; then
-            echo "⚠️  Lambda changes without test updates - consider adding tests"
+
+          if [ $TEST_CHANGES -eq 0 ] && [ $((COMPONENT_CHANGES + HOOK_CHANGES + API_CHANGES)) -gt 0 ]; then
+            echo "⚠️  Frontend changes without test updates - consider adding tests"
+          fi
+
+          if [ $API_CHANGES -gt 0 ]; then
+            echo "ℹ️  API route changes detected - ensure backend compatibility"
           fi
 
   # Auto-assign reviewers based on changed files
