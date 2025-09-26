@@ -96,7 +96,7 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
             onChange={(e) => handleFilterChange('supplier', e.target.value)}
             className="
               appearance-none bg-transparent
-              text-sm font-medium text-neutral-700
+              text-xs font-medium text-neutral-700
               pr-6 pl-1 py-1
               border-none outline-none
               cursor-pointer
