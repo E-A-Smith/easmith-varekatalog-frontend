@@ -1,0 +1,1 @@
+export { CatalogStats } from './CatalogStats';
