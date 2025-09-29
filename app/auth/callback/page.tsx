@@ -7,6 +7,45 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { trackLoginSuccess, trackError } from '@/utils/analytics';
+
+// JWT token parsing utility
+interface JwtPayload {
+  sub?: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  'cognito:username'?: string;
+  identities?: Array<{
+    userId: string;
+    providerName: string;
+    providerType: string;
+  }>;
+  scope?: string;
+  [key: string]: unknown;
+}
+
+const parseJwtPayload = (token: string): JwtPayload => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3 || !parts[1]) {
+      throw new Error('Invalid JWT format');
+    }
+
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to parse JWT payload:', error);
+    return {};
+  }
+};
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -35,6 +74,15 @@ function AuthCallbackContent() {
         // Handle OAuth errors
         if (error) {
           console.error('OAuth error:', error, errorDescription);
+
+          // Track authentication error
+          trackError(
+            'auth_error',
+            errorDescription || error,
+            'high',
+            'oauth_callback'
+          );
+
           setStatus('error');
           setError(`Authentisering feilet: ${errorDescription || error}`);
           return;
@@ -64,9 +112,14 @@ function AuthCallbackContent() {
         if (tokenResponse.access_token) {
           // Store Cognito tokens securely
           await storeCognitoTokensSecurely(tokenResponse);
-          
+
+          // Track successful login
+          const userPayload = parseJwtPayload(tokenResponse.id_token);
+          const organizationId = userPayload.identities?.[0]?.userId || userPayload['cognito:username'] || userPayload.sub;
+          trackLoginSuccess('azure_ad', organizationId);
+
           setStatus('success');
-          
+
           // Redirect to main application after successful authentication
           setTimeout(() => {
             router.push('/');
@@ -77,6 +130,15 @@ function AuthCallbackContent() {
 
       } catch (err) {
         console.error('OAuth callback error:', err);
+
+        // Track authentication error
+        trackError(
+          'auth_error',
+          err instanceof Error ? err.message : 'Ukjent feil under autentisering',
+          'high',
+          'oauth_token_exchange'
+        );
+
         setStatus('error');
         setError(err instanceof Error ? err.message : 'Ukjent feil under autentisering');
       }

@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { OAuthScope, UserPermissions } from '@/types/product';
+import { trackLogin, trackLogout, setUserProperties, trackError } from '@/utils/analytics';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -204,6 +205,14 @@ export const useAuth = (): AuthContext => {
               scopes,
               permissions,
             });
+
+            // Track successful authentication and set user properties
+            const organizationId = userInfo.identities?.[0]?.userId || userInfo.username;
+            setUserProperties({
+              user_type: 'authenticated',
+              organization_id: organizationId,
+            });
+
             return;
           } else {
             // Token expired, clear tokens (avoid circular dependency)
@@ -233,6 +242,9 @@ export const useAuth = (): AuthContext => {
 
   const signIn = useCallback((): void => {
     try {
+      // Track login initiation
+      trackLogin('azure_ad');
+
       // Generate PKCE parameters for security
       const codeVerifier = generateCodeVerifier();
       const state = generateCodeVerifier(); // Use same function for state parameter
@@ -260,6 +272,15 @@ export const useAuth = (): AuthContext => {
         window.location.href = authUrl;
       }).catch(error => {
         console.error('Failed to generate OAuth parameters:', error);
+
+        // Track authentication error
+        trackError(
+          'auth_error',
+          error instanceof Error ? error.message : 'Failed to generate OAuth parameters',
+          'high',
+          'oauth_initiation'
+        );
+
         setAuthState(prev => ({
           ...prev,
           error: 'Failed to start authentication',
@@ -268,6 +289,15 @@ export const useAuth = (): AuthContext => {
       
     } catch (error) {
       console.error('Sign in failed:', error);
+
+      // Track authentication error
+      trackError(
+        'auth_error',
+        error instanceof Error ? error.message : 'Sign in failed',
+        'high',
+        'signin_general'
+      );
+
       setAuthState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Sign in failed',
@@ -277,6 +307,9 @@ export const useAuth = (): AuthContext => {
 
   const signOut = useCallback(async (): Promise<void> => {
     try {
+      // Track logout event before clearing tokens
+      trackLogout();
+
       // Clear local tokens
       sessionStorage.removeItem('cognito_access_token');
       sessionStorage.removeItem('cognito_id_token');
@@ -367,10 +400,25 @@ export const useAuth = (): AuthContext => {
         scopes,
         permissions,
       });
+
+      // Update user properties after session refresh
+      const organizationId = userInfo.identities?.[0]?.userId || userInfo.username;
+      setUserProperties({
+        user_type: 'authenticated',
+        organization_id: organizationId,
+      });
       
     } catch (error) {
       console.error('Session refresh failed:', error);
-      
+
+      // Track authentication error
+      trackError(
+        'auth_error',
+        error instanceof Error ? error.message : 'Session refresh failed',
+        'medium',
+        'session_refresh'
+      );
+
       // Clear invalid tokens
       sessionStorage.removeItem('cognito_access_token');
       sessionStorage.removeItem('cognito_id_token');

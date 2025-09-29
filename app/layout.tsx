@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 // Fail-fast environment validation - must be at the top level
 import { validateEnvironmentOrThrow } from '@/utils/env-validation';
+import { GA_TRACKING_ID } from '@/utils/analytics';
 
 // Validate environment variables before app initialization
 if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
@@ -57,6 +59,7 @@ export default function RootLayout({
       >
         {children}
       </body>
+      <GoogleAnalytics gaId={GA_TRACKING_ID} />
     </html>
   );
 }
