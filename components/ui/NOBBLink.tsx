@@ -11,9 +11,10 @@ interface NOBBLinkProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   displayText?: string; // Optional custom text to display instead of "NOBB"
+  onClick?: () => void; // Analytics tracking callback
 }
 
-export function NOBBLink({ vvsNumber, className, size = 'sm', displayText }: NOBBLinkProps) {
+export function NOBBLink({ vvsNumber, className, size = 'sm', displayText, onClick }: NOBBLinkProps) {
   // Convert to string and validate VVS number
   const vvsStr = String(vvsNumber).trim();
   
@@ -44,6 +45,7 @@ export function NOBBLink({ vvsNumber, className, size = 'sm', displayText }: NOB
       href={nobbUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={onClick}
       className={clsx(
         'inline-flex items-center gap-1 bg-byggern-blue text-white rounded-md font-medium hover:bg-byggern-blue/90 transition-colors focus:outline-none focus:ring-2 focus:ring-byggern-blue focus:ring-offset-2',
         sizeClasses[size],

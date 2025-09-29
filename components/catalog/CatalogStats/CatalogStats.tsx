@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { StatCard } from '../StatCard/StatCard';
 import { useCatalogStats } from '@/hooks/useCatalogStats';
 import { formatDistanceToNow } from '@/utils/date-helpers';
@@ -12,10 +12,29 @@ import {
   CalendarIcon
 } from '@/components/ui/icons';
 
-export const CatalogStats: FC = () => {
+interface CatalogStatsProps {
+  onStatsView?: (totalProducts: number, totalSuppliers: number, lastUpdated?: string) => void;
+}
+
+export const CatalogStats: FC<CatalogStatsProps> = ({ onStatsView }) => {
   const { stats, isLoading, isError } = useCatalogStats();
   const { authState } = useAuth();
   const { isAuthenticated, user } = authState;
+
+  // Track catalog stats view when stats are loaded
+  useEffect(() => {
+    if (!isLoading && !isError && stats && onStatsView) {
+      const lastUpdated = stats.lastPriceUpdate > stats.lastStockUpdate
+        ? stats.lastPriceUpdate
+        : stats.lastStockUpdate;
+
+      onStatsView(
+        stats.totalProducts,
+        stats.totalSuppliers,
+        lastUpdated
+      );
+    }
+  }, [isLoading, isError, stats, onStatsView]);
 
   // Generate personalized greeting
   const getGreeting = (): string => {

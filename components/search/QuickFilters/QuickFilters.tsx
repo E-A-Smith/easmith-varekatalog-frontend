@@ -8,10 +8,9 @@
 
 'use client';
 
-import { FC, useState, useEffect, useMemo } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { QuickFiltersProps, FilterState } from './types';
-import { validateFilterValue } from '@/utils/filter-helpers';
 
 export const QuickFilters: FC<QuickFiltersProps> = ({
   onFiltersChange,
@@ -19,7 +18,6 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
   supplierOptions,
   categoryOptions,
   filters: controlledFilters,
-  onFiltersReset
 }) => {
   // Use controlled filters if provided, otherwise use internal state
   const [internalFilters, setInternalFilters] = useState<FilterState>({
@@ -53,26 +51,8 @@ export const QuickFilters: FC<QuickFiltersProps> = ({
     [categoryOptions]
   );
   
-  // Validate current filter values against available options
-  useEffect(() => {
-    const validatedSupplier = validateFilterValue(filters.supplier, currentSupplierOptions);
-    const validatedCategory = validateFilterValue(filters.category, currentCategoryOptions);
-    
-    if (validatedSupplier !== filters.supplier || validatedCategory !== filters.category) {
-      const resetFilters = {
-        ...filters,
-        supplier: validatedSupplier,
-        category: validatedCategory
-      };
-      
-      if (controlledFilters && onFiltersReset) {
-        onFiltersReset(resetFilters);
-      } else {
-        setInternalFilters(resetFilters);
-        onFiltersChange?.(resetFilters);
-      }
-    }
-  }, [currentSupplierOptions, currentCategoryOptions, filters, controlledFilters, onFiltersReset, onFiltersChange]);
+  // Removed automatic filter validation to prevent infinite loops
+  // Filters will remain stable even when search results change available options
 
 
 

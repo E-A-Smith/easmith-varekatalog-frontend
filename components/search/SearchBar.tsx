@@ -57,7 +57,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     // Set new timer for delayed search
     debounceTimerRef.current = setTimeout(() => {
       if (searchQuery.trim().length >= 2 || searchQuery.trim().length === 0) {
-        handleSearch();
+        // Call onSearch directly to avoid dependency on handleSearch
+        const searchTerm = searchQuery.trim();
+        if (searchTerm || searchTerm === '') {
+          onSearch(searchTerm);
+        }
       }
     }, 500); // 500ms delay for Norwegian typing
 
@@ -66,7 +70,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [searchQuery, enableInstantSearch, handleSearch]);
+  }, [searchQuery, enableInstantSearch, onSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {

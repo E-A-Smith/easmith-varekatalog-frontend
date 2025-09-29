@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Table, Pagination } from '../components/ui';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { NOBBLink } from '../components/ui/NOBBLink';
@@ -12,7 +12,7 @@ import { FilterState } from '../components/search/QuickFilters/types';
 // Import centralized types
 import type { Product, LagerStatus } from '@/types/product';
 // Import filter helper utilities
-import { getUniqueSuppliers, getUniqueCategories, validateFilterValue, matchesSupplierFilter } from '@/utils/filter-helpers';
+import { getUniqueSuppliers, getUniqueCategories, matchesSupplierFilter } from '@/utils/filter-helpers';
 import { formatNorwegianPrice } from '@/utils/formatters';
 import { displayLH, isEmptyLH } from '@/utils/display-helpers';
 import { CatalogStats } from '@/components/catalog/CatalogStats';
@@ -86,10 +86,10 @@ export default function Dashboard() {
       label: 'NOBB', 
       align: 'center' as const,
       render: (value: unknown, row: unknown) => (
-        <NOBBLink 
-          vvsNumber={(row as Product).nobbNumber || ''} 
+        <NOBBLink
+          vvsNumber={(row as Product).nobbNumber || ''}
           displayText={(row as Product).nobbNumber || ''}
-          size="sm" 
+          size="sm"
         />
       )
     },
@@ -220,39 +220,35 @@ export default function Dashboard() {
     return getUniqueCategories(baseData);
   }, [baseData]);
 
-  // Validate current filter values against available options
-  const validatedFilters = useMemo(() => {
-    return {
-      supplier: validateFilterValue(filters.supplier, supplierOptions),
-      category: validateFilterValue(filters.category, categoryOptions),
-      stock: filters.stock // Stock options remain static
-    };
-  }, [filters, supplierOptions, categoryOptions]);
+  // Removed validatedFilters to prevent infinite loops - using filters directly
 
-  // Update filters if validation changed them
-  useEffect(() => {
-    if (validatedFilters.supplier !== filters.supplier || 
-        validatedFilters.category !== filters.category) {
-      setFilters(validatedFilters);
-    }
-  }, [validatedFilters, filters]);
-    
-  const filteredData = applyFilters(baseData, validatedFilters);
+  // Removed problematic filter validation useEffect to prevent infinite loops
+
+  const filteredData = applyFilters(baseData, filters);
 
   // Pagination calculations
   const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-  
+
   // Get paginated data
   const displayData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // Analytics tracking removed from useEffect to prevent infinite loops
+  // Tracking is now handled directly in the useProductSearch hook
+
   // Reset to first page when filters change
   const resetPagination = () => setCurrentPage(1);
+
+  // Search function - stabilized with useCallback to prevent SearchBar infinite loops
+  const handleSearch = useCallback(async (query: string) => {
+    // Just perform the search - no analytics here to avoid loops
+    await searchProducts(query);
+  }, [searchProducts]);
 
   // Handle pagination
   const handlePageChange = (page: number) => {
@@ -268,7 +264,7 @@ export default function Dashboard() {
       <SubHeader />
       
       {/* Main Header: Logo and search (56px) */}
-      <Header onSearch={searchProducts} />
+      <Header onSearch={handleSearch} />
       
       {/* Quick Filters section (36px) */}
       <QuickFilters 
@@ -277,10 +273,6 @@ export default function Dashboard() {
         filters={filters}
         onFiltersChange={(newFilters) => {
           setFilters(newFilters);
-          resetPagination();
-        }}
-        onFiltersReset={(resetFilters) => {
-          setFilters(resetFilters);
           resetPagination();
         }}
       />
