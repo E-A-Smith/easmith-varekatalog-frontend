@@ -7,7 +7,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-// import { trackLoginSuccess, trackError } from '@/utils/analytics'; // Temporarily disabled
+import { trackLoginSuccess, trackError } from '@/utils/analytics';
 
 // JWT token parsing utility
 interface JwtPayload {
@@ -75,13 +75,13 @@ function AuthCallbackContent() {
         if (error) {
           console.error('OAuth error:', error, errorDescription);
 
-          // Track authentication error - temporarily disabled
-          // trackError(
-          //   'auth_error',
-          //   errorDescription || error,
-          //   'high',
-          //   'oauth_callback'
-          // );
+          // Track authentication error
+          trackError(
+            'auth_error',
+            errorDescription || error,
+            'high',
+            'oauth_callback'
+          );
 
           setStatus('error');
           setError(`Authentisering feilet: ${errorDescription || error}`);
@@ -113,10 +113,10 @@ function AuthCallbackContent() {
           // Store Cognito tokens securely
           await storeCognitoTokensSecurely(tokenResponse);
 
-          // Track successful login - temporarily disabled
-          // const userPayload = parseJwtPayload(tokenResponse.id_token);
-          // const organizationId = userPayload.identities?.[0]?.userId || userPayload['cognito:username'] || userPayload.sub;
-          // trackLoginSuccess('azure_ad', organizationId);
+          // Track successful login
+          const userPayload = parseJwtPayload(tokenResponse.id_token);
+          const organizationId = userPayload.identities?.[0]?.userId || userPayload['cognito:username'] || userPayload.sub;
+          trackLoginSuccess('azure_ad', organizationId);
 
           setStatus('success');
 
@@ -131,13 +131,13 @@ function AuthCallbackContent() {
       } catch (err) {
         console.error('OAuth callback error:', err);
 
-        // Track authentication error - temporarily disabled
-        // trackError(
-        //   'auth_error',
-        //   err instanceof Error ? err.message : 'Ukjent feil under autentisering',
-        //   'high',
-        //   'oauth_token_exchange'
-        // );
+        // Track authentication error
+        trackError(
+          'auth_error',
+          err instanceof Error ? err.message : 'Ukjent feil under autentisering',
+          'high',
+          'oauth_token_exchange'
+        );
 
         setStatus('error');
         setError(err instanceof Error ? err.message : 'Ukjent feil under autentisering');
