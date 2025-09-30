@@ -295,6 +295,29 @@ export default function Dashboard() {
               <Table
                 data={displayData}
                 columns={tableColumns}
+                expandable={{
+                  expandedRowRender: (product: Product) => {
+                    // Display produktBeskrivelse if available
+                    if (product.beskrivelse) {
+                      return (
+                        <div className="prose prose-sm max-w-none">
+                          <h4 className="text-sm font-semibold text-neutral-800 mb-2">Produktbeskrivelse</h4>
+                          <div
+                            className="text-sm text-neutral-700"
+                            dangerouslySetInnerHTML={{ __html: product.beskrivelse }}
+                          />
+                        </div>
+                      );
+                    }
+                    return (
+                      <p className="text-sm text-neutral-500 italic">Ingen beskrivelse tilgjengelig</p>
+                    );
+                  },
+                  rowExpandable: (product: Product) => {
+                    // Only allow expansion if there's a description
+                    return !!product.beskrivelse && product.beskrivelse.trim().length > 0;
+                  },
+                }}
               />
             ) : searchState.hasSearched ? (
               <div className="text-center py-12">

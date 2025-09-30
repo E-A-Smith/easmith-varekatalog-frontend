@@ -1,20 +1,14 @@
 /**
  * Table component for Varekatalog design system
- * Step 2.2: Enhanced with TypeScript types system support
+ * Enhanced with expandable rows functionality
  */
 
 import { forwardRef } from 'react';
 import { clsx } from 'clsx';
+import { ExpandableTableRow } from './Table/ExpandableTableRow';
+import type { TableColumn, TableProps } from './Table/types';
 
-// Define local type for table column
-interface ProductTableColumn {
-  key: string;
-  label: string;
-  align?: 'left' | 'center' | 'right';
-  render?: (value: unknown, row: Product) => React.ReactNode;
-}
-
-// Define local Product interface
+// Define local Product interface for backward compatibility
 interface Product {
   id: string;
   navn: string;
@@ -30,20 +24,12 @@ interface Product {
   enhet?: string;
 }
 
-interface TableColumn<T = Record<string, unknown>> {
+// Define local type for product table column (backward compatibility)
+interface ProductTableColumn {
   key: string;
   label: string;
   align?: 'left' | 'center' | 'right';
-  render?: (value: unknown, row: T) => React.ReactNode;
-}
-
-interface TableProps<T = Record<string, unknown>> {
-  data: T[];
-  columns: TableColumn<T>[];
-  loading?: boolean;
-  emptyMessage?: string;
-  onRowClick?: (row: T) => void;
-  className?: string;
+  render?: (value: unknown, row: Product) => React.ReactNode;
 }
 
 const tableStyles = {
@@ -63,6 +49,7 @@ function TableInner<T = Record<string, unknown>>(
     emptyMessage = 'Ingen data tilgjengelig',
     onRowClick,
     className,
+    expandable,
     ...props
   }: TableProps<T>,
   ref: React.ForwardedRef<HTMLTableElement>
@@ -84,6 +71,9 @@ function TableInner<T = Record<string, unknown>>(
     );
   }
 
+  // Determine if we should show expand column
+  const hasExpandableRows = !!expandable;
+
   return (
     <div className="w-full overflow-auto">
       <table
@@ -93,6 +83,13 @@ function TableInner<T = Record<string, unknown>>(
       >
         <thead className={tableStyles.header}>
           <tr>
+            {/* Expand column header (empty for icon) */}
+            {hasExpandableRows && (
+              <th className={clsx(tableStyles.headerCell, 'w-12')} aria-label="Utvid rad">
+                {/* Empty header for expand icon column */}
+              </th>
+            )}
+
             {columns.map((column) => (
               <th
                 key={column.key}
@@ -107,34 +104,51 @@ function TableInner<T = Record<string, unknown>>(
             ))}
           </tr>
         </thead>
-        
+
         <tbody>
-          {data.map((row, rowIndex) => (
-            <tr
-              key={rowIndex}
-              className={clsx(
-                tableStyles.row,
-                onRowClick && tableStyles.clickableRow
-              )}
-              onClick={() => onRowClick?.(row)}
-            >
-              {columns.map((column) => {
-                const value = (row as Record<string, unknown>)[column.key];
-                return (
-                  <td
-                    key={`${rowIndex}-${column.key}`}
-                    className={clsx(
-                      tableStyles.cell,
-                      column.align === 'center' && 'text-center',
-                      column.align === 'right' && 'text-right'
-                    )}
-                  >
-                    {column.render ? column.render(value, row) : (value as React.ReactNode)}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+          {data.map((row, rowIndex) => {
+            // If expandable config provided, use ExpandableTableRow
+            if (expandable) {
+              return (
+                <ExpandableTableRow
+                  key={rowIndex}
+                  row={row}
+                  rowIndex={rowIndex}
+                  columns={columns}
+                  expandableConfig={expandable}
+                  onRowClick={onRowClick}
+                />
+              );
+            }
+
+            // Otherwise, render standard row
+            return (
+              <tr
+                key={rowIndex}
+                className={clsx(
+                  tableStyles.row,
+                  onRowClick && tableStyles.clickableRow
+                )}
+                onClick={() => onRowClick?.(row)}
+              >
+                {columns.map((column) => {
+                  const value = (row as Record<string, unknown>)[column.key];
+                  return (
+                    <td
+                      key={`${rowIndex}-${column.key}`}
+                      className={clsx(
+                        tableStyles.cell,
+                        column.align === 'center' && 'text-center',
+                        column.align === 'right' && 'text-right'
+                      )}
+                    >
+                      {column.render ? column.render(value, row) : (value as React.ReactNode)}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
