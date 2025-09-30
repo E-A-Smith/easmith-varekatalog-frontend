@@ -59,8 +59,8 @@ export default function Dashboard() {
         );
       }
     },
-    { key: 'navn', label: 'Product Name' },
-    { key: 'produsent', label: 'Supplier' },
+    { key: 'navn', label: 'Produktnavn' },
+    { key: 'produsent', label: 'Leverandør' },
     { 
       key: 'lh', 
       label: 'LH', 
