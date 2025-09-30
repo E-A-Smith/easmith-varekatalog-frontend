@@ -134,7 +134,7 @@ export function ExpandableTableRow<T = Record<string, unknown>>({
       >
         {/* Expand icon cell */}
         {canExpand && (
-          <td className="px-4 py-3 text-sm">
+          <td className="px-4 py-2 text-sm">
             <div onClick={handleExpandIconClick}>
               <ExpandIcon
                 expanded={isExpanded}
@@ -152,10 +152,11 @@ export function ExpandableTableRow<T = Record<string, unknown>>({
             <td
               key={`${rowIndex}-${column.key}`}
               className={clsx(
-                'px-4 py-3 text-sm text-neutral-800',
+                'px-4 py-2 text-sm text-neutral-800',
                 column.align === 'center' && 'text-center',
                 column.align === 'right' && 'text-right'
               )}
+              style={column.width ? { width: column.width } : undefined}
             >
               {column.render ? column.render(value, row) : (value as ReactNode)}
             </td>

@@ -37,7 +37,7 @@ const tableStyles = {
   header: 'border-b border-neutral-200 bg-neutral-50',
   headerCell: 'px-4 py-3 text-left text-sm font-semibold text-neutral-800',
   row: 'border-b border-neutral-100 hover:bg-neutral-50/50 transition-colors',
-  cell: 'px-4 py-3 text-sm text-neutral-800',
+  cell: 'px-4 py-2 text-sm text-neutral-800',
   clickableRow: 'cursor-pointer hover:bg-byggern-blue/5',
 };
 
@@ -98,8 +98,11 @@ function TableInner<T = Record<string, unknown>>(
                   column.align === 'center' && 'text-center',
                   column.align === 'right' && 'text-right'
                 )}
+                style={column.width ? { width: column.width } : undefined}
               >
-                {column.label}
+                {column.label.split('\n').map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
               </th>
             ))}
           </tr>

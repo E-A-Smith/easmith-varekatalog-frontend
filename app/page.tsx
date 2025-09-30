@@ -93,19 +93,21 @@ export default function Dashboard() {
         />
       )
     },
-    { key: 'anbrekk', label: 'Anbr', align: 'center' as const },
-    { 
-      key: 'pakningAntall', 
-      label: '# i pakning', 
+    { key: 'anbrekk', label: 'Anbr', align: 'center' as const, width: '50px' },
+    {
+      key: 'pakningAntall',
+      label: '#\npakning',
       align: 'center' as const,
+      width: '60px',
       render: (value: unknown) => (
         <span className="text-neutral-700">{value as number}</span>
       )
     },
-    { 
-      key: 'lagerantall', 
-      label: 'Lagerantall', 
-      align: 'right' as const,
+    {
+      key: 'lagerantall',
+      label: 'Lager-\nantall',
+      align: 'center' as const,
+      width: '65px',
       render: (value: unknown) => {
         // Unauthenticated users: always show masking
         if (!isAuthenticated) {

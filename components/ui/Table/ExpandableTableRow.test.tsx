@@ -136,7 +136,9 @@ describe('ExpandableTableRow', () => {
     const row = screen.getAllByRole('button')[0]; // First button is the row itself when expandRowByClick is true
 
     // Press Enter to expand
-    fireEvent.keyDown(row, { key: 'Enter' });
+    if (row) {
+      fireEvent.keyDown(row, { key: 'Enter' });
+    }
 
     // Should be expanded now
     expect(screen.getByRole('button', { name: /skjul detaljer/i })).toBeInTheDocument();
@@ -162,7 +164,9 @@ describe('ExpandableTableRow', () => {
     const row = screen.getAllByRole('button')[0];
 
     // Press Space to expand
-    fireEvent.keyDown(row, { key: ' ' });
+    if (row) {
+      fireEvent.keyDown(row, { key: ' ' });
+    }
 
     // Should be expanded now
     expect(screen.getByRole('button', { name: /skjul detaljer/i })).toBeInTheDocument();
@@ -215,7 +219,9 @@ describe('ExpandableTableRow', () => {
     );
 
     const row = screen.getAllByRole('row')[0];
-    fireEvent.click(row);
+    if (row) {
+      fireEvent.click(row);
+    }
 
     expect(mockOnRowClick).toHaveBeenCalledWith(mockRow);
   });
