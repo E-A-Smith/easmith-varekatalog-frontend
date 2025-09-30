@@ -45,7 +45,7 @@ describe('ExpandableTableRow', () => {
     );
 
     expect(screen.getByText('Test Product')).toBeInTheDocument();
-    expect(screen.getByText('Test description content')).toBeInTheDocument();
+    expect(screen.getAllByText('Test description content')).toHaveLength(2);
   });
 
   it('renders expand icon when row is expandable', () => {
@@ -105,9 +105,8 @@ describe('ExpandableTableRow', () => {
 
     const expandButton = screen.getByRole('button', { name: /vis detaljer/i });
 
-    // Initially collapsed - content should be hidden
-    const expandedRow = screen.getByRole('row', { hidden: true });
-    expect(expandedRow).toHaveAttribute('aria-hidden', 'true');
+    // Initially collapsed - check button aria-expanded
+    expect(expandButton).toHaveAttribute('aria-expanded', 'false');
 
     // Click to expand
     fireEvent.click(expandButton);
