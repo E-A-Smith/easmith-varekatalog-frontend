@@ -59,8 +59,8 @@ export default function Dashboard() {
         );
       }
     },
-    { key: 'navn', label: 'Product Name' },
-    { key: 'produsent', label: 'Supplier' },
+    { key: 'navn', label: 'Produktnavn' },
+    { key: 'produsent', label: 'Leverandør' },
     { 
       key: 'lh', 
       label: 'LH', 
@@ -93,19 +93,21 @@ export default function Dashboard() {
         />
       )
     },
-    { key: 'anbrekk', label: 'Anbr', align: 'center' as const },
-    { 
-      key: 'pakningAntall', 
-      label: '# i pakning', 
+    { key: 'anbrekk', label: 'Anbr', align: 'center' as const, width: '50px' },
+    {
+      key: 'pakningAntall',
+      label: '#\npakning',
       align: 'center' as const,
+      width: '60px',
       render: (value: unknown) => (
         <span className="text-neutral-700">{value as number}</span>
       )
     },
-    { 
-      key: 'lagerantall', 
-      label: 'Lagerantall', 
-      align: 'right' as const,
+    {
+      key: 'lagerantall',
+      label: 'Lager-\nantall',
+      align: 'center' as const,
+      width: '65px',
       render: (value: unknown) => {
         // Unauthenticated users: always show masking
         if (!isAuthenticated) {
@@ -295,6 +297,29 @@ export default function Dashboard() {
               <Table
                 data={displayData}
                 columns={tableColumns}
+                expandable={{
+                  expandedRowRender: (product: Product) => {
+                    // Display produktBeskrivelse if available
+                    if (product.beskrivelse) {
+                      return (
+                        <div className="prose prose-sm max-w-none">
+                          <h4 className="text-sm font-semibold text-neutral-800 mb-2">Produktbeskrivelse</h4>
+                          <div
+                            className="text-sm text-neutral-700"
+                            dangerouslySetInnerHTML={{ __html: product.beskrivelse }}
+                          />
+                        </div>
+                      );
+                    }
+                    return (
+                      <p className="text-sm text-neutral-500 italic">Ingen beskrivelse tilgjengelig</p>
+                    );
+                  },
+                  rowExpandable: (product: Product) => {
+                    // Only allow expansion if there's a description
+                    return !!product.beskrivelse && product.beskrivelse.trim().length > 0;
+                  },
+                }}
               />
             ) : searchState.hasSearched ? (
               <div className="text-center py-12">
